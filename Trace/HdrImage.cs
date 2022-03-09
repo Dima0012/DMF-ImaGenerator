@@ -1,5 +1,5 @@
 ﻿namespace Trace;
-public class Class1
+public class HdrImage
 {
 
 }

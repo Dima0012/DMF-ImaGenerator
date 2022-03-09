@@ -2,7 +2,7 @@ using Xunit;
 
 namespace Trace.Tests;
 
-public class UnitTest1
+public class HdrImageTests
 {
     [Fact]
     public void Test1()

@@ -12,5 +12,5 @@ public struct Color
       this.b = b;
    }
    
-
+   
 }
