@@ -1,11 +1,11 @@
 ﻿namespace Trace;
 public struct Color
 {
-   private float r { get; set; } = 0.0;
-   private float g { get; set; } = 0.0;
-   private float b { get; set; } = 0.0;
+   private float r { get; }
+   private float g { get; }
+   private float b { get; }
 
-   public Colors( float r, float g, float b)
+   public Color( float r, float g, float b)
    {
       this.r = r;
       this.g = g;
