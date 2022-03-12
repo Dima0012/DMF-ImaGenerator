@@ -1,15 +1,16 @@
 ﻿namespace Trace;
+
 /// <summary>
-/// This class represents a HDR image as a matrix of element Color, each one representing a pixel.
+/// This class represents a HDR image as a matrix of Color elements, each one representing a pixel.
 /// </summary>
 public class HdrImage
 {
-    private int Height { get; set; }
-    private int Width { get; set; }
+    public int Height { get; set; }
+    public int Width { get; set; }
 
     private Color[] Pixels;
 
-    private HdrImage(int height, int width)
+    public HdrImage(int width, int height)
     {
         Height = height;
         Width = width;
@@ -21,23 +22,25 @@ public class HdrImage
         }
     }
 
-    private bool valid_coordinates(int x, int y)
+    public bool valid_coordinates(int x, int y)
     {
         return x >= 0 && x < Width && y >= 0 && y < Height;
     }
 
-    private int pixel_offset(int x, int y)
+    public int pixel_offset(int x, int y)
     {
         return y * Width + x;
     }
     
-    private Color GetPixel(int x, int y)
+    public Color GetPixel(int x, int y)
     {
-        return Pixels[pixel_offset(x,y)];
+        System.Diagnostics.Trace.Assert(valid_coordinates(x, y));
+        return Pixels[pixel_offset(x, y)];
     }
 
-    private void SetPixel(int x, int y, Color color)
+    public void SetPixel(int x, int y, Color color)
     {
-        Pixels[pixel_offset(x,y)] = color;
+        System.Diagnostics.Trace.Assert(valid_coordinates(x, y));
+        Pixels[pixel_offset(x, y)] = color;
     }
 }
