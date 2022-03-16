@@ -32,13 +32,13 @@ public class HdrImage
         return y * Width + x;
     }
     
-    public Color GetPixel(int x, int y)
+    public Color get_pixel(int x, int y)
     {
         System.Diagnostics.Trace.Assert(valid_coordinates(x, y));
         return Pixels[pixel_offset(x, y)];
     }
 
-    public void SetPixel(int x, int y, Color color)
+    public void set_pixel(int x, int y, Color color)
     {
         System.Diagnostics.Trace.Assert(valid_coordinates(x, y));
         Pixels[pixel_offset(x, y)] = color;

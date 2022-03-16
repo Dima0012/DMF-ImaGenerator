@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using Xunit;
 
 namespace Trace.Tests;
@@ -41,7 +43,38 @@ public class HdrImageTests
         HdrImage img = new HdrImage(7, 4);
 
         Color referenceColor = new Color(1.0f, 2.0f, 3.0f);
-        img.SetPixel(3, 2, referenceColor);
-        Assert.True(referenceColor.is_close(img.GetPixel(3, 2)));
+        img.set_pixel(3, 2, referenceColor);
+        Assert.True(referenceColor.is_close(img.get_pixel(3, 2)));
+    }
+
+    [Fact]
+    public void TestWrite_pfm()
+    {
+        HdrImage img = new HdrImage(3, 2);
+
+        img.set_pixel(0, 0, new Color(1.0e1f, 2.0e1f, 3.0e1f));
+        img.set_pixel(1, 0, new Color(4.0e1f, 5.0e1f, 6.0e1f));
+        img.set_pixel(2, 0, new Color(7.0e1f, 8.0e1f, 9.0e1f));
+        img.set_pixel(0, 1, new Color(1.0e2f, 2.0e2f, 3.0e2f));
+        img.set_pixel(1, 1, new Color(4.0e2f, 5.0e2f, 6.0e2f));
+        img.set_pixel(2, 1, new Color(7.0e2f, 8.0e2f, 9.0e2f));
+
+        //Little-endian format 
+        byte[] referenceBytes =
+        {
+            0x50, 0x46, 0x0a, 0x33, 0x20, 0x32, 0x0a, 0x2d, 0x31, 0x2e, 0x30, 0x0a,
+            0x00, 0x00, 0xc8, 0x42, 0x00, 0x00, 0x48, 0x43, 0x00, 0x00, 0x96, 0x43,
+            0x00, 0x00, 0xc8, 0x43, 0x00, 0x00, 0xfa, 0x43, 0x00, 0x00, 0x16, 0x44,
+            0x00, 0x00, 0x2f, 0x44, 0x00, 0x00, 0x48, 0x44, 0x00, 0x00, 0x61, 0x44,
+            0x00, 0x00, 0x20, 0x41, 0x00, 0x00, 0xa0, 0x41, 0x00, 0x00, 0xf0, 0x41,
+            0x00, 0x00, 0x20, 0x42, 0x00, 0x00, 0x48, 0x42, 0x00, 0x00, 0x70, 0x42,
+            0x00, 0x00, 0x8c, 0x42, 0x00, 0x00, 0xa0, 0x42, 0x00, 0x00, 0xb4, 0x42
+        };
+
+       // using (MemoryStream memStream = Memory<>.OpenWrite("file.pfm"))
+      //  {
+      //      img.write_pfm(memStream, -1.0);
+            
+     //   }
     }
 }

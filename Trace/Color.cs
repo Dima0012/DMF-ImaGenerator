@@ -65,16 +65,3 @@ public struct Color
         return "r: " + a.R + ", g: " + a.G + ", b: " + a.B;
     }
 }
-
-/* Alternatively, are_close as functions
-public bool are_close(double x, double y,
-    double epsilon = 1e-5) //should we put this function outside both the struct Color and the class HdrImage?
-{
-    return Math.Abs(x - y) < epsilon;
-}
-
-public bool are_colors_close(Color a, Color b)
-{
-    return are_close(a.R, b.R) && are_close(a.G, b.G) && are_close(a.B, b.B);
-}
-*/
