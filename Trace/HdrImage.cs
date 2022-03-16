@@ -1,4 +1,6 @@
-﻿namespace Trace;
+﻿using System.Text;
+
+namespace Trace;
 
 /// <summary>
 /// This class represents a HDR image as a matrix of Color elements, each one representing a pixel.
@@ -42,5 +44,46 @@ public class HdrImage
     {
         System.Diagnostics.Trace.Assert(valid_coordinates(x, y));
         Pixels[pixel_offset(x, y)] = color;
+    }
+
+    /// <summary>
+    /// Write a float number in a stream as a sequence of bytes.
+    /// </summary>
+    /// <param name="outputStream"> The output Stream to write the number onto.</param>
+    /// <param name="value"> The number to be written.</param>
+    /// <param name="endianness"> The endianness for writing the bytes; -1.0 for little endian, +1.0 for big endian</param>
+    private static void write_float(Stream outputStream, float value, double endianness)
+    {
+        var seq = BitConverter.GetBytes(value);
+        if ((endianness < 0 && !BitConverter.IsLittleEndian) || (endianness > 0 && BitConverter.IsLittleEndian))
+        {
+            Array.Reverse(seq);
+        }
+
+        outputStream.Write(seq, 0, seq.Length);
+    }
+
+    /// <summary>
+    /// Save an HDR image as a .pfm file.
+    /// </summary>
+    /// <param name="outputStream"> The output Stream where to save the file to.</param>
+    /// <param name="endianness"> The endianness for writing the bytes; -1.0 for little endian, +1.0 for big endian. </param>
+    public void write_pfm(Stream outputStream, double endianness)
+    {
+        // Define header
+        var header = Encoding.ASCII.GetBytes($"PF\n{Width} {Height}\n{endianness}\n");
+        outputStream.Write(header);
+
+        //Write image
+        for (int y = Height; y > 0; y--)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                var color = get_pixel(x, y);
+                write_float(outputStream, color.R, endianness);
+                write_float(outputStream, color.G, endianness);
+                write_float(outputStream, color.B, endianness);
+            }
+        }
     }
 }

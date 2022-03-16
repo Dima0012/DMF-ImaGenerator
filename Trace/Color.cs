@@ -4,9 +4,9 @@ namespace Trace;
 
 public struct Color
 {
-    private float R { get; set; }
-    private float G { get; set; }
-    private float B { get; set; }
+    public float R { get; set; }
+    public float G { get; set; }
+    public float B { get; set; }
 
     public Color()
     {
