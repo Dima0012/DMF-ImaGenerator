@@ -71,10 +71,27 @@ public class HdrImageTests
             0x00, 0x00, 0x8c, 0x42, 0x00, 0x00, 0xa0, 0x42, 0x00, 0x00, 0xb4, 0x42
         };
 
-       // using (MemoryStream memStream = Memory<>.OpenWrite("file.pfm"))
-      //  {
-      //      img.write_pfm(memStream, -1.0);
-            
-     //   }
+        // Writing img on memory stream
+        
+        // Need fix here, test doesn't work; find why.
+        using var memStream = new MemoryStream();
+        img.write_pfm(memStream, -1.0);
+        var buf = memStream.GetBuffer();
+
+        Assert.True(referenceBytes == buf);
+        
+
+        // Maybe try to test write_float? Also doesn't work
+        
+        // const float a = 2.0f;
+        // var aTest = BitConverter.GetBytes(a);
+        //
+        // img.write_float(memStream, a, -1.0);
+        //
+        // var b = memStream.GetBuffer();
+        //
+        // Assert.True(b == aTest);
+
+
     }
 }

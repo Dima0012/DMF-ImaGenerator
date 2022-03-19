@@ -52,14 +52,14 @@ public class HdrImage
     /// <param name="outputStream"> The output Stream to write the number onto.</param>
     /// <param name="value"> The number to be written.</param>
     /// <param name="endianness"> The endianness for writing the bytes; -1.0 for little endian, +1.0 for big endian</param>
-    private static void write_float(Stream outputStream, float value, double endianness)
+    public void write_float(Stream outputStream, float value, double endianness)
     {
         var seq = BitConverter.GetBytes(value);
         if ((endianness < 0 && !BitConverter.IsLittleEndian) || (endianness > 0 && BitConverter.IsLittleEndian))
         {
             Array.Reverse(seq);
         }
-
+        
         outputStream.Write(seq, 0, seq.Length);
     }
 
@@ -74,8 +74,8 @@ public class HdrImage
         var header = Encoding.ASCII.GetBytes($"PF\n{Width} {Height}\n{endianness}\n");
         outputStream.Write(header);
 
-        //Write image
-        for (int y = Height; y > 0; y--)
+        //Write image (from bottom left corner)
+        for (int y = Height - 1; y >= 0; y--)
         {
             for (int x = 0; x < Width; x++)
             {
