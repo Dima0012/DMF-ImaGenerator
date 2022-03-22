@@ -72,26 +72,36 @@ public class HdrImageTests
         };
 
         // Writing img on memory stream
-        
-        // Need fix here, test doesn't work; find why.
         using var memStream = new MemoryStream();
         img.write_pfm(memStream, -1.0);
         var buf = memStream.GetBuffer();
 
-        Assert.True(referenceBytes == buf);
+        for (var i = 0; i < referenceBytes.Length; i++)
+        {
+            Assert.True(referenceBytes[i] == buf[i]);
+        }
         
+        //Big-endian format 
+        byte[] referenceBytes_B =
+        {
+            0x50, 0x46, 0x0a, 0x33, 0x20, 0x32, 0x0a, 0x31, 0x2e, 0x30, 0x0a, 0x42,
+            0xc8, 0x00, 0x00, 0x43, 0x48, 0x00, 0x00, 0x43, 0x96, 0x00, 0x00, 0x43,
+            0xc8, 0x00, 0x00, 0x43, 0xfa, 0x00, 0x00, 0x44, 0x16, 0x00, 0x00, 0x44,
+            0x2f, 0x00, 0x00, 0x44, 0x48, 0x00, 0x00, 0x44, 0x61, 0x00, 0x00, 0x41,
+            0x20, 0x00, 0x00, 0x41, 0xa0, 0x00, 0x00, 0x41, 0xf0, 0x00, 0x00, 0x42,
+            0x20, 0x00, 0x00, 0x42, 0x48, 0x00, 0x00, 0x42, 0x70, 0x00, 0x00, 0x42,
+            0x8c, 0x00, 0x00, 0x42, 0xa0, 0x00, 0x00, 0x42, 0xb4, 0x00, 0x00
+        };
 
-        // Maybe try to test write_float? Also doesn't work
-        
-        // const float a = 2.0f;
-        // var aTest = BitConverter.GetBytes(a);
-        //
-        // img.write_float(memStream, a, -1.0);
-        //
-        // var b = memStream.GetBuffer();
-        //
-        // Assert.True(b == aTest);
+        // Writing img on memory stream
+        using var memStream_B = new MemoryStream();
+        img.write_pfm(memStream_B, 1.0);
+        var buf_B = memStream_B.GetBuffer();
 
+        for (var i = 0; i < referenceBytes_B.Length; i++)
+        {
+            Assert.True(referenceBytes_B[i] == buf_B[i]);
+        }
 
     }
 }

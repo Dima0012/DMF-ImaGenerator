@@ -52,7 +52,7 @@ public class HdrImage
     /// <param name="outputStream"> The output Stream to write the number onto.</param>
     /// <param name="value"> The number to be written.</param>
     /// <param name="endianness"> The endianness for writing the bytes; -1.0 for little endian, +1.0 for big endian</param>
-    public void write_float(Stream outputStream, float value, double endianness)
+    public static void write_float(Stream outputStream, float value, double endianness)
     {
         var seq = BitConverter.GetBytes(value);
         if ((endianness < 0 && !BitConverter.IsLittleEndian) || (endianness > 0 && BitConverter.IsLittleEndian))
@@ -70,8 +70,17 @@ public class HdrImage
     /// <param name="endianness"> The endianness for writing the bytes; -1.0 for little endian, +1.0 for big endian. </param>
     public void write_pfm(Stream outputStream, double endianness)
     {
+        string endianness_str;
+        if (endianness < 0)
+        {
+            endianness_str = "-1.0";
+        }
+        else
+        {
+            endianness_str = "1.0";
+        }
         // Define header
-        var header = Encoding.ASCII.GetBytes($"PF\n{Width} {Height}\n{endianness}\n");
+        var header = Encoding.ASCII.GetBytes($"PF\n{Width} {Height}\n{endianness_str}\n");
         outputStream.Write(header);
 
         //Write image (from bottom left corner)
