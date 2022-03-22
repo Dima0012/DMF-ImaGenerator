@@ -104,4 +104,21 @@ public class HdrImageTests
         }
 
     }
+
+    [Fact]
+    public void TestParseEndianness()
+    {
+        var img = new HdrImage(0,0);
+        
+        Assert.True( false == img._parse_endianness("1.0") );
+        Assert.True( true == img._parse_endianness("-1.0") );
+
+        // Throws exception (via lambda expression) and check if are raised correctly
+        Assert.Throws<InvalidPfmFileFormat>(() => img._parse_endianness("0.0") );
+        Assert.Throws<InvalidPfmFileFormat>(() => img._parse_endianness("abc") );
+        
+    }
+    
+    
+    
 }
