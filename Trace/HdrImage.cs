@@ -121,5 +121,35 @@ public class HdrImage
         byte[] cur_bytes = binReader.ReadBytes(4);
         float value = BitConverter.ToSingle( cur_bytes, 0 );
     }
-}
 
+    /// <summary>
+    /// Reads endianness from a PFM file and returns true if endianness matches computer endianness,
+    ///  otherwise returns false. 
+    /// </summary>
+    public bool _parse_endianness(string line)
+    {
+        double endianness;
+        try
+        {
+            endianness = Convert.ToDouble(line);
+        }
+        catch ( FormatException  err)
+        {
+            throw new InvalidPfmFileFormat("Missing endianness specification", err);
+        }
+
+        if ((endianness < 0 && !BitConverter.IsLittleEndian) || (endianness > 0 && BitConverter.IsLittleEndian) )
+        {
+            return false;
+        }
+
+        if (endianness == 0)
+        {
+            throw new InvalidPfmFileFormat("Invalid endianness specification, it cannot be zero");
+        }
+        
+        return true;
+
+
+    }
+}
