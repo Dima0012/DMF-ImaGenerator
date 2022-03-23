@@ -70,17 +70,17 @@ public class HdrImage
     /// <param name="endianness"> The endianness for writing the bytes; -1.0 for little endian, +1.0 for big endian. </param>
     public void write_pfm(Stream outputStream, double endianness)
     {
-        string endianness_str;
+        string endiannessStr;
         if (endianness < 0)
         {
-            endianness_str = "-1.0";
+            endiannessStr = "-1.0";
         }
         else
         {
-            endianness_str = "1.0";
+            endiannessStr = "1.0";
         }
         // Define header
-        var header = Encoding.ASCII.GetBytes($"PF\n{Width} {Height}\n{endianness_str}\n");
+        var header = Encoding.ASCII.GetBytes($"PF\n{Width} {Height}\n{endiannessStr}\n");
         outputStream.Write(header);
 
         //Write image (from bottom left corner)
@@ -104,14 +104,14 @@ public class HdrImage
 
         while (true)
         {
-            byte[] cur_byte = binReader.ReadBytes(1);
-            string cur_string = Encoding.ASCII.GetString(cur_byte);
+            byte[] curByte = binReader.ReadBytes(1);
+            string curString = Encoding.ASCII.GetString(curByte);
 
-            if (cur_string == "\n" || cur_string=="")
+            if (curString == "\n" || curString=="")
             {
                 return result;
             }
-            result += cur_string;
+            result += curString;
         }
     }
 
@@ -120,13 +120,15 @@ public class HdrImage
         BinaryReader binReader = new BinaryReader(inputStream);
         byte[] cur_bytes = binReader.ReadBytes(4);
         float value = BitConverter.ToSingle( cur_bytes, 0 );
+
+        return value;
     }
 
     /// <summary>
     /// Reads endianness from a PFM file and returns true if endianness matches computer endianness,
     ///  otherwise returns false. 
     /// </summary>
-    public bool _parse_endianness(string line)
+    public bool parse_endianness(string line)
     {
         double endianness;
         try
@@ -135,7 +137,7 @@ public class HdrImage
         }
         catch ( FormatException  err)
         {
-            throw new InvalidPfmFileFormat("Missing endianness specification", err);
+            throw new InvalidPfmFileFormat("Missing endianness specification.", err);
         }
 
         if ((endianness < 0 && !BitConverter.IsLittleEndian) || (endianness > 0 && BitConverter.IsLittleEndian) )
@@ -145,11 +147,46 @@ public class HdrImage
 
         if (endianness == 0)
         {
-            throw new InvalidPfmFileFormat("Invalid endianness specification, it cannot be zero");
+            throw new InvalidPfmFileFormat("Invalid endianness specification, it cannot be zero.");
         }
         
         return true;
-
-
     }
+    
+    /// <summary>
+    /// Reads a string and parses from it the width and height of the image,
+    /// returning it as a tuple of int.
+    /// </summary>
+    public (int, int) parse_img_size(string line)
+    {
+        var elements = line.Split(" ");
+    
+        if (elements.Length != 2)
+        {
+            throw new InvalidPfmFileFormat("Invalid image size specification.");
+        }
+    
+        int width = 0, height = 0;
+        
+        try
+        {
+            width = int.Parse(elements[0]);
+            height = int.Parse(elements[1]);
+    
+            if (width <= 0 || height <= 0)
+            {
+                throw new InvalidPfmFileFormat("width and height must be positive.");
+            }
+        }
+        catch (FormatException err)
+        {
+            throw new InvalidPfmFileFormat("Invalid width/height.", err);
+        }
+        
+        return (width, height);
+    }
+    
+    
+    
+    
 }
