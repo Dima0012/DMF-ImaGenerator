@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Text;
 using Xunit;
 
 namespace Trace.Tests;
@@ -102,6 +104,20 @@ public class HdrImageTests
         {
             Assert.True(referenceBytes_B[i] == buf_B[i]);
         }
+
+    }
+
+    [Fact]
+    public void test_pfm_read_line()
+    {
+        HdrImage img = new HdrImage(0,0);
+        
+        byte[] buf = Encoding.ASCII.GetBytes("hello\nworld");
+        using var memStream = new MemoryStream(buf);
+
+        Assert.True(img.read_line(memStream) == "hello");
+        Assert.True(img.read_line(memStream) == "world");
+        Assert.True(img.read_line(memStream) == "");
 
     }
 }

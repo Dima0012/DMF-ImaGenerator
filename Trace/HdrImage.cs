@@ -93,6 +93,33 @@ public class HdrImage
                 write_float(outputStream, color.G, endianness);
                 write_float(outputStream, color.B, endianness);
             }
+        }   
+    }
+
+    public string read_line(Stream inputStream)
+    {
+        string result = ""; 
+
+        BinaryReader binReader = new BinaryReader(inputStream);
+
+        while (true)
+        {
+            byte[] cur_byte = binReader.ReadBytes(1);
+            string cur_string = Encoding.ASCII.GetString(cur_byte);
+
+            if (cur_string == "\n" || cur_string=="")
+            {
+                return result;
+            }
+            result += cur_string;
         }
     }
+
+    public float read_float(Stream inputStream, bool endiannessBool)
+    {
+        BinaryReader binReader = new BinaryReader(inputStream);
+        byte[] cur_bytes = binReader.ReadBytes(4);
+        float value = BitConverter.ToSingle( cur_bytes, 0 );
+    }
 }
+
