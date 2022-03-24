@@ -2,14 +2,38 @@
 
 using System.Security.Cryptography;
 using System.Text;
+using SixLabors.ImageSharp.Memory;
 using Trace;
 
 Console.WriteLine("Hello, world!");
 
-var img = new HdrImage(0, 0);
+static void Main(string[] args)
+{
+    Parameters parameters = new Parameters();
+    try
+    {
+        parameters = new Parameters(args);
+    }
+    catch (RuntimeError err)
+    {
+        Console.WriteLine($"Error: {err}");
+        throw;
+    }
+    
+    using (Stream fileStreamIn = File.OpenRead(parameters.InputPfmFilename))
+    {
+        // this constructor is missing atm
+       // HdrImage img = new HdrImage(fileStreamIn);
+    }
 
-//(int a, int b) = img.parse_img_size("ss");
+    Console.WriteLine($"File {parameters.InputPfmFilename} has been read from disk.");
+    
+    HdrImage img = new HdrImage(2,1);//just to continue, must be removed later
+    img.normalize_image(parameters.Factor);
+    img.clamp_image();
 
+    img.write_ldr_image(parameters.OutputPngFilename, parameters.Gamma);
+    
+    Console.WriteLine($"File {parameters.OutputPngFilename} has been written to disk.");
 
-
-img.parse_img_size("-1 8");
+    }

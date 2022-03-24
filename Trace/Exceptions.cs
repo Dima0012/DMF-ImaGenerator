@@ -19,3 +19,17 @@ public partial class InvalidPfmFileFormat: FormatException
     }
 }
 
+public class RuntimeError: FormatException
+{
+    public RuntimeError(string message)
+        : base(message)
+    {
+    }
+    
+    public RuntimeError(string message, Exception err)
+        : base(message, err)
+    {
+    }
+
+}
+
