@@ -33,13 +33,16 @@ public class HdrImage
     {
         return y * Width + x;
     }
-    
+
     public Color get_pixel(int x, int y)
     {
         System.Diagnostics.Trace.Assert(valid_coordinates(x, y));
         return Pixels[pixel_offset(x, y)];
     }
-
+    
+    /// <summary>
+    /// Set the Color in Pixel with argument color, at coordinates (x,y). 
+    /// </summary>
     public void set_pixel(int x, int y, Color color)
     {
         System.Diagnostics.Trace.Assert(valid_coordinates(x, y));
@@ -59,7 +62,7 @@ public class HdrImage
         {
             Array.Reverse(seq);
         }
-        
+
         outputStream.Write(seq, 0, seq.Length);
     }
 
@@ -79,6 +82,7 @@ public class HdrImage
         {
             endiannessStr = "1.0";
         }
+
         // Define header
         var header = Encoding.ASCII.GetBytes($"PF\n{Width} {Height}\n{endiannessStr}\n");
         outputStream.Write(header);
@@ -93,12 +97,12 @@ public class HdrImage
                 write_float(outputStream, color.G, endianness);
                 write_float(outputStream, color.B, endianness);
             }
-        }   
+        }
     }
 
     public string read_line(Stream inputStream)
     {
-        string result = ""; 
+        string result = "";
 
         BinaryReader binReader = new BinaryReader(inputStream);
 
@@ -107,19 +111,30 @@ public class HdrImage
             byte[] curByte = binReader.ReadBytes(1);
             string curString = Encoding.ASCII.GetString(curByte);
 
-            if (curString == "\n" || curString=="")
+            if (curString == "\n" || curString == "")
             {
                 return result;
             }
+
             result += curString;
         }
     }
 
+    /// <summary>
+    /// Reads a float from an input stream.
+    /// The parameter endiannessBool checks if reversing the bytes is needed.
+    /// </summary>
     public float read_float(Stream inputStream, bool endiannessBool)
     {
-        BinaryReader binReader = new BinaryReader(inputStream);
-        byte[] cur_bytes = binReader.ReadBytes(4);
-        float value = BitConverter.ToSingle( cur_bytes, 0 );
+        var binReader = new BinaryReader(inputStream);
+
+        var curBytes = binReader.ReadBytes(4);
+        if (!endiannessBool)
+        {
+            Array.Reverse(curBytes);
+        }
+
+        var value = BitConverter.ToSingle(curBytes, 0);
 
         return value;
     }
@@ -135,12 +150,12 @@ public class HdrImage
         {
             endianness = Convert.ToDouble(line);
         }
-        catch ( FormatException  err)
+        catch (FormatException err)
         {
             throw new InvalidPfmFileFormat("Missing endianness specification.", err);
         }
 
-        if ((endianness < 0 && !BitConverter.IsLittleEndian) || (endianness > 0 && BitConverter.IsLittleEndian) )
+        if ((endianness < 0 && !BitConverter.IsLittleEndian) || (endianness > 0 && BitConverter.IsLittleEndian))
         {
             return false;
         }
@@ -149,10 +164,10 @@ public class HdrImage
         {
             throw new InvalidPfmFileFormat("Invalid endianness specification, it cannot be zero.");
         }
-        
+
         return true;
         
-    }
+}
     /// <summary>
     /// Reads a string and parses from it the width and height of the image,
     /// returning it as a tuple of int.
@@ -160,19 +175,19 @@ public class HdrImage
     public (int, int) parse_img_size(string line)
     {
         var elements = line.Split(" ");
-    
+
         if (elements.Length != 2)
         {
             throw new InvalidPfmFileFormat("Invalid image size specification.");
         }
-    
-        int width = 0, height = 0;
-        
+
+        int width, height;
+
         try
         {
             width = int.Parse(elements[0]);
             height = int.Parse(elements[1]);
-    
+
             if (width <= 0 || height <= 0)
             {
                 throw new InvalidPfmFileFormat("width and height must be positive.");
@@ -182,8 +197,47 @@ public class HdrImage
         {
             throw new InvalidPfmFileFormat("Invalid width/height.", err);
         }
-        
+
         return (width, height);
+    }
+
+    /// <summary>
+    /// Read a PFM file from an input stream, and load image on the HdrImage.
+    /// </summary>
+    public void read_pfm_image(Stream inputStream)
+    {
+        // Read magic
+        var magic = read_line(inputStream);
+        if (magic != "PF")
+        {
+            throw new InvalidPfmFileFormat("Invalid magic in PFM file.");
+        }
+
+        // Read img size
+        var imgSize = read_line(inputStream);
+        var (width, height) = parse_img_size(imgSize);
+
+        Width = width;
+        Height = height;
+
+        // Check endianness
+        var endiannessValue = read_line(inputStream);
+        var endiannessConsistency = parse_endianness(endiannessValue);
+
+        // Reads colors and set pixels
+        for (int y = Height - 1; y >= 0; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                var r = read_float(inputStream, endiannessConsistency);
+                var g = read_float(inputStream, endiannessConsistency);
+                var b = read_float(inputStream, endiannessConsistency);
+
+                var col = new Color(r, g, b);
+                
+                set_pixel(x,y, col);
+            }
+        }
     }
     
     public double average_luminosity(double delta = 1e-10)
