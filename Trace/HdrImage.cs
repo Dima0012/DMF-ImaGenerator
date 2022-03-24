@@ -42,7 +42,10 @@ public class HdrImage
         System.Diagnostics.Trace.Assert(valid_coordinates(x, y));
         return Pixels[pixel_offset(x, y)];
     }
-
+    
+    /// <summary>
+    /// Set the Color in Pixel with argument color, at coordinates (x,y). 
+    /// </summary>
     public void set_pixel(int x, int y, Color color)
     {
         System.Diagnostics.Trace.Assert(valid_coordinates(x, y));
@@ -120,11 +123,21 @@ public class HdrImage
         }
     }
 
+    /// <summary>
+    /// Reads a float from an input stream.
+    /// The parameter endiannessBool checks if reversing the bytes is needed.
+    /// </summary>
     public float read_float(Stream inputStream, bool endiannessBool)
     {
-        BinaryReader binReader = new BinaryReader(inputStream);
-        byte[] cur_bytes = binReader.ReadBytes(4);
-        float value = BitConverter.ToSingle(cur_bytes, 0);
+        var binReader = new BinaryReader(inputStream);
+
+        var curBytes = binReader.ReadBytes(4);
+        if (!endiannessBool)
+        {
+            Array.Reverse(curBytes);
+        }
+
+        var value = BitConverter.ToSingle(curBytes, 0);
 
         return value;
     }
@@ -156,7 +169,9 @@ public class HdrImage
         }
 
         return true;
-    }
+        
+}
+    
 
     /// <summary>
     /// Reads a string and parses from it the width and height of the image,
@@ -171,7 +186,7 @@ public class HdrImage
             throw new InvalidPfmFileFormat("Invalid image size specification.");
         }
 
-        int width = 0, height = 0;
+        int width, height;
 
         try
         {
@@ -191,6 +206,45 @@ public class HdrImage
         return (width, height);
     }
 
+    /// <summary>
+    /// Read a PFM file from an input stream, and load image on the HdrImage.
+    /// </summary>
+    public void read_pfm_image(Stream inputStream)
+    {
+        // Read magic
+        var magic = read_line(inputStream);
+        if (magic != "PF")
+        {
+            throw new InvalidPfmFileFormat("Invalid magic in PFM file.");
+        }
+
+        // Read img size
+        var imgSize = read_line(inputStream);
+        var (width, height) = parse_img_size(imgSize);
+
+        Width = width;
+        Height = height;
+
+        // Check endianness
+        var endiannessValue = read_line(inputStream);
+        var endiannessConsistency = parse_endianness(endiannessValue);
+
+        // Reads colors and set pixels
+        for (int y = Height - 1; y >= 0; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                var r = read_float(inputStream, endiannessConsistency);
+                var g = read_float(inputStream, endiannessConsistency);
+                var b = read_float(inputStream, endiannessConsistency);
+
+                var col = new Color(r, g, b);
+                
+                set_pixel(x,y, col);
+            }
+        }
+    }
+    
     public double average_luminosity(double delta = 1e-10)
     {
         double cumsum = 0;
