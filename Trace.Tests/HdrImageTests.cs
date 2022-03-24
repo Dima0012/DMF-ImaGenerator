@@ -1,7 +1,4 @@
-using System;
 using System.IO;
-using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
 using Xunit;
 
@@ -83,7 +80,7 @@ public class HdrImageTests
         {
             Assert.True(referenceBytesLe[i] == buf[i]);
         }
-        
+
         //Big-endian format 
         byte[] referenceBytesBe =
         {
@@ -105,51 +102,48 @@ public class HdrImageTests
         {
             Assert.True(referenceBytesBe[i] == buf_B[i]);
         }
-
     }
 
     [Fact]
     public void TestReadLine()
     {
-        HdrImage img = new HdrImage(0,0);
-        
+        HdrImage img = new HdrImage(0, 0);
+
         byte[] buf = Encoding.ASCII.GetBytes("hello\nworld");
         using var memStream = new MemoryStream(buf);
 
         Assert.True(img.read_line(memStream) == "hello");
         Assert.True(img.read_line(memStream) == "world");
         Assert.True(img.read_line(memStream) == "");
-
     }
 
     [Fact]
     public void TestParseEndianness()
     {
-        var img = new HdrImage(0,0);
-        
-        Assert.True( false == img.parse_endianness("1.0") );
-        Assert.True( true == img.parse_endianness("-1.0") );
+        var img = new HdrImage(0, 0);
+
+        Assert.True(false == img.parse_endianness("1.0"));
+        Assert.True(true == img.parse_endianness("-1.0"));
 
         // Throws exception (via lambda expression) and check if are raised correctly
-        Assert.Throws<InvalidPfmFileFormat>(() => img.parse_endianness("0.0") );
-        Assert.Throws<InvalidPfmFileFormat>(() => img.parse_endianness("abc") );
+        Assert.Throws<InvalidPfmFileFormat>(() => img.parse_endianness("0.0"));
+        Assert.Throws<InvalidPfmFileFormat>(() => img.parse_endianness("abc"));
     }
 
     [Fact]
     public void TestParseImgSize()
     {
         var img = new HdrImage(0, 0);
-        
+
         Assert.True(img.parse_img_size("3 2") == (3, 2));
-        
+
         // Throws exception (via lambda expression) and check if are raised correctly
-        Assert.Throws<InvalidPfmFileFormat>(() => img.parse_img_size("-1 3") );
-        Assert.Throws<InvalidPfmFileFormat>(() => img.parse_img_size("3 2 1") );
+        Assert.Throws<InvalidPfmFileFormat>(() => img.parse_img_size("-1 3"));
+        Assert.Throws<InvalidPfmFileFormat>(() => img.parse_img_size("3 2 1"));
     }
 
-
     [Fact]
-    public void TestReadWritePfm()
+    public void TestReadPfm()
     {
         //Little-endian format 
         byte[] referenceBytesLe =
@@ -162,11 +156,20 @@ public class HdrImageTests
             0x00, 0x00, 0x20, 0x42, 0x00, 0x00, 0x48, 0x42, 0x00, 0x00, 0x70, 0x42,
             0x00, 0x00, 0x8c, 0x42, 0x00, 0x00, 0xa0, 0x42, 0x00, 0x00, 0xb4, 0x42
         };
-        
-        
 
+        using var memStreamLe = new MemoryStream(referenceBytesLe);
+        var imgLe = new HdrImage(memStreamLe);
 
+        Assert.True(3 == imgLe.Width);
+        Assert.True(2 == imgLe.Height);
 
+        Assert.True(imgLe.get_pixel(0, 0).is_close((new Color(1.0e1f, 2.0e1f, 3.0e1f))));
+        Assert.True(imgLe.get_pixel(1, 0).is_close((new Color(4.0e1f, 5.0e1f, 6.0e1f))));
+        Assert.True(imgLe.get_pixel(2, 0).is_close((new Color(7.0e1f, 8.0e1f, 9.0e1f))));
+        Assert.True(imgLe.get_pixel(0, 1).is_close((new Color(1.0e2f, 2.0e2f, 3.0e2f))));
+        Assert.True(imgLe.get_pixel(0, 0).is_close((new Color(1.0e1f, 2.0e1f, 3.0e1f))));
+        Assert.True(imgLe.get_pixel(1, 1).is_close((new Color(4.0e2f, 5.0e2f, 6.0e2f))));
+        Assert.True(imgLe.get_pixel(2, 1).is_close((new Color(7.0e2f, 8.0e2f, 9.0e2f))));
 
 
         //Big-endian format 
@@ -180,38 +183,59 @@ public class HdrImageTests
             0x20, 0x00, 0x00, 0x42, 0x48, 0x00, 0x00, 0x42, 0x70, 0x00, 0x00, 0x42,
             0x8c, 0x00, 0x00, 0x42, 0xa0, 0x00, 0x00, 0x42, 0xb4, 0x00, 0x00
         };
-        
-        
-        
-        
+
+        using var memStreamBe = new MemoryStream(referenceBytesLe);
+        var imgBe = new HdrImage(memStreamBe);
+
+        Assert.True(3 == imgBe.Width);
+        Assert.True(2 == imgBe.Height);
+
+        Assert.True(imgBe.get_pixel(0, 0).is_close((new Color(1.0e1f, 2.0e1f, 3.0e1f))));
+        Assert.True(imgBe.get_pixel(1, 0).is_close((new Color(4.0e1f, 5.0e1f, 6.0e1f))));
+        Assert.True(imgBe.get_pixel(2, 0).is_close((new Color(7.0e1f, 8.0e1f, 9.0e1f))));
+        Assert.True(imgBe.get_pixel(0, 1).is_close((new Color(1.0e2f, 2.0e2f, 3.0e2f))));
+        Assert.True(imgBe.get_pixel(0, 0).is_close((new Color(1.0e1f, 2.0e1f, 3.0e1f))));
+        Assert.True(imgBe.get_pixel(1, 1).is_close((new Color(4.0e2f, 5.0e2f, 6.0e2f))));
+        Assert.True(imgBe.get_pixel(2, 1).is_close((new Color(7.0e2f, 8.0e2f, 9.0e2f))));
+    }
+
+    [Fact]
+    public void TestReadPfmWrong()
+    {
+        var img = new HdrImage(0, 0);
+        var buf = Encoding.ASCII.GetBytes("PF\n3 2\n-1.0\nstop");
+        using var memStream = new MemoryStream(buf);
+
+        // Check if a wrong PFM raises exceptions correctly.
+        Assert.Throws<InvalidPfmFileFormat>(() => img.read_pfm_image(memStream));
     }
 
     [Fact]
     public void TestAverageLuminosity()
     {
-        var img = new HdrImage(2,1);
+        var img = new HdrImage(2, 1);
         img.set_pixel(0, 0, new Color(5.0f, 10.0f, 15.0f));
         img.set_pixel(1, 0, new Color(500.0f, 1000.0f, 1500.0f));
-        Assert.True(img.double_is_close(100.0,img.average_luminosity(0.0)));
+        Assert.True(img.double_is_close(100.0, img.average_luminosity(0.0)));
     }
-    
+
     [Fact]
     public void TestDoubleClose()
     {
-        HdrImage img = new HdrImage(2,1);
+        HdrImage img = new HdrImage(2, 1);
         double a = 2.0;
-        Assert.True(img.double_is_close(a,2.0));
-        Assert.False(img.double_is_close(a,4.0));
+        Assert.True(img.double_is_close(a, 2.0));
+        Assert.False(img.double_is_close(a, 4.0));
     }
 
     [Fact]
     public void TestNormalizeImage()
     {
-        var img = new HdrImage(2,1);
+        var img = new HdrImage(2, 1);
         img.set_pixel(0, 0, new Color(5.0f, 10.0f, 15.0f));
         img.set_pixel(1, 0, new Color(500.0f, 1000.0f, 1500.0f));
-        
-        img.normalize_image(1000.0f,100.0f);
+
+        img.normalize_image(1000.0f, 100.0f);
         Assert.True(img.get_pixel(0, 0).is_close(new Color(0.5e2f, 1.0e2f, 1.5e2f)));
         Assert.True(img.get_pixel(1, 0).is_close(new Color(0.5e4f, 1.0e4f, 1.5e4f)));
     }
@@ -219,12 +243,12 @@ public class HdrImageTests
     [Fact]
     public void TestClampImage()
     {
-        var img = new HdrImage(2,1);
+        var img = new HdrImage(2, 1);
         img.set_pixel(0, 0, new Color(5.0e1f, 1.0e1f, 1.5e1f));
         img.set_pixel(1, 0, new Color(5.0e3f, 1.0e3f, 1.5e3f));
-        
+
         img.clamp_image();
-        
+
         //Just check that the R/G/B values are within the expected boundaries
         foreach (var curPixel in img.Pixels)
         {
@@ -233,5 +257,4 @@ public class HdrImageTests
             Assert.True(curPixel.B is >= 0 and <= 1);
         }
     }
-
 }

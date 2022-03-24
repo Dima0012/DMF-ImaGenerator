@@ -15,6 +15,11 @@ public class HdrImage
 
     public Color[] Pixels;
 
+    /// <summary>
+    /// Constructor that initialize a black image with the specified dimensions.
+    /// </summary>
+    /// <param name="width"> Width of the image in pixels.</param>
+    /// <param name="height"> Height of the image in pixels. </param>
     public HdrImage(int width, int height)
     {
         Height = height;
@@ -25,6 +30,21 @@ public class HdrImage
         {
             Pixels[i] = new Color();
         }
+    }
+
+    public HdrImage(Stream inputStream)
+    {
+        read_pfm_image(inputStream);
+    }
+
+    /// <summary>
+    /// Constructor that open the specified file and reads the image, initializing the instance.
+    /// </summary>
+    /// <param name="fileName"> Path of the image file to read. </param>
+    public HdrImage(string fileName)
+    {
+        using var fileStream = File.OpenRead(fileName);
+        read_pfm_image(fileStream);
     }
 
     public bool valid_coordinates(int x, int y)
@@ -42,7 +62,7 @@ public class HdrImage
         System.Diagnostics.Trace.Assert(valid_coordinates(x, y));
         return Pixels[pixel_offset(x, y)];
     }
-    
+
     /// <summary>
     /// Set the Color in Pixel with argument color, at coordinates (x,y). 
     /// </summary>
@@ -76,15 +96,7 @@ public class HdrImage
     /// <param name="endianness"> The endianness for writing the bytes; -1.0 for little endian, +1.0 for big endian. </param>
     public void write_pfm(Stream outputStream, double endianness)
     {
-        string endiannessStr;
-        if (endianness < 0)
-        {
-            endiannessStr = "-1.0";
-        }
-        else
-        {
-            endiannessStr = "1.0";
-        }
+        var endiannessStr = endianness < 0 ? "-1.0" : "1.0";
 
         // Define header
         var header = Encoding.ASCII.GetBytes($"PF\n{Width} {Height}\n{endiannessStr}\n");
@@ -131,14 +143,24 @@ public class HdrImage
     {
         var binReader = new BinaryReader(inputStream);
 
-        var curBytes = binReader.ReadBytes(4);
+        byte[] curBytes;
+        float value;
+
+        try
+        {
+            curBytes = binReader.ReadBytes(4);
+            value = BitConverter.ToSingle(curBytes, 0);
+        }
+        catch (ArgumentException err)
+        {
+            throw new InvalidPfmFileFormat("Impossible to read binary data from file.", err);
+        }
+
         if (!endiannessBool)
         {
             Array.Reverse(curBytes);
         }
-
-        var value = BitConverter.ToSingle(curBytes, 0);
-
+        
         return value;
     }
 
@@ -169,8 +191,8 @@ public class HdrImage
         }
 
         return true;
-        
-}
+    }
+
     
 
     /// <summary>
@@ -230,7 +252,8 @@ public class HdrImage
         var endiannessConsistency = parse_endianness(endiannessValue);
 
         // Reads colors and set pixels
-        for (int y = Height - 1; y >= 0; y++)
+        var imagePixels = new Color[Width * Height];
+        for (int y = Height - 1; y >= 0; y--)
         {
             for (int x = 0; x < Width; x++)
             {
@@ -239,12 +262,14 @@ public class HdrImage
                 var b = read_float(inputStream, endiannessConsistency);
 
                 var col = new Color(r, g, b);
-                
-                set_pixel(x,y, col);
+
+                imagePixels[pixel_offset(x, y)] = col;
             }
         }
+
+        Pixels = imagePixels;
     }
-    
+
     public double average_luminosity(double delta = 1e-10)
     {
         double cumsum = 0;
@@ -307,9 +332,7 @@ public class HdrImage
         }
 
         // Save the bitmap as a PNG file
-        using (Stream fileStream = File.OpenWrite(filename))
-        {
-            bitmap.Save(fileStream, new PngEncoder());
-        }
+        using Stream fileStream = File.OpenWrite(filename);
+        bitmap.Save(fileStream, new PngEncoder());
     }
 }
