@@ -1,4 +1,7 @@
 ﻿using System.Text;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Trace;
 
@@ -33,7 +36,7 @@ public class HdrImage
     {
         return y * Width + x;
     }
-    
+
     public Color get_pixel(int x, int y)
     {
         System.Diagnostics.Trace.Assert(valid_coordinates(x, y));
@@ -59,7 +62,7 @@ public class HdrImage
         {
             Array.Reverse(seq);
         }
-        
+
         outputStream.Write(seq, 0, seq.Length);
     }
 
@@ -79,6 +82,7 @@ public class HdrImage
         {
             endiannessStr = "1.0";
         }
+
         // Define header
         var header = Encoding.ASCII.GetBytes($"PF\n{Width} {Height}\n{endiannessStr}\n");
         outputStream.Write(header);
@@ -93,12 +97,12 @@ public class HdrImage
                 write_float(outputStream, color.G, endianness);
                 write_float(outputStream, color.B, endianness);
             }
-        }   
+        }
     }
 
     public string read_line(Stream inputStream)
     {
-        string result = ""; 
+        string result = "";
 
         BinaryReader binReader = new BinaryReader(inputStream);
 
@@ -107,10 +111,11 @@ public class HdrImage
             byte[] curByte = binReader.ReadBytes(1);
             string curString = Encoding.ASCII.GetString(curByte);
 
-            if (curString == "\n" || curString=="")
+            if (curString == "\n" || curString == "")
             {
                 return result;
             }
+
             result += curString;
         }
     }
@@ -119,7 +124,7 @@ public class HdrImage
     {
         BinaryReader binReader = new BinaryReader(inputStream);
         byte[] cur_bytes = binReader.ReadBytes(4);
-        float value = BitConverter.ToSingle( cur_bytes, 0 );
+        float value = BitConverter.ToSingle(cur_bytes, 0);
 
         return value;
     }
@@ -135,12 +140,12 @@ public class HdrImage
         {
             endianness = Convert.ToDouble(line);
         }
-        catch ( FormatException  err)
+        catch (FormatException err)
         {
             throw new InvalidPfmFileFormat("Missing endianness specification.", err);
         }
 
-        if ((endianness < 0 && !BitConverter.IsLittleEndian) || (endianness > 0 && BitConverter.IsLittleEndian) )
+        if ((endianness < 0 && !BitConverter.IsLittleEndian) || (endianness > 0 && BitConverter.IsLittleEndian))
         {
             return false;
         }
@@ -149,10 +154,10 @@ public class HdrImage
         {
             throw new InvalidPfmFileFormat("Invalid endianness specification, it cannot be zero.");
         }
-        
+
         return true;
-        
     }
+
     /// <summary>
     /// Reads a string and parses from it the width and height of the image,
     /// returning it as a tuple of int.
@@ -160,19 +165,19 @@ public class HdrImage
     public (int, int) parse_img_size(string line)
     {
         var elements = line.Split(" ");
-    
+
         if (elements.Length != 2)
         {
             throw new InvalidPfmFileFormat("Invalid image size specification.");
         }
-    
+
         int width = 0, height = 0;
-        
+
         try
         {
             width = int.Parse(elements[0]);
             height = int.Parse(elements[1]);
-    
+
             if (width <= 0 || height <= 0)
             {
                 throw new InvalidPfmFileFormat("width and height must be positive.");
@@ -182,10 +187,10 @@ public class HdrImage
         {
             throw new InvalidPfmFileFormat("Invalid width/height.", err);
         }
-        
+
         return (width, height);
     }
-    
+
     public double average_luminosity(double delta = 1e-10)
     {
         double cumsum = 0;
@@ -193,10 +198,10 @@ public class HdrImage
         {
             cumsum += Math.Log10(Pixels[i].luminosity() + delta);
         }
-        
+
         return Math.Pow(10, cumsum / Pixels.Length);
     }
-    
+
     public bool double_is_close(double a, double b, double epsilon = 1e-5)
     {
         return Math.Abs(a - b) < epsilon;
@@ -216,7 +221,7 @@ public class HdrImage
     {
         return x / (1 + x);
     }
-    
+
 
     public void clamp_image()
     {
@@ -225,6 +230,32 @@ public class HdrImage
             Pixels[i].R = clamp(Pixels[i].R);
             Pixels[i].G = clamp(Pixels[i].G);
             Pixels[i].B = clamp(Pixels[i].B);
+        }
+    }
+
+    public void write_ldr_image(string filename, float gamma)
+    {
+        // Create a sRGB bitmap
+        var bitmap = new Image<Rgb24>(Configuration.Default, Width, Height);
+
+        // The bitmap can be used as a matrix. To draw the pixels in the bitmap
+        // just use the syntax "bitmap[x, y]" like the following:
+        for (int y = 0; y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                var curColor = get_pixel(x, y);
+                byte curR = (byte) (255 * Math.Pow(curColor.R, 1 / gamma));
+                byte curG = (byte) (255 * Math.Pow(curColor.G, 1 / gamma));
+                byte curB = (byte) (255 * Math.Pow(curColor.B, 1 / gamma));
+                bitmap[x, y] = new Rgb24(curR, curG, curB); // Three "Byte" values!
+            }
+        }
+
+        // Save the bitmap as a PNG file
+        using (Stream fileStream = File.OpenWrite(filename))
+        {
+            bitmap.Save(fileStream, new PngEncoder());
         }
     }
 }

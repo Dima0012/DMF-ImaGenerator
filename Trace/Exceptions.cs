@@ -2,7 +2,7 @@ namespace Trace;
 /// <summary>
 /// Rudimentary implementation for a class exception.
 /// </summary>
-public class InvalidPfmFileFormat: FormatException
+public partial class InvalidPfmFileFormat: FormatException
 {
     public InvalidPfmFileFormat()
     {
