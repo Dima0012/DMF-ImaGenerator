@@ -108,7 +108,7 @@ public class HdrImageTests
     }
 
     [Fact]
-    public void test_pfm_read_line()
+    public void TestPfmReadLine()
     {
         HdrImage img = new HdrImage(0,0);
         
@@ -126,13 +126,24 @@ public class HdrImageTests
     {
         var img = new HdrImage(0,0);
         
-        Assert.True( false == img._parse_endianness("1.0") );
-        Assert.True( true == img._parse_endianness("-1.0") );
+        Assert.True( false == img.parse_endianness("1.0") );
+        Assert.True( true == img.parse_endianness("-1.0") );
 
         // Throws exception (via lambda expression) and check if are raised correctly
-        Assert.Throws<InvalidPfmFileFormat>(() => img._parse_endianness("0.0") );
-        Assert.Throws<InvalidPfmFileFormat>(() => img._parse_endianness("abc") );
+        Assert.Throws<InvalidPfmFileFormat>(() => img.parse_endianness("0.0") );
+        Assert.Throws<InvalidPfmFileFormat>(() => img.parse_endianness("abc") );
+    }
+
+    [Fact]
+    public void TestParseImgSize()
+    {
+        var img = new HdrImage(0, 0);
         
+        Assert.True(img.parse_img_size("3 2") == (3, 2));
+        
+        // Throws exception (via lambda expression) and check if are raised correctly
+        Assert.Throws<InvalidPfmFileFormat>(() => img.parse_img_size("-1 3") );
+        Assert.Throws<InvalidPfmFileFormat>(() => img.parse_img_size("3 2 1") );
     }
 
     [Fact]
