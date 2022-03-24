@@ -134,7 +134,53 @@ public class HdrImageTests
         Assert.Throws<InvalidPfmFileFormat>(() => img._parse_endianness("abc") );
         
     }
+
+    [Fact]
+    public void TestAverageLuminosity()
+    {
+        var img = new HdrImage(2,1);
+        img.set_pixel(0, 0, new Color(5.0f, 10.0f, 15.0f));
+        img.set_pixel(1, 0, new Color(500.0f, 1000.0f, 1500.0f));
+        Assert.True(img.double_is_close(100.0,img.average_luminosity(0.0)));
+    }
     
-    
-    
+    [Fact]
+    public void TestDoubleClose()
+    {
+        HdrImage img = new HdrImage(2,1);
+        double a = 2.0;
+        Assert.True(img.double_is_close(a,2.0));
+        Assert.False(img.double_is_close(a,4.0));
+    }
+
+    [Fact]
+    public void TestNormalizeImage()
+    {
+        var img = new HdrImage(2,1);
+        img.set_pixel(0, 0, new Color(5.0f, 10.0f, 15.0f));
+        img.set_pixel(1, 0, new Color(500.0f, 1000.0f, 1500.0f));
+        
+        img.normalize_image(1000.0f,100.0f);
+        Assert.True(img.get_pixel(0, 0).is_close(new Color(0.5e2f, 1.0e2f, 1.5e2f)));
+        Assert.True(img.get_pixel(1, 0).is_close(new Color(0.5e4f, 1.0e4f, 1.5e4f)));
+    }
+
+    [Fact]
+    public void TestClampImage()
+    {
+        var img = new HdrImage(2,1);
+        img.set_pixel(0, 0, new Color(5.0e1f, 1.0e1f, 1.5e1f));
+        img.set_pixel(1, 0, new Color(5.0e3f, 1.0e3f, 1.5e3f));
+        
+        img.clamp_image();
+        
+        //Just check that the R/G/B values are within the expected boundaries
+        foreach (var curPixel in img.Pixels)
+        {
+            Assert.True(curPixel.R is >= 0 and <= 1);
+            Assert.True(curPixel.G is >= 0 and <= 1);
+            Assert.True(curPixel.B is >= 0 and <= 1);
+        }
+    }
+
 }

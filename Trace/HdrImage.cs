@@ -10,7 +10,7 @@ public class HdrImage
     public int Height { get; set; }
     public int Width { get; set; }
 
-    private Color[] Pixels;
+    public Color[] Pixels;
 
     public HdrImage(int width, int height)
     {
@@ -115,12 +115,12 @@ public class HdrImage
         }
     }
 
-    public float read_float(Stream inputStream, bool endiannessBool)
-    {
-        BinaryReader binReader = new BinaryReader(inputStream);
-        byte[] cur_bytes = binReader.ReadBytes(4);
-        float value = BitConverter.ToSingle( cur_bytes, 0 );
-    }
+    // public float read_float(Stream inputStream, bool endiannessBool)
+    // {
+    //     BinaryReader binReader = new BinaryReader(inputStream);
+    //     byte[] cur_bytes = binReader.ReadBytes(4);
+    //     float value = BitConverter.ToSingle( cur_bytes, 0 );
+    // }
 
     /// <summary>
     /// Reads endianness from a PFM file and returns true if endianness matches computer endianness,
@@ -149,7 +149,47 @@ public class HdrImage
         }
         
         return true;
+        
+    }
+    
+    public double average_luminosity(double delta = 1e-10)
+    {
+        double cumsum = 0;
+        for (int i = 0; i < Height * Width; i++)
+        {
+            cumsum += Math.Log10(Pixels[i].luminosity() + delta);
+        }
+        
+        return Math.Pow(10, cumsum / Pixels.Length);
+    }
+    
+    public bool double_is_close(double a, double b, double epsilon = 1e-5)
+    {
+        return Math.Abs(a - b) < epsilon;
+    }
 
+    public void normalize_image(float factor, float? luminosity = null)
+    {
+        var lum = luminosity ?? average_luminosity();
+        for (int i = 0; i < Pixels.Length; ++i)
+        {
+            float alpha = (float) (factor / lum);
+            Pixels[i] *= alpha;
+        }
+    }
 
+    private float clamp(float x)
+    {
+        return x / (1 + x);
+    }
+
+    public void clamp_image()
+    {
+        for (int i = 0; i < Pixels.Length; ++i)
+        {
+            Pixels[i].R = clamp(Pixels[i].R);
+            Pixels[i].G = clamp(Pixels[i].G);
+            Pixels[i].B = clamp(Pixels[i].B);
+        }
     }
 }

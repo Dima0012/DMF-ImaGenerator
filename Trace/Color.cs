@@ -59,9 +59,19 @@ public struct Color
     {
         return Math.Abs(R - a.R) < epsilon && Math.Abs(G - a.G) < epsilon && Math.Abs(B - a.B) < epsilon;
     }
+    
+    public bool float_is_close(float a, float b, double epsilon = 1e-5)
+    {
+        return Math.Abs(a - b) < epsilon;
+    }
 
     public string to_string(Color a)
     {
         return "r: " + a.R + ", g: " + a.G + ", b: " + a.B;
+    }
+
+    public float luminosity()
+    {
+        return (Math.Max(R, Math.Max(G, B)) + Math.Min(R, Math.Min(G, B)))/2;
     }
 }
