@@ -38,7 +38,7 @@ public class HdrImage
     }
 
     /// <summary>
-    /// Constructor that open the specified file and reads the image, initializing the instance.
+    /// Constructor that open the specified file and reads the image, initializing a new instance of HdrImage.
     /// </summary>
     /// <param name="fileName"> Path of the image file to read. </param>
     public HdrImage(string fileName)
@@ -52,6 +52,9 @@ public class HdrImage
         return x >= 0 && x < Width && y >= 0 && y < Height;
     }
 
+    /// <summary>
+    /// Computes the 1D index given the pixel coordinates. 
+    /// </summary>
     public int pixel_offset(int x, int y)
     {
         return y * Width + x;
@@ -81,7 +84,7 @@ public class HdrImage
     public static void write_float(Stream outputStream, float value, double endianness)
     {
         var seq = BitConverter.GetBytes(value);
-        if ((endianness < 0 && !BitConverter.IsLittleEndian) || (endianness > 0 && BitConverter.IsLittleEndian))
+        if (endianness < 0 && !BitConverter.IsLittleEndian || endianness > 0 && BitConverter.IsLittleEndian)
         {
             Array.Reverse(seq);
         }
@@ -92,7 +95,7 @@ public class HdrImage
     /// <summary>
     /// Save an HDR image as a .pfm file.
     /// </summary>
-    /// <param name="outputStream"> The output Stream where to save the file to.</param>
+    /// <param name="outputStream"> The output Stream where to save the file to. </param>
     /// <param name="endianness"> The endianness for writing the bytes; -1.0 for little endian, +1.0 for big endian. </param>
     public void write_pfm(Stream outputStream, double endianness)
     {
@@ -115,6 +118,9 @@ public class HdrImage
         }
     }
 
+    /// <summary>
+    /// Read a line from the specified binary stream.
+    /// </summary>
     public string read_line(Stream inputStream)
     {
         string result = "";
@@ -160,7 +166,7 @@ public class HdrImage
         {
             Array.Reverse(curBytes);
         }
-        
+
         return value;
     }
 
@@ -193,7 +199,6 @@ public class HdrImage
         return true;
     }
 
-    
 
     /// <summary>
     /// Reads a string and parses from it the width and height of the image,
@@ -270,15 +275,20 @@ public class HdrImage
         Pixels = imagePixels;
     }
 
+    /// <summary>
+    /// Computes the average luminosity of an image, as the logarithmic average of single pixels'
+    /// luminosity. 
+    /// </summary>
+    /// <param name="delta"> Zero value for null luminosities. </param>
     public double average_luminosity(double delta = 1e-10)
     {
-        double cumsum = 0;
-        for (int i = 0; i < Height * Width; i++)
+        double cumSum = 0;
+        for (int i = 0; i < Pixels.Length; i++)
         {
-            cumsum += Math.Log10(Pixels[i].luminosity() + delta);
+            cumSum += Math.Log10(Pixels[i].luminosity() + delta);
         }
 
-        return Math.Pow(10, cumsum / Pixels.Length);
+        return Math.Pow(10, cumSum / Pixels.Length);
     }
 
     public bool double_is_close(double a, double b, double epsilon = 1e-5)
@@ -286,10 +296,14 @@ public class HdrImage
         return Math.Abs(a - b) < epsilon;
     }
 
+    /// <summary>
+    /// Normalize the HDR image to the specified luminosity and applies a correction with factor.
+    /// Default luminosity is the average luminosity of the image.
+    /// </summary>
     public void normalize_image(float factor, float? luminosity = null)
     {
         var lum = luminosity ?? average_luminosity();
-        for (int i = 0; i < Pixels.Length; ++i)
+        for (int i = 0; i < Pixels.Length; i++)
         {
             float alpha = (float) (factor / lum);
             Pixels[i] *= alpha;
@@ -301,10 +315,12 @@ public class HdrImage
         return x / (1 + x);
     }
 
-
+    /// <summary>
+    /// Clamp the image with the correction for light sources.
+    /// </summary>
     public void clamp_image()
     {
-        for (int i = 0; i < Pixels.Length; ++i)
+        for (int i = 0; i < Pixels.Length; i++)
         {
             Pixels[i].R = clamp(Pixels[i].R);
             Pixels[i].G = clamp(Pixels[i].G);
@@ -312,27 +328,32 @@ public class HdrImage
         }
     }
 
+    /// <summary>
+    /// Writes the image in LDR format as a .png file, with the specified name and applying the correction gamma.
+    /// It uses the library SixLabors.ImageSharp.
+    /// </summary>
+    /// <param name="filename"> Name of file saved. </param>
+    /// <param name="gamma"> Correction applied to the image. </param>
     public void write_ldr_image(string filename, float gamma)
     {
         // Create a sRGB bitmap
         var bitmap = new Image<Rgb24>(Configuration.Default, Width, Height);
 
-        // The bitmap can be used as a matrix. To draw the pixels in the bitmap
-        // just use the syntax "bitmap[x, y]" like the following:
+        // The bitmap can be used as a matrix.
         for (int y = 0; y < Height; y++)
         {
             for (int x = 0; x < Width; x++)
             {
                 var curColor = get_pixel(x, y);
-                byte curR = (byte) (255 * Math.Pow(curColor.R, 1 / gamma));
-                byte curG = (byte) (255 * Math.Pow(curColor.G, 1 / gamma));
-                byte curB = (byte) (255 * Math.Pow(curColor.B, 1 / gamma));
+                var curR = (byte) (255 * Math.Pow(curColor.R, 1 / gamma));
+                var curG = (byte) (255 * Math.Pow(curColor.G, 1 / gamma));
+                var curB = (byte) (255 * Math.Pow(curColor.B, 1 / gamma));
                 bitmap[x, y] = new Rgb24(curR, curG, curB); // Three "Byte" values!
             }
         }
 
         // Save the bitmap as a PNG file
-        using Stream fileStream = File.OpenWrite(filename);
+        using var fileStream = File.OpenWrite(filename);
         bitmap.Save(fileStream, new PngEncoder());
     }
 }

@@ -2,10 +2,10 @@ namespace Trace;
 
 public struct Parameters
 {
-    public string InputPfmFilename { get; set; } = "";
-    public float Factor { get; set; } = 0.2f;
-    public float Gamma { get; set; } = 1.0f;
-    public string OutputPngFilename { get; set; } = "";
+    public string InputPfmFilename { get; } = "";
+    public float Factor { get; } = 0.2f;
+    public float Gamma { get; } = 1.0f;
+    public string OutputPngFilename { get; } = "";
 
     public Parameters(string[] args)
     {
