@@ -78,7 +78,7 @@ public struct Color
 
     public string to_string()
     {
-        return "r: " + R + ", g: " + G + ", b: " + B;
+        return $"< r: {R}, b: {B}, g: {G} >";
     }
 
     /// <summary>
