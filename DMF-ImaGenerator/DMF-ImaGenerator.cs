@@ -20,6 +20,7 @@ Console.WriteLine($"File {parameters.InputPfmFilename} has been read from disk."
 img.normalize_image(parameters.Factor);
 img.clamp_image();
 
+Console.WriteLine(img.get_pixel(0,0).to_string());
 img.write_ldr_image(parameters.OutputPngFilename, parameters.Gamma);
 
 Console.WriteLine($"File {parameters.OutputPngFilename} has been written to disk.");
