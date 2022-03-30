@@ -76,9 +76,9 @@ public struct Color
         return Math.Abs(a - b) < epsilon;
     }
 
-    public string to_string(Color a)
+    public string to_string()
     {
-        return "r: " + a.R + ", g: " + a.G + ", b: " + a.B;
+        return $"< r: {R}, b: {B}, g: {G} >";
     }
 
     /// <summary>
