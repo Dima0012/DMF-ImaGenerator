@@ -21,7 +21,7 @@ public struct Color
         B = 0.0f;
     }
     /// <summary>
-    /// Initialize a new instance of Color, with specified component.
+    /// Initialize a new instance of Color, with the specified components.
     /// </summary>
     /// <param name="r"> The red component.</param>
     /// <param name="g"> The green component.</param>
