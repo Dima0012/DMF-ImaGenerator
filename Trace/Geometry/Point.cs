@@ -27,6 +27,31 @@ public struct Point
     {
         return new Point(p.X + v.X, p.Y + v.Y, p.Z + v.Z);
     }
+
+    public static Vec operator -(Point p, Point q)
+    {
+        return new Vec(p.X - q.X, p.Y - q.Y, p.Z - q.Z);
+    }
+
+    public static Point operator -(Point p, Vec v)
+    {
+        return new Point(p.X - v.X, p.Y - v.Y, p.Z - v.Z);
+    }
     
-    
+    public static Point operator *(Point p, float alpha)
+    {
+        return new Point(p.X * alpha, p.Y * alpha, p.Z * alpha);
+    }
+
+    public static Point operator *(float alpha, Point p)
+    {
+        return new Point(p.X * alpha, p.Y * alpha, p.Z * alpha);
+    }
+
+    public Vec to_vec()
+    {
+        return new Vec(X, Y, Z);
+    }
+
+
 }
