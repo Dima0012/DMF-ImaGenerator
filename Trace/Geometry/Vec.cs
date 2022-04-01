@@ -16,7 +16,7 @@ public struct Vec
 
     public string to_string()
     {
-        return $"< x: {X}, y: {Y}, z: {Z} >";
+        return $"Vec < x: {X}, y: {Y}, z: {Z} >";
     }
 
 

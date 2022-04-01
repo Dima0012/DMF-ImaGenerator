@@ -15,7 +15,7 @@ public struct Point
 
     public string to_string()
     {
-        return $"< x:{X}, y:{Y}, z:{Z} >";
+        return $"Point < x:{X}, y:{Y}, z:{Z} >";
     }
     
     public bool is_close(Point p, double epsilon = 1e-5)
