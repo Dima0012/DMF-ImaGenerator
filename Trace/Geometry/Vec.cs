@@ -29,17 +29,17 @@ public struct Vec
     {
         return new Vec(v.X + u.X, v.Y + u.Y, v.Z + u.Z);
     }
-    
+
     public static Vec operator -(Vec v, Vec u)
     {
         return new Vec(v.X - u.X, v.Y - u.Y, v.Z - u.Z);
     }
 
-    public static Vec operator *(Vec v,  float alpha)
+    public static Vec operator *(Vec v, float alpha)
     {
         return new Vec(v.X * alpha, v.Y * alpha, v.Z * alpha);
     }
-    
+
     public static Vec operator *(float alpha, Vec v)
     {
         return new Vec(v.X * alpha, v.Y * alpha, v.Z * alpha);
@@ -50,18 +50,39 @@ public struct Vec
         return new Vec(-X, -Y, -Z);
     }
 
-    public static Vec operator *(Vec v, Vec u)
+    public static double operator *(Vec v, Vec u)
     {
-        return new Vec(v.X * u.Y, v.Y * u.Y, v.Z * u.Z);
+        return v.X * u.X + v.Y * u.Y + v.Z * u.Z;
     }
 
     public Vec vec_prod(Vec v)
     {
         return new Vec(
-            Y*v.Z - Z*v.Y,
-            Z*v.X - X*v.Z,
-            X*v.Y - Y*v.X
-            );
+            Y * v.Z - Z * v.Y,
+            Z * v.X - X * v.Z,
+            X * v.Y - Y * v.X
+        );
     }
 
+    public double norm()
+    {
+        return Math.Sqrt(squared_norm());
+    }
+
+    public double squared_norm()
+    {
+        return X * X + Y * Y + Z * Z;
+    }
+
+    public void normalize()
+    {
+        X /= (float) norm();
+        Y /= (float) norm();
+        Z /= (float) norm();
+    }
+
+    // public Normal to_norm()
+    // {
+    //     return new Normal(X, Y, Z);
+    // }
 }
