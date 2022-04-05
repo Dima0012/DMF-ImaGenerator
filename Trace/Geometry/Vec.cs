@@ -110,8 +110,8 @@ public struct Vec
         Z /= (float) norm();
     }
 
-    // public Normal to_norm()
-    // {
-    //     return new Normal(X, Y, Z);
-    // }
+    public Normal to_normal()
+    {
+        return new Normal(X, Y, Z);
+    }
 }
