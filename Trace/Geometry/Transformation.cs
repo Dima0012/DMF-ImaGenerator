@@ -15,26 +15,29 @@ public struct Transformation
 
     public static bool are_matr_close(Matrix4x4 ma, Matrix4x4 mb)
     {
-        return Math.Abs(ma.M11 - mb.M11) < 1e-5 &&
-               Math.Abs(ma.M12 - mb.M12) < 1e-5 &&
-               Math.Abs(ma.M13 - mb.M13) < 1e-5 &&
-               Math.Abs(ma.M14 - mb.M14) < 1e-5 &&
-               Math.Abs(ma.M21 - mb.M21) < 1e-5 &&
-               Math.Abs(ma.M22 - mb.M22) < 1e-5 &&
-               Math.Abs(ma.M23 - mb.M23) < 1e-5 &&
-               Math.Abs(ma.M24 - mb.M24) < 1e-5 &&
-               Math.Abs(ma.M31 - mb.M31) < 1e-5 &&
-               Math.Abs(ma.M32 - mb.M32) < 1e-5 &&
-               Math.Abs(ma.M33 - mb.M33) < 1e-5 &&
-               Math.Abs(ma.M34 - mb.M34) < 1e-5 &&
-               Math.Abs(ma.M41 - mb.M41) < 1e-5 &&
-               Math.Abs(ma.M42 - mb.M42) < 1e-5 &&
-               Math.Abs(ma.M43 - mb.M43) < 1e-5 &&
-               Math.Abs(ma.M44 - mb.M44) < 1e-5; //seriously?? didn't find a way to access an element as "matrix[i,j]"
+        // return Math.Abs(ma.M11 - mb.M11) < 1e-5 &&
+        //        Math.Abs(ma.M12 - mb.M12) < 1e-5 &&
+        //        Math.Abs(ma.M13 - mb.M13) < 1e-5 &&
+        //        Math.Abs(ma.M14 - mb.M14) < 1e-5 &&
+        //        Math.Abs(ma.M21 - mb.M21) < 1e-5 &&
+        //        Math.Abs(ma.M22 - mb.M22) < 1e-5 &&
+        //        Math.Abs(ma.M23 - mb.M23) < 1e-5 &&
+        //        Math.Abs(ma.M24 - mb.M24) < 1e-5 &&
+        //        Math.Abs(ma.M31 - mb.M31) < 1e-5 &&
+        //        Math.Abs(ma.M32 - mb.M32) < 1e-5 &&
+        //        Math.Abs(ma.M33 - mb.M33) < 1e-5 &&
+        //        Math.Abs(ma.M34 - mb.M34) < 1e-5 &&
+        //        Math.Abs(ma.M41 - mb.M41) < 1e-5 &&
+        //        Math.Abs(ma.M42 - mb.M42) < 1e-5 &&
+        //        Math.Abs(ma.M43 - mb.M43) < 1e-5 &&
+        //        Math.Abs(ma.M44 - mb.M44) < 1e-5; //seriously?? didn't find a way to access an element as "matrix[i,j]"
+        
+        // new built-in method to check if are equal
+        return ma == mb;
     }
 
     /// <summary>
-    /// Check if the transformation passed as argument represents the same transform.
+    /// Check if the transformation passed as argument represents the same transformation.
     /// </summary>
     public bool is_transf_close(Transformation t)
     {
@@ -49,18 +52,19 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Return a :class:`.Transformation` object encoding a rigid translation.
+    /// Return a Transformation object encoding a rigid translation.
     /// The parameter `vec` specifies the amount of shift to be applied along the three axes.
-    /// /// </summary>
+    /// </summary>
     public Transformation translation(Vec vec)
     {
-        Matrix4x4 m = new Matrix4x4
-        (1.0f, 0.0f, 0.0f, vec.X,
+        Matrix4x4 m = new Matrix4x4(
+            1.0f, 0.0f, 0.0f, vec.X,
             0.0f, 1.0f, 0.0f, vec.Y,
             0.0f, 0.0f, 1.0f, vec.Z,
             0.0f, 0.0f, 0.0f, 1.0f);
-        Matrix4x4 invM = new Matrix4x4
-        (1.0f, 0.0f, 0.0f, -vec.X,
+        
+        Matrix4x4 invM = new Matrix4x4(
+            1.0f, 0.0f, 0.0f, -vec.X,
             0.0f, 1.0f, 0.0f, -vec.Y,
             0.0f, 0.0f, 1.0f, -vec.Z,
             0.0f, 0.0f, 0.0f, 1.0f);
@@ -69,18 +73,19 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Return a :class:`.Transformation` object encoding a scaling
-    /// The parameter `vec` specifies the amount of scaling along the three directions X, Y, Z.
-    /// /// </summary>
+    /// Return a Transformation object encoding a scaling.
+    /// The parameter vec specifies the amount of scaling along the three directions X, Y, Z.
+    /// </summary>
     public Transformation scaling(Vec vec)
     {
-        Matrix4x4 m = new Matrix4x4
-        (vec.X, 0.0f, 0.0f, 0.0f,
+        Matrix4x4 m = new Matrix4x4(
+            vec.X, 0.0f, 0.0f, 0.0f,
             0.0f, vec.Y, 0.0f, 0.0f,
             0.0f, 0.0f, vec.Z, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f);
-        Matrix4x4 invM = new Matrix4x4
-        (1 / vec.X, 0.0f, 0.0f, 0.0f,
+        
+        Matrix4x4 invM = new Matrix4x4(
+            1 / vec.X, 0.0f, 0.0f, 0.0f,
             0.0f, 1 / vec.Y, 0.0f, 0.0f,
             0.0f, 0.0f, 1 / vec.Z, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f);
@@ -89,21 +94,23 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Return a :class:`.Transformation` object encoding a rotation around the X axis
+    /// Return a Transformation object encoding a rotation around the X axis
     ///The parameter `angle_deg` specifies the rotation angle (in degrees).
     /// The positive sign is given by the right-hand rule.
-    /// /// </summary>
-    public Transformation rotation_x(float angle_deg)
+    /// </summary>
+    public Transformation rotation_x(float angleDeg)
     {
-        float sinang = (float) Math.Sin((Math.PI / 180) * angle_deg);
-        float cosang = (float) Math.Cos((Math.PI / 180) * angle_deg);
-        Matrix4x4 m = new Matrix4x4
-        (1.0f, 0.0f, 0.0f, 0.0f,
+        var sinang = (float) Math.Sin((Math.PI / 180) * angleDeg);
+        var cosang = (float) Math.Cos((Math.PI / 180) * angleDeg);
+        
+        Matrix4x4 m = new Matrix4x4(
+            1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, cosang, -sinang, 0.0f,
             0.0f, sinang, cosang, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f);
-        Matrix4x4 invM = new Matrix4x4
-        (1.0f, 0.0f, 0.0f, 0.0f,
+        
+        Matrix4x4 invM = new Matrix4x4(
+            1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, cosang, sinang, 0.0f,
             0.0f, -sinang, cosang, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f);
@@ -112,21 +119,23 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Return a :class:`.Transformation` object encoding a rotation around the Y axis
-    ///The parameter `angle_deg` specifies the rotation angle (in degrees).
+    /// Return a Transformation object encoding a rotation around the Y axis
+    /// The parameter angle_deg specifies the rotation angle (in degrees).
     /// The positive sign is given by the right-hand rule.
-    /// /// </summary>
-    public Transformation rotation_y(float angle_deg)
+    /// </summary>
+    public Transformation rotation_y(float angleDeg)
     {
-        float sinang = (float) Math.Sin((Math.PI / 180) * angle_deg);
-        float cosang = (float) Math.Cos((Math.PI / 180) * angle_deg);
-        Matrix4x4 m = new Matrix4x4
-        (cosang, 0.0f, sinang, 0.0f,
+        float sinang = (float) Math.Sin((Math.PI / 180) * angleDeg);
+        float cosang = (float) Math.Cos((Math.PI / 180) * angleDeg);
+        
+        Matrix4x4 m = new Matrix4x4(
+            cosang, 0.0f, sinang, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
             -sinang, 0.0f, cosang, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f);
-        Matrix4x4 invM = new Matrix4x4
-        (cosang, 0.0f, -sinang, 0.0f,
+        
+        Matrix4x4 invM = new Matrix4x4(
+            cosang, 0.0f, -sinang, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
             sinang, 0.0f, cosang, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f);
@@ -135,21 +144,23 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Return a :class:`.Transformation` object encoding a rotation around the Z axis
-    ///The parameter `angle_deg` specifies the rotation angle (in degrees).
+    /// Return a Transformation object encoding a rotation around the Z axis
+    /// The parameter angleDeg specifies the rotation angle (in degrees).
     /// The positive sign is given by the right-hand rule.
-    /// /// </summary>
-    public Transformation rotation_z(float angle_deg)
+    /// </summary>
+    public Transformation rotation_z(float angleDeg)
     {
-        float sinang = (float) Math.Sin((Math.PI / 180) * angle_deg);
-        float cosang = (float) Math.Cos((Math.PI / 180) * angle_deg);
-        Matrix4x4 m = new Matrix4x4
-        (cosang, -sinang, 0.0f, 0.0f,
+        float sinang = (float) Math.Sin((Math.PI / 180) * angleDeg);
+        float cosang = (float) Math.Cos((Math.PI / 180) * angleDeg);
+        
+        Matrix4x4 m = new Matrix4x4(
+            cosang, -sinang, 0.0f, 0.0f,
             sinang, cosang, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f);
-        Matrix4x4 invM = new Matrix4x4
-        (cosang, sinang, 0.0f, 0.0f,
+        
+        Matrix4x4 invM = new Matrix4x4(
+            cosang, sinang, 0.0f, 0.0f,
             -sinang, cosang, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f);
@@ -174,9 +185,11 @@ public struct Transformation
     public static Point operator *(Transformation t, Point p)
     {
         var m = t.M;
-        var resultPoint = new Point(p.X * m.M11 + p.Y * m.M12 + p.Z * m.M13 + m.M14,
+        var resultPoint = new Point(
+            p.X * m.M11 + p.Y * m.M12 + p.Z * m.M13 + m.M14,
             p.X * m.M21 + p.Y * m.M22 + p.Z * m.M23 + m.M24,
             p.X * m.M31 + p.Y * m.M32 + p.Z * m.M33 + m.M34);
+        
         var w = p.X * m.M41 + p.Y * m.M42 + p.Z * m.M43 + m.M44;
 
         if (Math.Abs(w - 1f) < 1e-5) //he used w == 1.0, what's better?
@@ -192,7 +205,8 @@ public struct Transformation
     public static Vec operator *(Transformation t, Vec vec)
     {
         var m = t.M;
-        var resultVec = new Vec(vec.X * m.M11 + vec.Y * m.M12 + vec.Z * m.M13,
+        var resultVec = new Vec(
+            vec.X * m.M11 + vec.Y * m.M12 + vec.Z * m.M13,
             vec.X * m.M21 + vec.Y * m.M22 + vec.Z * m.M23,
             vec.X * m.M31 + vec.Y * m.M32 + vec.Z * m.M33);
 
@@ -202,7 +216,8 @@ public struct Transformation
     public static Normal operator *(Transformation t, Normal n)
     {
         var invM = t.InvM;
-        var resultNormal = new Normal(n.X * invM.M11 + n.Y * invM.M21 + n.Z * invM.M31,
+        var resultNormal = new Normal(
+            n.X * invM.M11 + n.Y * invM.M21 + n.Z * invM.M31,
             n.X * invM.M12 + n.Y * invM.M22 + n.Z * invM.M32,
             n.X * invM.M13 + n.Y * invM.M23 + n.Z * invM.M33);
 
