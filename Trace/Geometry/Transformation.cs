@@ -4,13 +4,19 @@ namespace Trace.Geometry;
 
 public struct Transformation
 {
-    public Matrix4x4 M { get; set; } = Matrix4x4.Identity;
-    public Matrix4x4 InvM { get; set; } = Matrix4x4.Identity;
+    public Matrix4x4 M { get; set; }
+    public Matrix4x4 InvM { get; set; }
 
     public Transformation(Matrix4x4 m, Matrix4x4 invM)
     {
         M = m;
         InvM = invM;
+    }
+    
+    public Transformation()
+    {
+        M = Matrix4x4.Identity;
+        InvM = Matrix4x4.Identity;
     }
 
     public static bool are_matr_close(Matrix4x4 ma, Matrix4x4 mb)
