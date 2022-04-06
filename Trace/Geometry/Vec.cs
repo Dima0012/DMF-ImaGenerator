@@ -25,7 +25,7 @@ public struct Vec
     /// <summary>
     /// Checks if two Vectors are equal within a epsilon threshold.
     /// </summary>
-    public bool is_close(Vec v, double epsilon = 10e-5)
+    public bool is_close(Vec v, double epsilon = 1e-5)
     {
         return Math.Abs(X - v.X) < epsilon && Math.Abs(Y - v.Y) < epsilon && Math.Abs(Z - v.Z) < epsilon;
     }
