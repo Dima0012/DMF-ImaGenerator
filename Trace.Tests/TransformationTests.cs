@@ -89,7 +89,7 @@ public class TransformationTests
 
         var tExp = new Transformation(mExp, invmExp);
 
-        Assert.True(tExp.is_consistent());
+        Assert.True(tExp.is_consistent(1e-4));
         Assert.True(tExp.is_transf_close(t1*t2));
     }
 
