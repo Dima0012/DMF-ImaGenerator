@@ -21,22 +21,23 @@ public struct Transformation
 
     public static bool are_matr_close(Matrix4x4 ma, Matrix4x4 mb)
     {
-         return Math.Abs(ma.M11 - mb.M11) < 1e-5 &&
-                Math.Abs(ma.M12 - mb.M12) < 1e-5 &&
-                Math.Abs(ma.M13 - mb.M13) < 1e-5 &&
-                Math.Abs(ma.M14 - mb.M14) < 1e-5 &&
-                Math.Abs(ma.M21 - mb.M21) < 1e-5 &&
-                Math.Abs(ma.M22 - mb.M22) < 1e-5 &&
-                Math.Abs(ma.M23 - mb.M23) < 1e-5 &&
-                Math.Abs(ma.M24 - mb.M24) < 1e-5 &&
-                Math.Abs(ma.M31 - mb.M31) < 1e-5 &&
-                Math.Abs(ma.M32 - mb.M32) < 1e-5 &&
-                Math.Abs(ma.M33 - mb.M33) < 1e-5 && 
-                Math.Abs(ma.M34 - mb.M34) < 1e-5 &&
-                Math.Abs(ma.M41 - mb.M41) < 1e-5 &&
-                Math.Abs(ma.M42 - mb.M42) < 1e-5 &&
-                Math.Abs(ma.M43 - mb.M43) < 1e-5 &&
-                Math.Abs(ma.M44 - mb.M44) < 1e-5; //seriously?? didn't find a way to access an element as "matrix[i,j]"
+        var epsilon = 1e-5;
+         return Math.Abs(ma.M11 - mb.M11) < epsilon &&
+                Math.Abs(ma.M12 - mb.M12) < epsilon &&
+                Math.Abs(ma.M13 - mb.M13) < epsilon &&
+                Math.Abs(ma.M14 - mb.M14) < epsilon &&
+                Math.Abs(ma.M21 - mb.M21) < epsilon &&
+                Math.Abs(ma.M22 - mb.M22) < epsilon &&
+                Math.Abs(ma.M23 - mb.M23) < epsilon &&
+                Math.Abs(ma.M24 - mb.M24) < epsilon &&
+                Math.Abs(ma.M31 - mb.M31) < epsilon &&
+                Math.Abs(ma.M32 - mb.M32) < epsilon &&
+                Math.Abs(ma.M33 - mb.M33) < epsilon && 
+                Math.Abs(ma.M34 - mb.M34) < epsilon &&
+                Math.Abs(ma.M41 - mb.M41) < epsilon &&
+                Math.Abs(ma.M42 - mb.M42) < epsilon &&
+                Math.Abs(ma.M43 - mb.M43) < epsilon &&
+                Math.Abs(ma.M44 - mb.M44) < epsilon; //seriously?? didn't find a way to access an element as "matrix[i,j]"
         
         // new built-in method to check if are equal
        // return ma == mb;
