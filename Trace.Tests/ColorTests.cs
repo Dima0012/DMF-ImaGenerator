@@ -42,7 +42,7 @@ public class ColorTests
     [Fact]
     public void TestProd()
     {
-        Color a1 = new Color(0.0f, 2.0f, 3.0f);
+        Color a1 = new Color(1.0f, 2.0f, 3.0f);
         Color b1 = new Color(5.0f, 7.0f, 9.0f);
         Assert.True((a1 * b1).is_close(new Color(5.0f, 14.0f, 27.0f)));
     }
