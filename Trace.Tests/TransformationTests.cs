@@ -29,10 +29,10 @@ public class TransformationTests
         Assert.True(t1.is_transf_close(t2));
 
         Matrix4x4 m3 = t1.M;
-        m3.M33 += 1.0f; 
+        m3.M33 += 1.0f;
         var t3 = new Transformation(m3, t1.InvM);
         Assert.False(t1.is_transf_close(t3));
-        
+
         Matrix4x4 invm4 = t1.InvM;
         invm4.M33 += 1.0f;
         var t4 = new Transformation(t1.M, invm4);
@@ -79,7 +79,7 @@ public class TransformationTests
             89.0f, 84.0f, 40.0f, 58.0f,
             118.0f, 106.0f, 48.0f, 88.0f,
             63.0f, 51.0f, 22.0f, 50.0f);
-        
+
         var invmExp = new Matrix4x4(
             -1.45f, 1.45f, -1.0f, 0.6f,
             -13.95f, 11.95f, -6.5f, 2.6f,
@@ -89,8 +89,9 @@ public class TransformationTests
 
         var tExp = new Transformation(mExp, invmExp);
 
+        // Here used different epsilon for rounding errors.
         Assert.True(tExp.is_consistent(1e-4));
-        Assert.True(tExp.is_transf_close(t1*t2));
+        Assert.True(tExp.is_transf_close(t1 * t2));
     }
 
     [Fact]
@@ -101,7 +102,7 @@ public class TransformationTests
             5.0f, 6.0f, 7.0f, 8.0f,
             9.0f, 9.0f, 8.0f, 7.0f,
             0.0f, 0.0f, 0.0f, 1.0f);
-        
+
         var invm = new Matrix4x4(
             -3.75f, 2.75f, -1f, 0f,
             5.75f, -4.75f, 2.0f, 1.0f,
@@ -112,14 +113,13 @@ public class TransformationTests
         Assert.True(t.is_consistent());
 
         var expV = new Vec(14.0f, 38.0f, 51.0f);
-        Assert.True(expV.is_close(t* new Vec(1f,2f,3f )));
-        
+        Assert.True(expV.is_close(t * new Vec(1f, 2f, 3f)));
+
         var expP = new Point(18.0f, 46.0f, 58.0f);
-        Assert.True(expP.is_close(t* new Point(1.0f, 2.0f, 3.0f)));
-        
+        Assert.True(expP.is_close(t * new Point(1.0f, 2.0f, 3.0f)));
+
         var expN = new Normal(-8.75f, 7.75f, -3.0f);
-        Assert.True(expN.is_close(t* new Normal(3.0f, 2.0f, 4.0f)));
-        
+        Assert.True(expN.is_close(t * new Normal(3.0f, 2.0f, 4.0f)));
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class TransformationTests
             5.0f, 6.0f, 7.0f, 8.0f,
             9.0f, 9.0f, 8.0f, 7.0f,
             6.0f, 5.0f, 4.0f, 1.0f);
-        
+
         var invm = new Matrix4x4(
             -3.75f, 2.75f, -1f, 0.0f,
             4.375f, -3.875f, 2.0f, -0.5f,
@@ -150,51 +150,47 @@ public class TransformationTests
     public void TestTranslations()
     {
         var t = new Transformation();
-        var tr1 = t.translation(new Vec(1.0f, 2.0f, 3.0f));
+        var tr1 = Transformation.translation(new Vec(1.0f, 2.0f, 3.0f));
         Assert.True(tr1.is_consistent());
-        
-        var tr2 = t.translation(new Vec(4.0f, 6.0f, 8.0f));
+
+        var tr2 = Transformation.translation(new Vec(4.0f, 6.0f, 8.0f));
         Assert.True(tr2.is_consistent());
 
         var prod = tr1 * tr2;
         Assert.True(prod.is_consistent());
-        
-        var expTr = t.translation(new Vec(5.0f, 8.0f, 11.0f));
-        Assert.True(prod.is_transf_close(expTr));
 
+        var expTr = Transformation.translation(new Vec(5.0f, 8.0f, 11.0f));
+        Assert.True(prod.is_transf_close(expTr));
     }
 
     [Fact]
     public void TestRotations()
     {
         var t = new Transformation();
-        Assert.True(t.rotation_x(0.1f).is_consistent());
-        Assert.True(t.rotation_y(0.1f).is_consistent());
-        Assert.True(t.rotation_z(0.1f).is_consistent());
+        Assert.True(Transformation.rotation_x(0.1f).is_consistent());
+        Assert.True(Transformation.rotation_y(0.1f).is_consistent());
+        Assert.True(Transformation.rotation_z(0.1f).is_consistent());
 
         var vecX = new Vec(1f, 0f, 0f);
         var vecY = new Vec(0f, 1f, 0f);
         var vecZ = new Vec(0f, 0f, 1f);
-        
-        Assert.True((t.rotation_x(90f) * vecY).is_close(vecZ));
-        Assert.True((t.rotation_y(90f) * vecZ).is_close(vecX));
-        Assert.True((t.rotation_z(90f) * vecX).is_close(vecY));
+
+        Assert.True((Transformation.rotation_x(90f) * vecY).is_close(vecZ));
+        Assert.True((Transformation.rotation_y(90f) * vecZ).is_close(vecX));
+        Assert.True((Transformation.rotation_z(90f) * vecX).is_close(vecY));
     }
 
     [Fact]
     public void TestScalings()
     {
         var t = new Transformation();
-        var tr1 = t.scaling(new Vec(2.0f, 5.0f, 10.0f));
+        var tr1 = Transformation.scaling(new Vec(2.0f, 5.0f, 10.0f));
         Assert.True(tr1.is_consistent());
-        
-        var tr2 = t.scaling(new Vec(3.0f, 2.0f, 4.0f));
+
+        var tr2 = Transformation.scaling(new Vec(3.0f, 2.0f, 4.0f));
         Assert.True(tr2.is_consistent());
-        
-        var expTr = t.scaling(new Vec(6.0f, 10.0f, 40.0f));
-        Assert.True(expTr.is_transf_close(tr1*tr2));
+
+        var expTr = Transformation.scaling(new Vec(6.0f, 10.0f, 40.0f));
+        Assert.True(expTr.is_transf_close(tr1 * tr2));
     }
-    
-
-
 }
