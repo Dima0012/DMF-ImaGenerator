@@ -34,4 +34,9 @@ public struct Ray
     {
         return Origin.is_close(ray.Origin, epsilon) && Dir.is_close(ray.Dir, epsilon);
     }
+
+    public Ray transform(Transformation transformation)
+    {
+        return new Ray(transformation * Origin, transformation * Dir, Tmin, Tmax, Depth);
+    }
 }
