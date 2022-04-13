@@ -1,4 +1,6 @@
-namespace Trace;
+using Trace;
+
+namespace DMF_ImaGenerator;
 
 public struct Parameters
 {
