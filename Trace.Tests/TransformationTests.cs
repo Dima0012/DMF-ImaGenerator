@@ -26,17 +26,17 @@ public class TransformationTests
         Assert.True(t1.is_consistent());
 
         var t2 = new Transformation(t1.M, t1.InvM);
-        Assert.True(t1.is_transf_close(t2));
+        Assert.True(t1.is_close(t2));
 
         Matrix4x4 m3 = t1.M;
         m3.M33 += 1.0f;
         var t3 = new Transformation(m3, t1.InvM);
-        Assert.False(t1.is_transf_close(t3));
+        Assert.False(t1.is_close(t3));
 
         Matrix4x4 invm4 = t1.InvM;
         invm4.M33 += 1.0f;
         var t4 = new Transformation(t1.M, invm4);
-        Assert.False(t1.is_transf_close(t4));
+        Assert.False(t1.is_close(t4));
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class TransformationTests
 
         // Here used different epsilon for rounding errors.
         Assert.True(tExp.is_consistent(1e-4));
-        Assert.True(tExp.is_transf_close(t1 * t2));
+        Assert.True(tExp.is_close(t1 * t2));
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public class TransformationTests
 
         var prod = t1 * t2;
         Assert.True(prod.is_consistent());
-        Assert.True(prod.is_transf_close(new Transformation()));
+        Assert.True(prod.is_close(new Transformation()));
     }
 
     [Fact]
@@ -160,7 +160,7 @@ public class TransformationTests
         Assert.True(prod.is_consistent());
 
         var expTr = Transformation.translation(new Vec(5.0f, 8.0f, 11.0f));
-        Assert.True(prod.is_transf_close(expTr));
+        Assert.True(prod.is_close(expTr));
     }
 
     [Fact]
@@ -191,6 +191,6 @@ public class TransformationTests
         Assert.True(tr2.is_consistent());
 
         var expTr = Transformation.scaling(new Vec(6.0f, 10.0f, 40.0f));
-        Assert.True(expTr.is_transf_close(tr1 * tr2));
+        Assert.True(expTr.is_close(tr1 * tr2));
     }
 }

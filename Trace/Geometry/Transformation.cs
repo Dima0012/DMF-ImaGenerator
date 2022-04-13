@@ -77,7 +77,7 @@ public struct Transformation
     /// <summary>
     /// Check if the transformation passed as argument represents the same transformation.
     /// </summary>
-    public bool is_transf_close(Transformation t)
+    public bool is_close(Transformation t)
     {
         return are_matr_close(M, t.M) && are_matr_close(InvM, t.InvM);
     }
