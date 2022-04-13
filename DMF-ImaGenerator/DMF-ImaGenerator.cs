@@ -24,3 +24,4 @@ img.clamp_image();
 img.write_ldr_image(parameters.OutputPngFilename, parameters.Gamma);
 
 Console.WriteLine($"File {parameters.OutputPngFilename} has been written to disk.");
+

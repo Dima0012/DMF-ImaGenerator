@@ -10,4 +10,8 @@
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Geometry" />
+  </ItemGroup>
+
 </Project>
