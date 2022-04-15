@@ -32,9 +32,9 @@ public class RayTests
     public void TestTransform()
     {
         var ray = new Ray(new Point(1.0f, 2.0f, 3.0f), new Vec(6.0f, 5.0f, 4.0f));
-        Transformation traslation = Transformation.translation(new Vec(10.0f, 11.0f, 12.0f));
-        Transformation rotation = Transformation.rotation_x(90.0f);
-        Ray transformed = ray.transform(rotation).transform(traslation);
+        var translation = Transformation.translation(new Vec(10.0f, 11.0f, 12.0f));
+        var rotation = Transformation.rotation_x(90.0f);
+        var transformed = ray.transform(rotation).transform(translation);
 
         Assert.True(transformed.Origin.is_close(new Point(11.0f, 8.0f, 14.0f)));
         Assert.True(transformed.Dir.is_close(new Vec(6.0f,-4.0f,5.0f)));

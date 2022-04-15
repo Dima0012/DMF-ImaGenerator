@@ -19,10 +19,11 @@ public struct Ray
         Depth = depth;
     }
 
-    public Ray(Point origin, Vec dir)
+    public Ray(Point origin, Vec dir, float tmin = 1e-5f)
     {
         Origin = origin;
         Dir = dir;
+        Tmin = tmin;
     }
 
     public Point at(float t)
