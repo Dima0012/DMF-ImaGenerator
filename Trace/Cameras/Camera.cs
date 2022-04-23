@@ -1,5 +1,6 @@
 ﻿using Trace.Geometry;
 
+
 namespace Trace.Cameras;
 
 public interface ICamera
@@ -41,6 +42,12 @@ public class PerspectiveCamera : ICamera
     public PerspectiveCamera(float distance, float aspectRatio, Transformation transformation)
     {
         Distance = distance;
+        AspectRatio = aspectRatio;
+        Transformation = transformation;
+    }
+    
+    public PerspectiveCamera(float aspectRatio, Transformation transformation)
+    {
         AspectRatio = aspectRatio;
         Transformation = transformation;
     }
