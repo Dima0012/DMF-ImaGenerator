@@ -1,17 +1,10 @@
 ﻿namespace Trace.Cameras;
 
-// This part is the interface which was commented out, as we now use delegates.
-// Left here for eventual future use, but might be removed
-
-// public interface IImageTracer
-// {
-//     public void fire_all_rays(Func<Ray, Color> renderer);
-// }
 
 /// <summary>
 /// Trace an image by shooting light Rays through each of its pixels
 /// </summary>
-public class ImageTracer //: IImageTracer
+public class ImageTracer 
 {
     public HdrImage Image { get; set; }
     public ICamera Camera { get; set; }
@@ -43,7 +36,6 @@ public class ImageTracer //: IImageTracer
             for (int col = 0; col < Image.Width; col++)
             {
                 var ray = fire_ray(col, row);
-                // var color = new Color(1.0f, 2.0f, 3.0f);
                 var color = renderer(ray);
                 Image.set_pixel(col, row, color);
             }
