@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using Xunit;
 using Trace.Cameras;
 using Trace.Geometry;
