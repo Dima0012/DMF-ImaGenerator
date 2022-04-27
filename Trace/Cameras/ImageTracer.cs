@@ -21,8 +21,8 @@ public class ImageTracer
     public Ray fire_ray(int col, int row, float uPixel = 0.5f, float vPixel = 0.5f)
     {
         //There is an error in this formula, professor said to implement it as it is
-        float u = (col + uPixel) / (Image.Width - 1);
-        float v = (row + vPixel) / (Image.Height - 1);
+        float u = (col + uPixel) / Image.Width;
+        float v = 1.0f - (row + vPixel) / Image.Height;
         return Camera.fire_ray(u, v);
     }
 
