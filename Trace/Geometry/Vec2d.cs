@@ -2,7 +2,8 @@
 
 /// <summary>
 /// A 2D vector used to represent a point on a surface
-/// The fields are named `u` and `v` to distinguish them from the usual 3D coordinates `x`, `y`, `z`.
+/// The fields are named u and v to distinguish them
+/// from the usual 3D coordinates x, y, z.
 /// </summary>
 public struct Vec2d
 {
@@ -14,7 +15,6 @@ public struct Vec2d
         U = u;
         V = v;
     }
-
 
     public string to_string()
     {
@@ -28,5 +28,4 @@ public struct Vec2d
     {
         return Math.Abs(U - vec.U) < epsilon && Math.Abs(V - vec.V) < epsilon;
     }
-
 }

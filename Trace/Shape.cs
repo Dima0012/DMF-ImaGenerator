@@ -1,7 +1,6 @@
 ﻿using Trace.Geometry;
 using Trace.Cameras;
 
-
 namespace Trace;
 
 /// <summary>
@@ -21,7 +20,11 @@ public abstract class Shape
     {
         Transformation = transformation;
     }
-
+    
+    /// <summary>
+    /// Checks if a ray intersects the shape.
+    /// Returns a HitRecord, or Null if no intersection was found.
+    /// </summary>
     public abstract HitRecord? ray_intersection(Ray ray);
 }
 
@@ -32,8 +35,8 @@ public class Sphere : Shape
     
 
     /// <summary>
-    /// Checks if a ray intersects the sphere
-    /// Return a `HitRecord`, or `None` if no intersection was found.
+    /// Checks if a ray intersects the sphere.
+    /// Return a HitRecord, or Null if no intersection was found.
     /// </summary>
     public override HitRecord? ray_intersection(Ray ray)
     {
@@ -78,9 +81,9 @@ public class Sphere : Shape
     }
 
     /// <summary>
-    /// Compute the normal of a unit sphere
-    /// The normal is computed for `point` (a point on the surface of the sphere),
-    /// and it is chosen so that it is always in the opposite direction with respect to `ray_dir`.
+    /// Compute the normal of a unit sphere.
+    /// The normal is computed for point (a point on the surface of the sphere),
+    /// and it is chosen so that it is always in the opposite direction with respect to ray_dir.
     /// </summary>
     public Normal sphere_normal(Point point, Vec ray_dir)
     {
@@ -100,7 +103,7 @@ public class Sphere : Shape
         float u = (float) (Math.Atan2(point.Y, point.X) / (2.0 * Math.PI));
         if (u < 0.0f)
         {
-            u = u + 1.0f;
+            u += 1.0f;
         }
 
         return new Vec2d(u, (float) (Math.Acos(point.Z) / Math.PI));

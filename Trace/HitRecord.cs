@@ -14,7 +14,7 @@ public class HitRecord
     public Vec2d SurfacePoint { get; set; }
     public float T { get; set; }
     public Ray Ray { get; set; }
-    
+
     public HitRecord(Point worldPoint, Normal normal, Vec2d surfacePoint, float t, Ray ray)
     {
         WorldPoint = worldPoint;
@@ -35,5 +35,4 @@ public class HitRecord
                (Math.Abs(T - hr.T) < epsilon) &&
                Ray.is_close(hr.Ray);
     }
-    
 }
