@@ -3,7 +3,7 @@ namespace Trace;
 /// <summary>
 /// Rudimentary implementation for a class exception for PFM file reading.
 /// </summary>
-public partial class InvalidPfmFileFormat : FormatException
+public class InvalidPfmFileFormat : FormatException
 {
     public InvalidPfmFileFormat()
     {
@@ -23,15 +23,17 @@ public partial class InvalidPfmFileFormat : FormatException
 /// <summary>
 /// Rudimentary implementation for a class exception for reading input parameters.
 /// </summary>
-public class RuntimeError : FormatException
+public class InputError : FormatException
 {
-    public RuntimeError(string message)
+    public InputError(string message)
         : base(message)
     {
     }
 
-    public RuntimeError(string message, Exception err)
+    public InputError(string message, Exception err)
         : base(message, err)
     {
     }
+    
 }
+

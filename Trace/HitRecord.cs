@@ -29,7 +29,7 @@ public class HitRecord
     /// </summary>
     public bool is_close(HitRecord? hr, double epsilon = 1e-5)
     {
-        return WorldPoint.is_close(hr.WorldPoint) &&
+        return WorldPoint.is_close(hr!.WorldPoint) &&
                Normal.is_close(hr.Normal) &&
                SurfacePoint.is_close(hr.SurfacePoint) &&
                (Math.Abs(T - hr.T) < epsilon) &&
