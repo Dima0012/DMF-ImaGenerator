@@ -140,21 +140,21 @@ public class SphereTests
         direction).*/
 
         var ray1 = new Ray(new Point(2.0f, 0.0f, 0.0f), VecX.neg());
-        Assert.True(sphere.ray_intersection(ray1)!.SurfacePoint.is_close(new Vec2d(0.0f, 0.5f)));
+        Assert.True(sphere.ray_intersection(ray1)?.SurfacePoint.is_close(new Vec2d(0.0f, 0.5f)));
 
         var ray2 = new Ray(new Point(0.0f, 2.0f, 0.0f), VecY.neg());
-        Assert.True(sphere.ray_intersection(ray2)!.SurfacePoint.is_close(new Vec2d(0.25f, 0.5f)));
+        Assert.True(sphere.ray_intersection(ray2)?.SurfacePoint.is_close(new Vec2d(0.25f, 0.5f)));
 
         var ray3 = new Ray(new Point(-2.0f, 0.0f, 0.0f), VecX);
-        Assert.True(sphere.ray_intersection(ray3)!.SurfacePoint.is_close(new Vec2d(0.5f, 0.5f)));
+        Assert.True(sphere.ray_intersection(ray3)?.SurfacePoint.is_close(new Vec2d(0.5f, 0.5f)));
 
         var ray4 = new Ray(new Point(0.0f, -2.0f, 0.0f), VecY);
-        Assert.True(sphere.ray_intersection(ray4)!.SurfacePoint.is_close(new Vec2d(0.75f, 0.5f)));
+        Assert.True(sphere.ray_intersection(ray4)?.SurfacePoint.is_close(new Vec2d(0.75f, 0.5f)));
 
         var ray5 = new Ray(new Point(2.0f, 0.0f, 0.5f), VecX.neg());
-        Assert.True(sphere.ray_intersection(ray5)!.SurfacePoint.is_close(new Vec2d(0.0f, 1f / 3f)));
+        Assert.True(sphere.ray_intersection(ray5)?.SurfacePoint.is_close(new Vec2d(0.0f, 1f / 3f)));
 
         var ray6 = new Ray(new Point(2.0f, 0.0f, -0.5f), VecX.neg());
-        Assert.True(sphere.ray_intersection(ray6)!.SurfacePoint.is_close(new Vec2d(0.0f, 2f / 3f)));
+        Assert.True(sphere.ray_intersection(ray6)?.SurfacePoint.is_close(new Vec2d(0.0f, 2f / 3f)));
     }
 }

@@ -109,3 +109,53 @@ public class Sphere : Shape
         return new Vec2d(u, (float) (Math.Acos(point.Z) / Math.PI));
     }
 }
+
+/// <summary>
+/// A 3D infinite plane parallel to the x and y axis and passing through the origin.
+/// </summary>
+
+public class Plane : Shape
+{
+    public Plane() : base(){}
+
+    public Plane(Transformation transformation) : base(transformation){}
+    
+    /// <summary>
+    /// Checks if a ray intersects the plane.
+    /// Return a HitRecord, or Null if no intersection was found.
+    /// </summary>
+    public override HitRecord? ray_intersection(Ray ray)
+    {
+        var invRay = ray.transform(Transformation.inverse());
+
+        if (Math.Abs(invRay.Dir.Z) < 1e-5)
+        {
+            return null;
+        }
+
+        var t = -invRay.Origin.Z / invRay.Dir.Z;
+
+        if (t <= invRay.Tmin || t >= invRay.Tmax)
+        {
+            return null;
+        }
+        
+        var hitPoint = invRay.at(t);
+        var plane_normal = new Normal(0.0f, 0.0f, 1.0f);
+        if (invRay.Dir.Z >= 0)
+        {
+            plane_normal.Z = -1.0f;
+        }
+        
+        
+        return new HitRecord(
+            Transformation * hitPoint, 
+            Transformation * plane_normal,
+            new Vec2d(hitPoint.X - (float)Math.Floor(hitPoint.X),hitPoint.Y - (float)Math.Floor(hitPoint.Y)),
+            t, ray
+        );
+
+    }
+    
+
+}
