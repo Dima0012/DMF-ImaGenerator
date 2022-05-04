@@ -40,6 +40,10 @@ internal class ParserSettings
         [Option('o', "orthogonal", Default = false,
             HelpText = "Renders the image using an Orthogonal Camera instead of a Perspective Camera.")]
         public bool Camera { get; set; }
+        
+        [Option('a', "angle-deg", Default = 0f,
+            HelpText = "Rotation angle for the camera / observer")]
+        public float Angle { get; set; }
     }
 
     [Verb("pfm2png", HelpText = "Convert a file from PFM format to PNG format.")]

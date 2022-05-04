@@ -62,6 +62,7 @@ internal static class DfmImaGenerator
         var width = parsed.Width;
         var height = parsed.Height;
         var cam = parsed.Camera;
+        var angle = parsed.Angle;
 
         var world = new World();
         
@@ -96,7 +97,7 @@ internal static class DfmImaGenerator
         world.add(spheref2);
 
         // Define camera
-        var camTransformation = Transformation.translation(new Vec(-2.0f, 0,0));
+        var camTransformation = Transformation.translation(new Vec(-2.0f, 0,0)) * Transformation.rotation_z(angle);
         ICamera camera;
         string s;
         
