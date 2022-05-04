@@ -85,12 +85,12 @@ internal static class DfmImaGenerator
         }
         
         // Add sphere to cube faces
-        var transl = Transformation.translation(new Vec(-0.5f, 0f , 0f));
+        var transl = Transformation.translation(new Vec(0f, 0.5f , 0f));
         var transf = transl * scaling;
         var spheref1 = new Sphere(transf);
         world.add(spheref1);
         
-        transl = Transformation.translation(new Vec(0f, -0.5f , 0f));
+        transl = Transformation.translation(new Vec(0f, 0f , -0.5f));
         transf = transl * scaling;
         var spheref2 = new Sphere(transf);
         world.add(spheref2);
@@ -100,7 +100,7 @@ internal static class DfmImaGenerator
         ICamera camera;
         string s;
         
-        if (cam)
+        if (!cam)
         {
             camera = new PerspectiveCamera(1.0f, (float) width/height, camTransformation);
             s = "perspective";

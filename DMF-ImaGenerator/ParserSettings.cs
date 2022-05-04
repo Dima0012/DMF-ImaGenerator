@@ -37,8 +37,8 @@ internal class ParserSettings
             HelpText = "The height of the image in pixels.")]
         public int Height { get; set; }
         
-        [Option('c', "camera", MetaValue = "BOOL", Default = (bool)true,
-            HelpText = "Whether of not use a Perspective Camera to render the image. If false, a Orthogonal Camera will be used.")]
+        [Option('o', "orthogonal", Default = false,
+            HelpText = "Renders the image using an Orthogonal Camera instead of a Perspective Camera.")]
         public bool Camera { get; set; }
     }
 
