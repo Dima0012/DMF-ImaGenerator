@@ -5,10 +5,6 @@
 - New feature ``demo`` now generates a simple demo image, with the possibility to choose the size of the image and the angle for the observer.
 - The old feature is now named ``pfm2png``.
 - Internally added new geometry class, with shapes Sphere and Plane.
-
-
-# Previous fixings
-
 - Fixed bug in issue https://github.com/Dima0012/DMF-ImaGenerator/issues/3
 
 
