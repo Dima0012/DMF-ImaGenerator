@@ -62,6 +62,7 @@ internal static class DfmImaGenerator
         var height = parsed.Height;
         var cam = parsed.Camera;
         var angle = parsed.Angle;
+        var name = parsed.Name;
 
         var world = new World();
         
@@ -127,9 +128,14 @@ internal static class DfmImaGenerator
         imageTracer.Image.normalize_image(0.18f);
         imageTracer.Image.clamp_image();
 
-        imageTracer.Image.write_ldr_image(s+"_demo.png", 1.0f);
+        if (name == "default")
+        {
+            name = s + "_demo.png";
+        }
+        
+        imageTracer.Image.write_ldr_image(name, 1.0f);
 
-        Console.WriteLine("File "+s+"_demo.png has been written to disk.");
+        Console.WriteLine("File "+name+" has been written to disk.");
         
     }
 }

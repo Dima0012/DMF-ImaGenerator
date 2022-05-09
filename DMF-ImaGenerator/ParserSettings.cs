@@ -44,6 +44,10 @@ internal class ParserSettings
         [Option('a', "angle-deg", Default = 0f,
             HelpText = "Rotation angle for the camera / observer")]
         public float Angle { get; set; }
+        
+        [Option('n', "output-name", Default = "default",
+            HelpText = "Name of the output png file")]
+        public string Name { get; set; } = null!;
     }
 
     [Verb("pfm2png", HelpText = "Convert a file from PFM format to PNG format.")]
