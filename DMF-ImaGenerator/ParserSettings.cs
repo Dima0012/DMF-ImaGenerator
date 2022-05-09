@@ -18,7 +18,7 @@ internal class ParserSettings
                 h.Heading = "DMF-ImaGenerator 0.1.0"; //change header
                 h.Copyright = "Copyright (c) 2022 DMF"; //change copyright text
                 h.AutoVersion = false;
-                h.AutoHelp = false;
+                h.AutoHelp = true;
 
                 return HelpText.DefaultParsingErrorsHandler(result, h);
             }, e => e, false);

@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using CommandLine;
 using CommandLine.Text;
 using Trace;
@@ -96,7 +95,7 @@ internal static class DfmImaGenerator
         var spheref2 = new Sphere(transf);
         world.add(spheref2);
 
-        // Define camera
+        // Define camera with rotation angle
         var camTransformation = Transformation.translation(new Vec(-2.0f, 0,0)) * Transformation.rotation_z(angle);
         ICamera camera;
         string s;
