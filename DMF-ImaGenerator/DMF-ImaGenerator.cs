@@ -96,7 +96,7 @@ internal static class DfmImaGenerator
         world.add(spheref2);
 
         // Define camera with rotation angle
-        var camTransformation = Transformation.translation(new Vec(-2.0f, 0,0)) * Transformation.rotation_z(angle);
+        var camTransformation = Transformation.rotation_z(angle)*Transformation.translation(new Vec(-2.0f, 0,0));
         ICamera camera;
         string s;
         
