@@ -3,7 +3,7 @@ Project for RayTracing Course @ Physics UniMi AY 21/22
 
 This application renders photo-realistic images, saving them in HDR format (PFM) and LDR format (PNG). It is currently in development.
 
-To install the application, simply download the .exe file ``DMF-ImaGenerator`` from the latest release. You then need to add executable rights with the Unix command: ``chmod +x DMF-ImaGenerator`` . Then the application is ready to run via command line as ``./DMF-ImaGenerator`` . 
+To install the application, simply download the .exe file ``DMF-ImaGenerator`` from the latest release. You then need to add executable rights with the Unix command: ``chmod +x DMF-ImaGenerator`` via Terminal. Then the application is ready to run via command line as ``./DMF-ImaGenerator`` . 
 
 # Features available
 
