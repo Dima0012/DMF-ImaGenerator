@@ -131,11 +131,10 @@ internal static class DfmImaGenerator
         if (name == "default")
         {
             name = s + "_demo.png";
+            Console.WriteLine("File "+name+" has been written to disk.");
         }
         
         imageTracer.Image.write_ldr_image(name, 1.0f);
-
-        Console.WriteLine("File "+name+" has been written to disk.");
         
     }
 }
