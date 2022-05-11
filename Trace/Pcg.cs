@@ -1,3 +1,5 @@
+using System.Data;
+
 namespace Trace;
 
 /// <summary>
