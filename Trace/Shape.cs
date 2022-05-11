@@ -10,6 +10,7 @@ namespace Trace;
 public abstract class Shape
 {
     protected Transformation Transformation;
+    protected Material Material;
     
     public Shape()
     {
@@ -19,6 +20,12 @@ public abstract class Shape
     public Shape(Transformation transformation)
     {
         Transformation = transformation;
+    }
+
+    public Shape(Transformation transformation, Material material)
+    {
+        Transformation = transformation;
+        Material = material;
     }
     
     /// <summary>
@@ -32,6 +39,7 @@ public class Sphere : Shape
 {
     public Sphere() : base(){}
     public Sphere(Transformation transformation) : base(transformation){}
+    public Sphere(Transformation transformation, Material material) : base(transformation, material){}
     
 
     /// <summary>
@@ -75,7 +83,9 @@ public class Sphere : Shape
             Transformation * hitPoint, 
             Transformation * sphere_normal(hitPoint,invRay.Dir),
             sphere_point_to_uv(hitPoint),
-            firstHitT, ray
+            firstHitT,
+            ray,
+            this
             );
 
     }
@@ -141,18 +151,20 @@ public class Plane : Shape
         }
         
         var hitPoint = invRay.at(t);
-        var plane_normal = new Normal(0.0f, 0.0f, 1.0f);
+        var planeNormal = new Normal(0.0f, 0.0f, 1.0f);
         if (invRay.Dir.Z >= 0)
         {
-            plane_normal.Z = -1.0f;
+            planeNormal.Z = -1.0f;
         }
         
         
         return new HitRecord(
             Transformation * hitPoint, 
-            Transformation * plane_normal,
+            Transformation * planeNormal,
             new Vec2d(hitPoint.X - (float)Math.Floor(hitPoint.X),hitPoint.Y - (float)Math.Floor(hitPoint.Y)),
-            t, ray
+            t,
+            ray,
+            this
         );
 
     }
