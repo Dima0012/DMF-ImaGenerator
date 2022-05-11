@@ -2,6 +2,10 @@ using System.Data;
 
 namespace Trace;
 
+/// <summary>
+/// PCG Uniform Pseudo-random Number Generator
+/// </summary>
+
 public class Pcg
 {
     public ulong State { get; set; }
@@ -22,13 +26,13 @@ public class Pcg
     {
         // 64-bit
         ulong oldState = State;
-        State = (ulong) (oldState * 6364136223846793005 + Inc);
+        State = oldState * 6364136223846793005 + Inc;
         
         // 32-bit
         uint xorShifted = (uint) (((oldState >> 18) ^ oldState) >> 27);
         uint rot = (uint) (oldState >> 59);
 
-        return (uint) (xorShifted >> rot) | (xorShifted << ((-rot) & 31));
+        return (uint) (xorShifted >> (int) rot) | (xorShifted << ( (int) (-rot) & 31));
     }
     
     /// <summary>
@@ -37,6 +41,6 @@ public class Pcg
     /// </summary>
     public float random_float()
     {
-        return random() / 0xffffffff;
+        return (float) random() / 0xffffffff;
     }
 }

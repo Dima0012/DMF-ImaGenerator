@@ -10,7 +10,7 @@ public class PcgTests
         var pcg = new Pcg();
 
         Assert.True(pcg.State == 1753877967969059832);
-        Assert.True(pcg.inc == 109);
+        Assert.True(pcg.Inc == 109);
 
         uint[] testRndVec =
         {
