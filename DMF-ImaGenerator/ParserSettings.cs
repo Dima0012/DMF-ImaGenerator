@@ -15,7 +15,7 @@ internal class ParserSettings
             helpText = HelpText.AutoBuild(result, h =>
             {
                 h.AdditionalNewLineAfterOption = true;
-                h.Heading = "DMF-ImaGenerator 0.1.0"; //change header
+                h.Heading = "DMF-ImaGenerator 0.2.0"; //change header
                 h.Copyright = "Copyright (c) 2022 DMF"; //change copyright text
                 h.AutoVersion = false;
                 h.AutoHelp = true;
