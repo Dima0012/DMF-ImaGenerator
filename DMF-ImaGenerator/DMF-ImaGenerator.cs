@@ -63,6 +63,7 @@ internal static class DfmImaGenerator
         var cam = parsed.Camera;
         var angle = parsed.Angle;
         var name = parsed.Name;
+        var algorithm = parsed.Algorithm;
 
         var world = new World();
         
@@ -114,9 +115,10 @@ internal static class DfmImaGenerator
 
         var img = new HdrImage(width, height);
         var imageTracer = new ImageTracer(img, camera);
+        var renderer = new OnOffRenderer(world);
         
         // Trace image with on-off method
-        imageTracer.fire_all_rays(ray => world.ray_intersection(ray) != null ? new Color(1, 1, 1) : new Color(0, 0, 0));
+        imageTracer.fire_all_rays(renderer);
 
         // Save image in PFM format
         using Stream outputFilePfm = File.OpenWrite(s+"_demo.pfm");

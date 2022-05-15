@@ -29,14 +29,14 @@ public class ImageTracer
     /// <summary>
     /// Shoots several Rays crossing each of the pixel in the Image.  
     /// </summary>
-    public void fire_all_rays(Func<Ray, Color> renderer)
+    public void fire_all_rays(Renderer renderer)
     {
         for (int row = 0; row < Image.Height; row++)
         {
             for (int col = 0; col < Image.Width; col++)
             {
                 var ray = fire_ray(col, row);
-                var color = renderer(ray);
+                var color = renderer.Render(ray);
                 Image.set_pixel(col, row, color);
             }
         }

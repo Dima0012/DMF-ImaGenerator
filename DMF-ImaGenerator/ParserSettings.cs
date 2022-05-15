@@ -48,6 +48,10 @@ internal class ParserSettings
         [Option('n', "output-name", Default = "default",
             HelpText = "Name of the output png file")]
         public string Name { get; set; } = null!;
+        
+        [Option('a', "algorithm", Default = "on-off",
+            HelpText = "Algorithm used to render the image")]
+        public string Algorithm { get; set; } = null!;
     }
 
     [Verb("pfm2png", HelpText = "Convert a file from PFM format to PNG format.")]
