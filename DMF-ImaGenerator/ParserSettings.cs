@@ -50,7 +50,7 @@ internal class ParserSettings
         public string Name { get; set; } = null!;
         
         [Option('a', "algorithm", Default = "on-off",
-            HelpText = "Algorithm used to render the image")]
+            HelpText = "Algorithm used to render the image. Choose between 'on-off' and 'flat'")]
         public string Algorithm { get; set; } = null!;
     }
 

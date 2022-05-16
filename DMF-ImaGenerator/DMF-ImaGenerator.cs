@@ -115,10 +115,19 @@ internal static class DfmImaGenerator
 
         var img = new HdrImage(width, height);
         var imageTracer = new ImageTracer(img, camera);
-        var renderer = new OnOffRenderer(world);
-        
-        // Trace image with on-off method
-        imageTracer.fire_all_rays(renderer);
+
+        if (algorithm == "flat")
+        {
+            var renderer = new FlatRenderer(world);
+            // Trace image with flat method
+            imageTracer.fire_all_rays(renderer);
+        }
+        else
+        {
+            var renderer = new OnOffRenderer(world);
+            // Trace image with on-off method
+            imageTracer.fire_all_rays(renderer);
+        }
 
         // Save image in PFM format
         using Stream outputFilePfm = File.OpenWrite(s+"_demo.pfm");

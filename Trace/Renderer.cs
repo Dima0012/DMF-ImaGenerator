@@ -17,7 +17,7 @@ public abstract class Renderer
     /// </summary>
     protected Color BackgroundColor = new(0, 0, 0);
     
-    protected Renderer(World world)
+    public Renderer(World world)
     {
         World = world;
     }
