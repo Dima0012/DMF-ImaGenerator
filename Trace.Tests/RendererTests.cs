@@ -14,7 +14,7 @@ public class RendererTests
     {
         var sphere = new Sphere(
             Transformation.translation(new Vec(2, 0, 0)) * Transformation.scaling(new Vec(0.2f, 0.2f, 0.2f)),
-            new Material(new DiffuseBrdf(UniformPigment(White))));
+            new Material(new DiffuseBrdf(new UniformPigment(White))));
 
         var img = new HdrImage(3, 3);
         var cam = new OrthogonalCamera((float) 3 / 3, new Transformation());
@@ -44,14 +44,14 @@ public class RendererTests
 
         var sphere = new Sphere(
             Transformation.translation(new Vec(2, 0, 0)) * Transformation.scaling(new Vec(0.2f, 0.2f, 0.2f)),
-            new Material(new DiffuseBrdf(UniformPigment(sphereColor))));
+            new Material(new DiffuseBrdf(new UniformPigment(sphereColor))));
 
         var img = new HdrImage(3, 3);
         var cam = new OrthogonalCamera((float) 3 / 3, new Transformation());
         var imgTracer = new ImageTracer(img, cam);
         var world = new World();
         world.add(sphere);
-        var renderer = new OnOffRenderer(world);
+        var renderer = new FlatRenderer(world);
         imgTracer.fire_all_rays(renderer);
 
         Assert.True(img.get_pixel(0, 0).is_close(Black));

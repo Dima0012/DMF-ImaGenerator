@@ -129,6 +129,7 @@ public class Plane : Shape
     public Plane() : base(){}
 
     public Plane(Transformation transformation) : base(transformation){}
+    public Plane(Transformation transformation, Material material) : base(transformation, material){}
     
     /// <summary>
     /// Checks if a ray intersects the plane.

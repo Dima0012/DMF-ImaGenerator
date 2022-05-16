@@ -32,6 +32,18 @@ public abstract class Renderer
 }
 
 /// <summary>
+/// This Renderer will return just one color. We need it for ImageTracerTests.
+/// </summary>
+public class OneColor : Renderer
+{
+    public OneColor(World world) : base(world){}
+    public override Color Render(Ray ray)
+    {
+        return new Color(1f, 2f, 3f);
+    }
+}
+
+/// <summary>
 /// This Renderer implements an on-off method. All objects will be rendered white, the background black.
 /// For debug purposes only.
 /// </summary>

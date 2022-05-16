@@ -22,7 +22,8 @@ public class SphereTests
             new Normal(0.0f, 0.0f, 1.0f),
             new Vec2d(0.0f, 0.0f),
             1.0f,
-            ray1).is_close(intersection1));
+            ray1,
+            sphere).is_close(intersection1));
 
         var ray2 = new Ray(new Point(3f, 0f, 0f), VecX.neg());
         var intersection2 = sphere.ray_intersection(ray2);
@@ -32,7 +33,8 @@ public class SphereTests
             new Normal(1.0f, 0.0f, 0.0f),
             new Vec2d(0.0f, 0.5f),
             2.0f,
-            ray2).is_close(intersection2));
+            ray2,
+            sphere).is_close(intersection2));
 
         Assert.True(sphere.ray_intersection(new Ray(new Point(0f, 10f, 2f), VecZ.neg())) == null);
     }
@@ -50,7 +52,8 @@ public class SphereTests
             new Normal(-1.0f, 0.0f, 0.0f),
             new Vec2d(0.0f, 0.5f),
             1.0f,
-            ray).is_close(intersection));
+            ray,
+            sphere).is_close(intersection));
     }
 
     [Fact]
@@ -66,7 +69,8 @@ public class SphereTests
             new Normal(0.0f, 0.0f, 1.0f),
             new Vec2d(0.0f, 0.0f),
             1.0f,
-            ray1).is_close(intersection1));
+            ray1,
+            sphere).is_close(intersection1));
 
         var ray2 = new Ray(new Point(13f, 0f, 0f), VecX.neg());
         var intersection2 = sphere.ray_intersection(ray2);
@@ -76,7 +80,8 @@ public class SphereTests
             new Normal(1.0f, 0.0f, 0.0f),
             new Vec2d(0.0f, 0.5f),
             2.0f,
-            ray2).is_close(intersection2));
+            ray2,
+            sphere).is_close(intersection2));
 
         // Check if the sphere failed to move by trying to hit the untransformed shape
         Assert.True(sphere.ray_intersection(new Ray(new Point(0f, 0f, 2f), VecZ.neg())) == null);

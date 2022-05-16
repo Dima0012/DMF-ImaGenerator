@@ -28,7 +28,8 @@ public class ImageTracerTests
     [Fact]
     public void TestImageCoverage()
     {
-        tracer.fire_all_rays(_ => new Color(1f, 2f, 3f));
+        var world = new World();
+        tracer.fire_all_rays(new OneColor(world));
         for (int row = 0; row < image.Height; row++)
         {
             for (int col = 0; col < image.Width; col++)

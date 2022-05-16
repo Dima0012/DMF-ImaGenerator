@@ -22,7 +22,8 @@ public class PlaneTests
             new Normal(0.0f, 0.0f, 1.0f),
             new Vec2d(0.0f, 0.0f),
             1.0f,
-            ray1).is_close(intersection1));
+            ray1,
+            plane).is_close(intersection1));
 
         var ray2 = new Ray(new Point(0f, 0f, 1f), VecZ);
         var intersection2 = plane.ray_intersection(ray2);
@@ -51,7 +52,8 @@ public class PlaneTests
             new Normal(1.0f, 0.0f, 0.0f),
             new Vec2d(0.0f, 0.0f),
             1.0f,
-            ray1).is_close(intersection1));
+            ray1,
+            plane).is_close(intersection1));
 
         var ray2 = new Ray(new Point(0f, 0f, 1f), VecZ);
         var intersection2 = plane.ray_intersection(ray2);

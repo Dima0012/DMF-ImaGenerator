@@ -19,7 +19,7 @@ public abstract class Brdf
         Pigment = pigment;
     }
 
-    public Color eval(Normal normal, Vec inDir, Vec outDir, Vec2d uv)
+    public virtual Color eval(Normal normal, Vec inDir, Vec outDir, Vec2d uv)
     {
         return new Color(1, 1, 1);
     }
@@ -34,7 +34,7 @@ public class DiffuseBrdf: Brdf
     public DiffuseBrdf() : base(){}
     public DiffuseBrdf(IPigment pigment): base(pigment){}
 
-    public Color eval(Normal normal, Vec inDir, Vec outDir, Vec2d uv)
+    public override Color eval(Normal normal, Vec inDir, Vec outDir, Vec2d uv)
     {
         return Pigment.get_color(uv) * (float)(1.0 / Math.PI);
     }
