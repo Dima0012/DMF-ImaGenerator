@@ -6,7 +6,7 @@ namespace Trace.Tests;
 public class PigmentsTests
 {
     [Fact]
-    public void testUniformPigment()
+    public void TestUniformPigment()
     {
         var color = new Color(1, 2, 3);
         var pigment = new UniformPigment(color);
@@ -18,7 +18,7 @@ public class PigmentsTests
     }
 
     [Fact]
-    public void testImagePigment()
+    public void TestImagePigment()
     {
         var image = new HdrImage(2, 2);
         image.set_pixel(0, 0, new Color(1.0f, 2.0f, 3.0f));
@@ -34,7 +34,7 @@ public class PigmentsTests
     }
 
     [Fact]
-    public void testCheckeredPigment()
+    public void TestCheckeredPigment()
     {
         var color1 = new Color(1.0f, 2.0f, 3.0f);
         var color2 = new Color(10.0f, 20.0f, 30.0f);

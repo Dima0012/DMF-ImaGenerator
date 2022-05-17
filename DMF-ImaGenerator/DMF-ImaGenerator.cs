@@ -10,13 +10,11 @@ internal static class DfmImaGenerator
 {
     private static void Main(string[] args)
     {
+        Console.WriteLine();
+        
         var parserSettings = new ParserSettings();
         var parser = new Parser(with => with.HelpWriter = null);
         var result = parser.ParseArguments<ParserSettings.Pfm2PngOptions, ParserSettings.DemoOptions>(args);
-
-        Console.WriteLine();
-        Console.WriteLine(HeadingInfo.Default);
-        Console.WriteLine();
 
         result.WithParsed<ParserSettings.Pfm2PngOptions>(Pfm2Png);
         result.WithParsed<ParserSettings.DemoOptions>(Demo);
@@ -28,6 +26,10 @@ internal static class DfmImaGenerator
 
     private static void Pfm2Png(ParserSettings.Pfm2PngOptions parsed)
     {
+        Console.WriteLine();
+        Console.WriteLine(HeadingInfo.Default);
+        Console.WriteLine();
+        
         var gamma = parsed.Gamma;
         var factor = parsed.Factor;
         var inputFile = parsed.InputFile;
@@ -58,6 +60,10 @@ internal static class DfmImaGenerator
 
     private static void Demo(ParserSettings.DemoOptions parsed)
     {
+        Console.WriteLine();
+        Console.WriteLine(HeadingInfo.Default);
+        Console.WriteLine();
+        
         var width = parsed.Width;
         var height = parsed.Height;
         var cam = parsed.Camera;
@@ -65,9 +71,21 @@ internal static class DfmImaGenerator
         var name = parsed.Name;
         var algorithm = parsed.Algorithm;
 
+        List<string> algs = new List<string> {"onoff", "flat"};
+
+        if (!algs.Contains(algorithm))
+        {
+            Console.WriteLine("Unknown render option. Choose between: ");
+            Console.WriteLine("onoff\n"+"flat\n");
+            Console.WriteLine("Exiting application.");
+            return;
+        }
+
         var world = new World();
-        
-        var scaling = Transformation.scaling(new Vec(1 / 10f, 1 / 10f, 1 / 10f));
+
+        var scalingFactor = 1 / 10f;
+        var scaling = Transformation.scaling(new Vec(scalingFactor,scalingFactor,scalingFactor));
+        var material = new Material(new DiffuseBrdf(new UniformPigment(new Color(1, 0, 0))));
 
         // Add sphere to cube vertexes
         for (var x = 0.5f; x >= -0.5f; x -= 1.0f)
@@ -79,7 +97,7 @@ internal static class DfmImaGenerator
                     var translation = Transformation.translation(new Vec(x, y, z));
                     var transformation = translation * scaling;
 
-                    var sphere = new Sphere(transformation);
+                    var sphere = new Sphere(transformation, material);
 
                     world.add(sphere);
                 }
@@ -89,12 +107,18 @@ internal static class DfmImaGenerator
         // Add sphere to cube faces
         var transl = Transformation.translation(new Vec(0f, 0.5f , 0f));
         var transf = transl * scaling;
-        var spheref1 = new Sphere(transf);
+        var materiaf1 = new Material(new DiffuseBrdf(new UniformPigment()));
+        var spheref1 = new Sphere(transf, materiaf1);
         world.add(spheref1);
         
         transl = Transformation.translation(new Vec(0f, 0f , -0.5f));
         transf = transl * scaling;
-        var spheref2 = new Sphere(transf);
+
+        var green = new Color(0.3f, 0.9f, 0.5f);
+        var yellow = new Color(0.9f, 0.9f, 0.4f);
+        
+        var materialf2 = new Material(new DiffuseBrdf(new CheckeredPigment(green, yellow,2)));
+        var spheref2 = new Sphere(transf, materialf2);
         world.add(spheref2);
 
         // Define camera with rotation angle
@@ -116,17 +140,24 @@ internal static class DfmImaGenerator
         var img = new HdrImage(width, height);
         var imageTracer = new ImageTracer(img, camera);
 
-        if (algorithm == "flat")
+        switch (algorithm)
         {
-            var renderer = new FlatRenderer(world);
-            // Trace image with flat method
-            imageTracer.fire_all_rays(renderer);
-        }
-        else
-        {
-            var renderer = new OnOffRenderer(world);
-            // Trace image with on-off method
-            imageTracer.fire_all_rays(renderer);
+            case "onoff":
+            {
+                Console.WriteLine($"Rendering demo image with {algorithm} renderer.\n");
+                var renderer = new OnOffRenderer(world);
+                // Trace image with flat method
+                imageTracer.fire_all_rays(renderer);
+                break;
+            }
+            case "flat":
+            {
+                Console.WriteLine($"Rendering demo image with {algorithm} renderer.\n");
+                var renderer = new FlatRenderer(world);
+                // Trace image with on-off method
+                imageTracer.fire_all_rays(renderer);
+                break;
+            }
         }
 
         // Save image in PFM format

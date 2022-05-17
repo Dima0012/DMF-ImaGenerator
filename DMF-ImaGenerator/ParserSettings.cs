@@ -15,8 +15,8 @@ internal class ParserSettings
             helpText = HelpText.AutoBuild(result, h =>
             {
                 h.AdditionalNewLineAfterOption = true;
-                h.Heading = "DMF-ImaGenerator 0.2.0"; //change header
-                h.Copyright = "Copyright (c) 2022 DMF"; //change copyright text
+                // h.Heading = "DMF-ImaGenerator 0.2.0"; //change header
+                // h.Copyright = "Copyright (c) 2022 DMF"; //change copyright text
                 h.AutoVersion = false;
                 h.AutoHelp = true;
 
@@ -41,15 +41,15 @@ internal class ParserSettings
             HelpText = "Renders the image using an Orthogonal Camera instead of a Perspective Camera.")]
         public bool Camera { get; set; }
         
-        [Option('a', "angle-deg", Default = 0f,
+        [Option('d', "angle-deg", Default = 0f, Separator = ' ',
             HelpText = "Rotation angle for the camera / observer")]
         public float Angle { get; set; }
         
-        [Option('n', "output-name", Default = "default",
+        [Option('n', "output-name", Default = "default", Separator = ' ',
             HelpText = "Name of the output png file")]
         public string Name { get; set; } = null!;
         
-        [Option('a', "algorithm", Default = "on-off",
+        [Option('a', "algorithm", Default = "onoff",Separator = ' ',
             HelpText = "Algorithm used to render the image. Choose between 'on-off' and 'flat'")]
         public string Algorithm { get; set; } = null!;
     }
