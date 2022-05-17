@@ -44,10 +44,14 @@ internal class ParserSettings
         [Option('d', "angle-deg", Default = 0f, Separator = ' ',
             HelpText = "Rotation angle for the camera / observer")]
         public float Angle { get; set; }
+
+        [Option('p', "pfm-output", Default = "default", Separator = ' ',
+            HelpText = "Name of the output PFM file.")]
+        public string PfmName { get; set; } = null!;
         
-        [Option('n', "output-name", Default = "default", Separator = ' ',
-            HelpText = "Name of the output png file")]
-        public string Name { get; set; } = null!;
+        [Option('n', "png-output", Default = "default", Separator = ' ',
+            HelpText = "Name of the output PNG file.")]
+        public string PngName { get; set; } = null!;
         
         [Option('a', "algorithm", Default = "onoff",Separator = ' ',
             HelpText = "Algorithm used to render the image. Choose between 'on-off' and 'flat'")]
@@ -70,5 +74,9 @@ internal class ParserSettings
         [Option('f', "factor", MetaValue = "FLOAT", Default = 0.18f, Separator = ' ',
             HelpText = "The factor for the luminosity normalization of the image.")]
         public float Factor { get; set; }
+
+        [Option('l', "luminosity", MetaValue = "FLOAT", Default = null, Separator = ' ',
+            HelpText = "Luminosity value for tone mapping")]
+        public float? Luminosity { get; set; }
     }
 }
