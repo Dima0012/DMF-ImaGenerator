@@ -167,7 +167,7 @@ internal static class DfmImaGenerator
         // Save image in PNG format
 
         // Adjusting image
-        imageTracer.Image.normalize_image(0.18f, 0.5f);
+        imageTracer.Image.normalize_image(0.18f, 0.1f);
         imageTracer.Image.clamp_image();
 
         if (name == "default")
