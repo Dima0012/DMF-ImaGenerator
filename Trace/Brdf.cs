@@ -24,6 +24,8 @@ public abstract class Brdf
     {
         return new Color(1, 1, 1);
     }
+    
+    public abstract Ray scatter_ray(Pcg pcg, Vec inDir, Point intP, Normal n, int depth);
 
 }
 
@@ -40,7 +42,7 @@ public class DiffuseBrdf: Brdf
         return Pigment.get_color(uv) * (float)(1.0 / Math.PI);
     }
     
-    public Ray scatter_ray(Pcg pcg, Vec inDir, Point intP, Normal n, int depth)
+    public override Ray scatter_ray(Pcg pcg, Vec inDir, Point intP, Normal n, int depth)
     {
         //Cosine-weighted distribution around the z (local) axis
         var onb = new Onb(n.to_vec());
@@ -93,7 +95,7 @@ public class SpecularBrdf: Brdf
     /// There is no need to use the PCG here, as the reflected direction is always completely
     /// deterministic for a perfect mirror
     /// </summary>
-    public Ray scatter_ray(Pcg pcg, Vec inDir, Point intP, Normal n, int depth)
+    public override Ray scatter_ray(Pcg pcg, Vec inDir, Point intP, Normal n, int depth)
     {
         var rayDir = new Vec(inDir.X, inDir.Y, inDir.Z).normalize();
         var normal = n.to_vec();
