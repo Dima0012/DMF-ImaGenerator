@@ -62,6 +62,17 @@ public struct Normal
     }
     
     /// <summary>
+    /// Scalar product of a normalized normal and a normalized vector.
+    /// </summary>
+    public float normalized_dot(Vec v)
+    {
+        normalize();
+        v.normalize();
+
+        return X * v.X + Y * v.Y + Z * v.Z; 
+    }
+    
+    /// <summary>
     /// Returns the vector product of the Normal with the Vector v as a Vector.
     /// </summary>
     public Vec vec_prod(Vec v)
@@ -104,9 +115,16 @@ public struct Normal
     /// <summary>
     /// Normalize the Normal by invoking norm().
     /// </summary>
-    public Vec normalize()
+    public void normalize()
     {
-        return new Vec(X/(float) norm(), Y/(float) norm(), Z/(float) norm());
+        X /= (float) norm();
+        Y /= (float) norm();
+        Z /= (float) norm();
+    }
+
+    public Vec to_vec()
+    {
+        return new Vec(X, Y, Z);
     }
 
 }

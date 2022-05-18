@@ -1,3 +1,4 @@
+using Trace.Cameras;
 using Trace.Geometry;
 
 namespace Trace;
@@ -37,6 +38,58 @@ public class DiffuseBrdf: Brdf
     public override Color eval(Normal normal, Vec inDir, Vec outDir, Vec2d uv)
     {
         return Pigment.get_color(uv) * (float)(1.0 / Math.PI);
+    }
+    
+}
+
+/// <summary>
+/// A class representing an ideal mirror BRDF
+/// </summary>
+public class SpecularBrdf: Brdf
+{
+    public float ThresholdAngleRad;
+    public SpecularBrdf() : base(){}
+
+    public SpecularBrdf(IPigment pigment, float thresholdAngleRad) : base(pigment)
+    {
+        ThresholdAngleRad = thresholdAngleRad;
+    }
+    
+    /// <summary>
+    /// We provide this implementation for reference, but we are not going to use it (neither in the
+    /// path tracer nor in the point-light tracer)
+    /// </summary>
+    public override Color eval(Normal normal, Vec inDir, Vec outDir, Vec2d uv)
+    {
+        var thetaIn = Math.Acos(normal.normalized_dot(inDir));
+        var thetaOut = Math.Acos(normal.normalized_dot(outDir));
+
+        if (Math.Abs(thetaIn - thetaOut) < ThresholdAngleRad)
+        {
+            return Pigment.get_color(uv);
+        }
+
+        return new Color(0.0f, 0.0f, 0.0f);
+    }
+
+    /// <summary>
+    /// There is no need to use the PCG here, as the reflected direction is always completely
+    /// deterministic for a perfect mirror
+    /// </summary>
+    public Ray scatter_ray(Pcg pcg, Vec inDir, Point intP, Normal n, int depth)
+    {
+        var rayDir = new Vec(inDir.X, inDir.Y, inDir.Z);
+        rayDir.normalize();
+        var normal = n.to_vec();
+        dot_prod = normal.dot(ray_dir)
+
+        return Ray(
+            origin=interaction_point,
+            dir=ray_dir - normal * 2 * dot_prod,
+            tmin=1e-5,
+            tmax=inf,
+            depth=depth,
+        )
     }
     
 }
