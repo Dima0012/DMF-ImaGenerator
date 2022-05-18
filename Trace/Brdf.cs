@@ -40,6 +40,22 @@ public class DiffuseBrdf: Brdf
         return Pigment.get_color(uv) * (float)(1.0 / Math.PI);
     }
     
+    public Ray scatter_ray(Pcg pcg, Vec inDir, Point intP, Normal n, int depth)
+    {
+        //Cosine-weighted distribution around the z (local) axis
+        e1, e2, e3 = create_onb_from_z(normal)
+        cos_theta_sq = pcg.random_float()
+        cos_theta, sin_theta = sqrt(cos_theta_sq), sqrt(1.0 - cos_theta_sq)
+        phi = 2.0 * pi * pcg.random_float()
+
+        return new Ray(
+            intP,
+            rayDir - normal * (float) (2 * dotProd),
+            1e-5f,
+            float.PositiveInfinity,
+            depth);
+    }
+    
 }
 
 /// <summary>
@@ -78,8 +94,7 @@ public class SpecularBrdf: Brdf
     /// </summary>
     public Ray scatter_ray(Pcg pcg, Vec inDir, Point intP, Normal n, int depth)
     {
-        var rayDir = new Vec(inDir.X, inDir.Y, inDir.Z);
-        rayDir.normalize();
+        var rayDir = new Vec(inDir.X, inDir.Y, inDir.Z).normalize();
         var normal = n.to_vec();
         var dotProd = normal * rayDir;
 

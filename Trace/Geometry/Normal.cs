@@ -115,11 +115,12 @@ public struct Normal
     /// <summary>
     /// Normalize the Normal by invoking norm().
     /// </summary>
-    public void normalize()
+    public Normal normalize()
     {
         X /= (float) norm();
         Y /= (float) norm();
         Z /= (float) norm();
+        return this;
     }
 
     public Vec to_vec()

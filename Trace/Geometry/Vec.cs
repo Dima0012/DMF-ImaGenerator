@@ -103,11 +103,12 @@ public struct Vec
     /// <summary>
     /// Normalize the Vector by invoking norm().
     /// </summary>
-    public void normalize()
+    public Vec normalize()
     {
         X /= (float) norm();
         Y /= (float) norm();
         Z /= (float) norm();
+        return this;
     }
 
     public Normal to_normal()
