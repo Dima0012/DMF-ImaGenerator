@@ -81,15 +81,14 @@ public class SpecularBrdf: Brdf
         var rayDir = new Vec(inDir.X, inDir.Y, inDir.Z);
         rayDir.normalize();
         var normal = n.to_vec();
-        dot_prod = normal.dot(ray_dir)
+        var dotProd = normal * rayDir;
 
-        return Ray(
-            origin=interaction_point,
-            dir=ray_dir - normal * 2 * dot_prod,
-            tmin=1e-5,
-            tmax=inf,
-            depth=depth,
-        )
+        return new Ray(
+            intP,
+            rayDir - normal * (float) (2 * dotProd),
+            1e-5f,
+            float.PositiveInfinity,
+            depth);
     }
     
 }
