@@ -15,11 +15,18 @@ public abstract class Renderer
     /// <summary>
     /// The background color of the scene. Default is black. 
     /// </summary>
-    protected Color BackgroundColor = new(0, 0, 0);
+    protected Color BackgroundColor;
     
     public Renderer(World world)
     {
         World = world;
+        BackgroundColor = new Color(0, 0, 0);
+    }
+    
+    public Renderer(World world, Color backgroundColor)
+    {
+        World = world;
+        BackgroundColor = backgroundColor;
     }
 
     /// <summary>
@@ -52,6 +59,7 @@ public class OnOffRenderer : Renderer
     public Color ObjectColor = new(1, 1, 1);
 
     public OnOffRenderer(World world) : base(world){}
+    public OnOffRenderer(World world, Color backgroundColor) : base(world, backgroundColor){}
     
     public override Color Render(Ray ray)
     {
@@ -69,6 +77,7 @@ public class FlatRenderer : Renderer
 {
     
     public FlatRenderer(World world) : base(world){}
+    public FlatRenderer(World world, Color backgroundColor) : base(world, backgroundColor){}
     
     public override Color Render(Ray ray)
     {
@@ -84,4 +93,91 @@ public class FlatRenderer : Renderer
         return material.Brdf.Pigment.get_color(hit.SurfacePoint) + material.EmittedRadiance.get_color(hit.SurfacePoint);
 
     }
+}
+
+/// <summary>
+/// A simple path-tracing renderer. The algorithm implemented here allows the caller to tune number of
+/// rays thrown at each iteration, as well as the maximum depth. It implements Russian roulette, so
+/// in principle it will take a finite time to complete the calculation even if you set max_depth
+/// to `math.inf`.
+/// </summary>
+public class PathTracer : Renderer
+{
+    public Pcg Pcg;
+    public int NumOfRays;
+    public int MaxDepth;
+    public int RussianRouletteLimit;
+    public PathTracer(World world) : base(world)
+    {
+        Pcg = new Pcg();
+        NumOfRays = 10;
+        MaxDepth = 2;
+        RussianRouletteLimit = 3;
+    }
+    public PathTracer(World world, Color backgroundColor) : base(world, backgroundColor)
+    {
+        Pcg = new Pcg();
+        NumOfRays = 10;
+        MaxDepth = 2;
+        RussianRouletteLimit = 3;
+    }
+
+    public override Color Render(Ray ray)
+    {
+        if (ray.Depth > MaxDepth)
+        {
+            return new Color(0.0f, 0.0f, 0.0f);
+        }
+        
+        var hitRecord = World.ray_intersection(ray);
+        if (hitRecord == null)
+        {
+            return BackgroundColor;
+        }
+
+        var hitMaterial = hitRecord.Shape.Material;
+        var hitColor = hitMaterial.Brdf.Pigment.get_color(hitRecord.SurfacePoint);
+        var emittedRadiance = hitMaterial.EmittedRadiance.get_color(hitRecord.SurfacePoint);
+
+        var hitColorLum = Math.Max(Math.Max(hitColor.R, hitColor.G), hitColor.B);
+
+        //Russian roulette
+        if (ray.Depth >= RussianRouletteLimit)
+        {
+            var q = MathF.Max(0.05f, 1 - hitColorLum);
+            if (Pcg.random_float() > q)
+            {
+                //Keep the recursion going, but compensate for other potentially discarded rays
+                hitColor *= 1.0f / (1.0f - q);
+            }
+            else
+            {
+                //Terminate prematurely
+                return emittedRadiance;
+            }
+
+        }
+
+        var cumRadiance = new Color(0.0f, 0.0f, 0.0f);
+        if (hitColorLum > 0.0) //Only do costly recursions if it's worth it
+        {
+            for (int rayIndex = 0; rayIndex < NumOfRays; rayIndex++)
+            {
+                var newRay = hitMaterial.Brdf.scatter_ray(
+                    Pcg,
+                    hitRecord.Ray.Dir,
+                    hitRecord.WorldPoint,
+                    hitRecord.Normal,
+                    ray.Depth + 1
+                );
+                // Recursive call
+                var newRadiance = Render(newRay);
+                cumRadiance += hitColor * newRadiance;
+            }
+        }
+
+        return emittedRadiance + cumRadiance * (1.0f / NumOfRays);
+        
+    }
+
 }
