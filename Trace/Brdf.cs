@@ -74,6 +74,11 @@ public class SpecularBrdf: Brdf
         ThresholdAngleRad = thresholdAngleRad;
     }
     
+    public SpecularBrdf(IPigment pigment) : base(pigment)
+    {
+        ThresholdAngleRad = MathF.PI/1800;
+    }
+    
     /// <summary>
     /// We provide this implementation for reference, but we are not going to use it (neither in the
     /// path tracer nor in the point-light tracer)

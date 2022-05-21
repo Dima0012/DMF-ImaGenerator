@@ -84,7 +84,21 @@ internal static class DfmImaGenerator
         }
 
         var world = new World();
+        var skyMaterial = new Material(new DiffuseBrdf(new UniformPigment(new Color(0, 0, 0))),
+            new UniformPigment(new Color(1.0f, 0.9f, 0.5f)));
+        var groundMaterial = new Material(new DiffuseBrdf(new CheckeredPigment(
+            new Color(0.3f, 0.5f, 0.1f),
+            new Color(0.1f, 0.2f, 0.5f))));
+        var sphereMaterial = new Material(new DiffuseBrdf(new UniformPigment(new Color(0.3f, 0.4f, 0.8f))));
+        var mirrorMaterial = new Material(new SpecularBrdf(new UniformPigment(new Color(0.6f, 0.2f, 0.3f))));
+        
+        world.add(new Sphere(Transformation.scaling(new Vec(200, 200, 200)) * Transformation.translation(new Vec(0, 0, 0.4f)),
+                skyMaterial));
+        world.add(new Plane(groundMaterial));
+        world.add(new Sphere(Transformation.translation(new Vec(0, 0, 1)), sphereMaterial));
+        world.add(new Sphere(Transformation.translation(new Vec(1, 2.5f, 0)), mirrorMaterial));
 
+        /*
         var scalingFactor = 1 / 10f;
         var scaling = Transformation.scaling(new Vec(scalingFactor, scalingFactor, scalingFactor));
         var material = new Material(new DiffuseBrdf(new UniformPigment(new Color(1, 0, 0))));
@@ -122,6 +136,7 @@ internal static class DfmImaGenerator
         var materialf2 = new Material(new DiffuseBrdf(new CheckeredPigment(green, yellow, 2)));
         var spheref2 = new Sphere(transf, materialf2);
         world.add(spheref2);
+        */
 
         // Define camera with rotation angle
         var camTransformation = Transformation.rotation_z(angle) * Transformation.translation(new Vec(-2.0f, 0, 0));
@@ -168,7 +183,7 @@ internal static class DfmImaGenerator
         {
             pfmName = s + "_demo.pfm";
         }
-        
+
         using Stream outputFilePfm = File.OpenWrite(pfmName);
         imageTracer.Image.write_pfm(outputFilePfm, -1.0);
         Console.WriteLine("File " + pfmName + " has been written to disk.");

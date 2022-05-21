@@ -66,4 +66,34 @@ public class RendererTests
         Assert.True(img.get_pixel(1, 2).is_close(Black));
         Assert.True(img.get_pixel(2, 2).is_close(Black));
     }
+
+    [Fact]
+    public void TestFurnace_PathTracer()
+    {
+        var pcg = new Pcg();
+
+        //Run the furnace test several times using random values for the emitted radiance and reflectance
+        for (int i = 1; i<=5; i++)
+        {
+            var world = new World();
+
+            var emittedRadiance = pcg.random_float();
+            var reflectance = pcg.random_float();
+            var enclosureMaterial = new Material(
+                new DiffuseBrdf(new UniformPigment(new Color(1.0f, 1.0f, 1.0f) * reflectance)),
+                new UniformPigment(new Color(1.0f, 1.0f, 1.0f) * emittedRadiance));
+
+            world.add(new Sphere(new Transformation(),enclosureMaterial));
+
+            var pathTracer = new PathTracer(world, pcg, 1, 100, 101);
+
+            var ray = new Ray(new Point(0, 0, 0), new Vec(1, 0, 0));
+            var color = pathTracer.Render(ray);
+
+            var expected = emittedRadiance / (1.0f - reflectance);
+            Assert.True(color.float_is_close(color.R, expected, 1e-3));
+            Assert.True(color.float_is_close(color.G, expected, 1e-3));
+            Assert.True(color.float_is_close(color.B, expected, 1e-3));
+        }
+    }
 }

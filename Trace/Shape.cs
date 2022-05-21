@@ -128,6 +128,11 @@ public class Plane : Shape
 {
     public Plane() : base(){}
 
+    public Plane(Material material) : base()
+    {
+        Material = material;
+    }
+
     public Plane(Transformation transformation) : base(transformation){}
     public Plane(Transformation transformation, Material material) : base(transformation, material){}
     
