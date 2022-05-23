@@ -45,7 +45,7 @@ public class OnbTests
             Assert.True(Math.Abs(squaredNorm) < tolerance);
 
             // Verify that the base is right-oriented
-            // Assert.True(onb.E1.vec_prod(onb.E2).is_close(onb.E3, tolerance));
+            Assert.True(onb.E1.vec_prod(onb.E2).is_close(onb.E3, tolerance));
         }
     }
 }

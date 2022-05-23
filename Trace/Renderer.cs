@@ -51,6 +51,49 @@ public class OneColor : Renderer
 }
 
 /// <summary>
+/// This Renderer implements a test render for TestAntiAliasing.
+/// For debug purposes only.
+/// </summary>
+public class AliasingRenderer : Renderer
+{
+    public int NumOfRays { get; set; }
+    public int Test1 { get; set; }
+    public int Test2 { get; set; }
+    public int Test3 { get; set; }
+    
+    public AliasingRenderer(World world) : base(world)
+    {
+        Test1 = 0;
+        Test2 = 0;
+        Test3 = 0;
+        NumOfRays = 0;
+    }
+
+    public override Color Render(Ray ray)
+    {
+        var point = ray.at(1);
+    
+        // Check all the rays intersect the screen within the region [−1, 1] × [−1, 1]
+        var test1 = MathF.Abs(point.X) < 10e-5;
+        var test2 = point.Y is >= -1.0f and <= 1.0f;
+        var test3 = point.Z is >= -1.0f and <= 1.0f;
+
+        if (test1 && test2 && test3)
+        {
+            Test1 += 1;
+            Test2 += 1;
+            Test3 += 1;
+        }
+        
+        NumOfRays += 1;
+        
+        return new Color(0, 0, 0);
+
+    }
+    
+}
+
+/// <summary>
 /// This Renderer implements an on-off method. All objects will be rendered white, the background black.
 /// For debug purposes only.
 /// </summary>
@@ -99,7 +142,7 @@ public class FlatRenderer : Renderer
 /// A simple path-tracing renderer. The algorithm implemented here allows the caller to tune number of
 /// rays thrown at each iteration, as well as the maximum depth. It implements Russian roulette, so
 /// in principle it will take a finite time to complete the calculation even if you set max_depth
-/// to `math.inf`.
+/// to Math.Inf.
 /// </summary>
 public class PathTracer : Renderer
 {

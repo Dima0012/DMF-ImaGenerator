@@ -53,9 +53,15 @@ internal class ParserSettings
             HelpText = "Name of the output PNG file.")]
         public string PngName { get; set; } = null!;
         
-        [Option('a', "algorithm", Default = "onoff",Separator = ' ',
+        [Option('a', "algorithm", Default = "onoff", Separator = ' ',
             HelpText = "Algorithm used to render the image. Choose between 'on-off' and 'flat'")]
         public string Algorithm { get; set; } = null!;
+        
+        [Option('s', "samples-per-pixels", MetaValue = "INT", Default = 1, Separator = ' ',
+            HelpText = "number of samples per pixel for anti-aliasing. Must be a perfect square (eg. 16)." )]
+        public int PixelSamples { get; set; }
+        
+        
     }
 
     [Verb("pfm2png", HelpText = "Convert a file from PFM format to PNG format.")]

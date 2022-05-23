@@ -72,13 +72,22 @@ internal static class DfmImaGenerator
         var pngName = parsed.PngName;
         var pfmName = parsed.PfmName;
         var algorithm = parsed.Algorithm;
+        var pixelSamples = parsed.PixelSamples;
 
-        List<string> algs = new List<string> {"onoff", "flat"};
+        var algs = new List<string> {"onoff", "flat"};
 
         if (!algs.Contains(algorithm))
         {
             Console.WriteLine("Unknown render option. Choose between: ");
             Console.WriteLine("onoff\n" + "flat\n");
+            Console.WriteLine("Exiting application.");
+            return;
+        }
+
+        var samplesPerSide = MathF.Sqrt(pixelSamples);
+        if (Math.Abs(samplesPerSide*samplesPerSide - pixelSamples) > 10-4)
+        {
+            Console.WriteLine($"Error. Samples per pixels {pixelSamples} is not a perfect square.");
             Console.WriteLine("Exiting application.");
             return;
         }
