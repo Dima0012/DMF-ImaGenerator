@@ -189,3 +189,66 @@ public class PathTracer : Renderer
     }
 
 }
+
+/// <summary>
+/// A simple point-light renderer.
+/// This renderer is similar to what POV-Ray provides by default.
+/// </summary>
+public class PointLightRenderer : Renderer
+{
+    public Color AmbientColor;
+
+    public PointLightRenderer(World world) : base(world)
+    {
+        AmbientColor = new Color(0.1f, 0.1f, 0.1f);
+    }
+    
+    public PointLightRenderer(World world, Color backgroundColor) : base(world, backgroundColor)
+    {
+        AmbientColor = new Color(0.1f, 0.1f, 0.1f);
+    }
+    
+    public PointLightRenderer(World world, Color backgroundColor, Color ambientColor) : base(world, backgroundColor)
+    {
+        AmbientColor = ambientColor;
+    }
+
+    public override Color Render(Ray ray)
+    {
+        var hitRecord = World.ray_intersection(ray);
+        if (hitRecord == null)
+        {
+            return BackgroundColor;
+        }
+
+        var hitMaterial = hitRecord.Shape.Material;
+
+        var resultColor = AmbientColor;
+        foreach (var curLight in World.PointLights)
+        {
+            if (!World.is_point_visible(curLight.Position, hitRecord.WorldPoint)) continue;
+            var distanceVec = hitRecord.WorldPoint - curLight.Position;
+            var distance = distanceVec.norm();
+            var inDir = distanceVec * (1.0f / distance);
+            var cosTheta = MathF.Max(0.0f, hitRecord.Normal.normalized_dot(ray.Dir.neg()));
+
+            var distanceFactor = 1.0f;
+            if (curLight.LinearRadius > 0)
+            {
+                distanceFactor = MathF.Pow(curLight.LinearRadius / distance, 2);
+            }
+
+            var emittedColor = hitMaterial.EmittedRadiance.get_color(hitRecord.SurfacePoint);
+            var brdfColor = hitMaterial.Brdf.eval(
+                hitRecord.Normal,
+                inDir,
+                ray.Dir.neg(),
+                hitRecord.SurfacePoint);
+            resultColor += (emittedColor + brdfColor) * curLight.Color * cosTheta * distanceFactor;
+        }
+
+        return resultColor;
+    }
+}
+    
+
