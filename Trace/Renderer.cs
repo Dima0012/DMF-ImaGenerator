@@ -146,10 +146,10 @@ public class FlatRenderer : Renderer
 /// </summary>
 public class PathTracer : Renderer
 {
-    public Pcg Pcg;
-    public int NumOfRays;
-    public int MaxDepth;
-    public int RussianRouletteLimit;
+    public Pcg Pcg { get; set; }
+    public int NumOfRays{ get; set; }
+    public int MaxDepth{ get; set; }
+    public int RussianRouletteLimit{ get; set; }
     public PathTracer(World world) : base(world)
     {
         Pcg = new Pcg();
