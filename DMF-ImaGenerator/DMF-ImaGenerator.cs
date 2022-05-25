@@ -15,7 +15,10 @@ internal static class DfmImaGenerator
 
         var parserSettings = new ParserSettings();
         var parser = new Parser(with => with.HelpWriter = null);
-        var result = parser.ParseArguments<ParserSettings.Pfm2PngOptions, ParserSettings.DemoOptions, ParserSettings.DemoFullOptions>(args);
+        var result =
+            parser
+                .ParseArguments<ParserSettings.Pfm2PngOptions, ParserSettings.DemoOptions,
+                    ParserSettings.DemoFullOptions>(args);
 
         result.WithParsed<ParserSettings.Pfm2PngOptions>(Pfm2Png);
         result.WithParsed<ParserSettings.DemoOptions>(Demo);
@@ -259,14 +262,14 @@ internal static class DfmImaGenerator
 
         // Create scene 
         var world = new World();
-        
+
         var skyMaterial = new Material(new DiffuseBrdf(new UniformPigment(new Color(0, 0, 0))),
             new UniformPigment(new Color(1.0f, 0.9f, 0.5f)));
-        
+
         var groundMaterial = new Material(new DiffuseBrdf(new CheckeredPigment(
             new Color(0.3f, 0.5f, 0.1f),
             new Color(0.1f, 0.2f, 0.5f))));
-        
+
         var sphereMaterial = new Material(new DiffuseBrdf(new UniformPigment(new Color(0.3f, 0.4f, 0.8f))));
         var mirrorMaterial = new Material(new SpecularBrdf(new UniformPigment(new Color(0.6f, 0.2f, 0.3f))));
 
@@ -317,6 +320,9 @@ internal static class DfmImaGenerator
             {
                 Console.WriteLine($"Rendering full-demo image with {algorithm} renderer.");
                 Console.WriteLine($"Resolution is {width}x{height}\n");
+
+                world.add_light(new PointLight(new Point(-30, 30, 30), new Color(1, 1, 1)));
+
                 var renderer = new PointLightRenderer(world);
                 // Trace image with point-light method
                 stopWatch.Start();

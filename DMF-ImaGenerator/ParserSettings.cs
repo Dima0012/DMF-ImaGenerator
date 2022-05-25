@@ -69,7 +69,7 @@ internal class ParserSettings
             HelpText = "Luminosity value for tone mapping.")]
         public float? Luminosity { get; set; }
 
-        [Option('s', "samples-per-pixels", MetaValue = "INT", Default = 1, Separator = ' ',
+        [Option('s', "samples-per-pixels", MetaValue = "INT", Default = 0, Separator = ' ',
             HelpText = "number of samples per pixel for anti-aliasing. Must be a perfect square (eg. 16).")]
         public int PixelSamples { get; set; }
     }
@@ -117,7 +117,7 @@ internal class ParserSettings
             HelpText = "Luminosity value for tone mapping.")]
         public float? Luminosity { get; set; }
 
-        [Option('s', "samples-per-pixels", MetaValue = "INT", Default = 1, Separator = ' ',
+        [Option('s', "samples-per-pixels", MetaValue = "INT", Default = 0, Separator = ' ',
             HelpText = "Number of samples per pixel for anti-aliasing. Must be a perfect square (eg. 16).")]
         public int PixelSamples { get; set; }
         

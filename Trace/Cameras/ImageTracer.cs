@@ -10,7 +10,7 @@ public class ImageTracer
     public Pcg Pcg { get; set; }
     public int SamplesPerSide { get; set; }
 
-    public ImageTracer(HdrImage image, ICamera camera, int samplesPerSide = 1)
+    public ImageTracer(HdrImage image, ICamera camera, int samplesPerSide = 0)
     {
         Image = image;
         Camera = camera;
