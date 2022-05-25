@@ -10,7 +10,7 @@ public class Pcg
     public ulong State { get; set; }
     public ulong Inc { get; set; }
 
-    public Pcg(ulong initState = 42, ulong initSeq = 54)
+    public Pcg(ulong initState = 42UL, ulong initSeq = 54UL)
     {
         State = 0;
         Inc = (initSeq << 1) | 1;

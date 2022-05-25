@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CommandLine;
 using CommandLine.Text;
 using Trace;
@@ -10,16 +11,18 @@ internal static class DfmImaGenerator
 {
     private static void Main(string[] args)
     {
+        Console.WriteLine();
+
         var parserSettings = new ParserSettings();
         var parser = new Parser(with => with.HelpWriter = null);
-        var result = parser.ParseArguments<ParserSettings.Pfm2PngOptions, ParserSettings.DemoOptions>(args);
-
-        Console.WriteLine();
-        Console.WriteLine(HeadingInfo.Default);
-        Console.WriteLine();
+        var result =
+            parser
+                .ParseArguments<ParserSettings.Pfm2PngOptions, ParserSettings.DemoOptions,
+                    ParserSettings.DemoFullOptions>(args);
 
         result.WithParsed<ParserSettings.Pfm2PngOptions>(Pfm2Png);
         result.WithParsed<ParserSettings.DemoOptions>(Demo);
+        result.WithParsed<ParserSettings.DemoFullOptions>(DemoFull);
 
         result.WithNotParsed(errs => ParserSettings.DisplayHelp(result, errs));
 
@@ -28,8 +31,12 @@ internal static class DfmImaGenerator
 
     private static void Pfm2Png(ParserSettings.Pfm2PngOptions parsed)
     {
+        Console.WriteLine(HeadingInfo.Default);
+        Console.WriteLine();
+
         var gamma = parsed.Gamma;
         var factor = parsed.Factor;
+        var luminosity = parsed.Luminosity;
         var inputFile = parsed.InputFile;
         var outputFile = parsed.OutputFile;
 
@@ -37,9 +44,7 @@ internal static class DfmImaGenerator
         {
             Console.WriteLine("Could not find the specified file.");
             Console.WriteLine("File name: " + inputFile);
-            Console.WriteLine();
-            Console.WriteLine("Exiting application.");
-            Console.WriteLine();
+            Console.WriteLine("\nExiting application.");
             return;
         }
 
@@ -48,7 +53,7 @@ internal static class DfmImaGenerator
         Console.WriteLine($"File {inputFile} has been read from disk.");
 
         // Adjusting image
-        img.normalize_image(factor);
+        img.normalize_image(factor, luminosity);
         img.clamp_image();
 
         img.write_ldr_image(outputFile, gamma);
@@ -58,15 +63,45 @@ internal static class DfmImaGenerator
 
     private static void Demo(ParserSettings.DemoOptions parsed)
     {
+        Console.WriteLine(HeadingInfo.Default);
+        Console.WriteLine();
+
         var width = parsed.Width;
         var height = parsed.Height;
         var cam = parsed.Camera;
         var angle = parsed.Angle;
-        var name = parsed.Name;
+        var pngName = parsed.PngName;
+        var pfmName = parsed.PfmName;
+        var luminosity = parsed.Luminosity;
+        var factor = parsed.Factor;
+        var gamma = parsed.Gamma;
+        var algorithm = parsed.Algorithm;
+        var pixelSamples = parsed.PixelSamples;
 
+        var algs = new List<string> {"on-off", "flat"};
+
+        if (!algs.Contains(algorithm))
+        {
+            Console.WriteLine("Unknown render option. Choose between: ");
+            Console.WriteLine("on-off\n" + "flat\n");
+            Console.WriteLine("\nExiting application.");
+            return;
+        }
+
+        var samplesPerSide = MathF.Sqrt(pixelSamples);
+        if (Math.Abs(samplesPerSide * samplesPerSide - pixelSamples) > 10 - 4)
+        {
+            Console.WriteLine(
+                $"Error. Samples per pixels {pixelSamples} to use in anti aliasing is not a perfect square.");
+            Console.WriteLine("\nExiting application.");
+            return;
+        }
+
+        // Create scene
         var world = new World();
-        
-        var scaling = Transformation.scaling(new Vec(1 / 10f, 1 / 10f, 1 / 10f));
+        const float scalingFactor = 1 / 10f;
+        var scaling = Transformation.scaling(new Vec(scalingFactor, scalingFactor, scalingFactor));
+        var material = new Material(new DiffuseBrdf(new UniformPigment(new Color(1, 0, 0))));
 
         // Add sphere to cube vertexes
         for (var x = 0.5f; x >= -0.5f; x -= 1.0f)
@@ -78,63 +113,255 @@ internal static class DfmImaGenerator
                     var translation = Transformation.translation(new Vec(x, y, z));
                     var transformation = translation * scaling;
 
-                    var sphere = new Sphere(transformation);
+                    var sphere = new Sphere(transformation, material);
 
                     world.add(sphere);
                 }
             }
         }
-        
+
         // Add sphere to cube faces
-        var transl = Transformation.translation(new Vec(0f, 0.5f , 0f));
+        var transl = Transformation.translation(new Vec(0f, 0.5f, 0f));
         var transf = transl * scaling;
-        var spheref1 = new Sphere(transf);
+        var materiaf1 = new Material(new DiffuseBrdf(new UniformPigment()));
+        var spheref1 = new Sphere(transf, materiaf1);
         world.add(spheref1);
-        
-        transl = Transformation.translation(new Vec(0f, 0f , -0.5f));
+
+        transl = Transformation.translation(new Vec(0f, 0f, -0.5f));
         transf = transl * scaling;
-        var spheref2 = new Sphere(transf);
+
+        var green = new Color(0.3f, 0.9f, 0.5f);
+        var yellow = new Color(0.9f, 0.9f, 0.4f);
+
+        var materialf2 = new Material(new DiffuseBrdf(new CheckeredPigment(green, yellow, 2)));
+        var spheref2 = new Sphere(transf, materialf2);
         world.add(spheref2);
 
         // Define camera with rotation angle
-        var camTransformation = Transformation.rotation_z(angle)*Transformation.translation(new Vec(-2.0f, 0,0));
+        var camTransformation = Transformation.rotation_z(angle) * Transformation.translation(new Vec(-2.0f, 0, 0));
         ICamera camera;
         string s;
-        
+
+        // Choose camera
         if (!cam)
         {
-            camera = new PerspectiveCamera(1.0f, (float) width/height, camTransformation);
+            camera = new PerspectiveCamera(1.0f, (float) width / height, camTransformation);
             s = "perspective";
         }
         else
         {
-            camera = new OrthogonalCamera((float) width/height, camTransformation);
+            camera = new OrthogonalCamera((float) width / height, camTransformation);
             s = "orthogonal";
         }
 
         var img = new HdrImage(width, height);
-        var imageTracer = new ImageTracer(img, camera);
-        
-        // Trace image with on-off method
-        imageTracer.fire_all_rays(ray => world.ray_intersection(ray) != null ? new Color(1, 1, 1) : new Color(0, 0, 0));
+        var imageTracer = new ImageTracer(img, camera, (int) samplesPerSide);
+        var stopWatch = new Stopwatch();
+
+        // Choose algorithm and render
+        switch (algorithm)
+        {
+            case "on-off":
+            {
+                Console.WriteLine($"Rendering demo image with {algorithm} renderer.");
+                Console.WriteLine($"Resolution is {width}x{height}\n");
+                var renderer = new OnOffRenderer(world);
+                // Trace image with flat method
+                stopWatch.Start();
+                imageTracer.fire_all_rays(renderer);
+                stopWatch.Stop();
+                break;
+            }
+            case "flat":
+            {
+                Console.WriteLine($"Rendering demo image with {algorithm} renderer.");
+                Console.WriteLine($"Resolution is {width}x{height}\n");
+                var renderer = new FlatRenderer(world);
+                // Trace image with on-off method
+                stopWatch.Start();
+                imageTracer.fire_all_rays(renderer);
+                stopWatch.Stop();
+                break;
+            }
+        }
+
+        var ts = stopWatch.Elapsed;
+        var elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds / 10:00}";
 
         // Save image in PFM format
-        using Stream outputFilePfm = File.OpenWrite(s+"_demo.pfm");
+
+        if (pfmName == "default")
+        {
+            pfmName = s + "_demo.pfm";
+        }
+
+        Console.WriteLine($"Rendering of {pfmName} complete.");
+        Console.WriteLine("Time elapsed: " + elapsedTime);
+
+        using Stream outputFilePfm = File.OpenWrite(pfmName);
         imageTracer.Image.write_pfm(outputFilePfm, -1.0);
-        
+        Console.WriteLine("\nFile " + pfmName + " has been written to disk.");
+
         // Save image in PNG format
 
         // Adjusting image
-        imageTracer.Image.normalize_image(0.18f);
+        imageTracer.Image.normalize_image(factor, luminosity);
         imageTracer.Image.clamp_image();
 
-        if (name == "default")
+        if (pngName == "default")
         {
-            name = s + "_demo.png";
-            Console.WriteLine("File "+name+" has been written to disk.");
+            pngName = s + "_demo.png";
         }
-        
-        imageTracer.Image.write_ldr_image(name, 1.0f);
-        
+
+        imageTracer.Image.write_ldr_image(pngName, gamma);
+        Console.WriteLine("File " + pngName + " has been written to disk.");
+        Console.WriteLine("\nExiting application.");
+    }
+
+
+    private static void DemoFull(ParserSettings.DemoFullOptions parsed)
+    {
+        Console.WriteLine(HeadingInfo.Default);
+        Console.WriteLine();
+
+        var width = parsed.Width;
+        var height = parsed.Height;
+        var cam = parsed.Camera;
+        var angle = parsed.Angle;
+        var pngName = parsed.PngName;
+        var pfmName = parsed.PfmName;
+        var algorithm = parsed.Algorithm;
+        var factor = parsed.Factor;
+        var gamma = parsed.Gamma;
+        var luminosity = parsed.Luminosity;
+        var pixelSamples = parsed.PixelSamples;
+        var initState = parsed.InitState;
+        var initSeq = parsed.InitSequence;
+        var numberOfRays = parsed.NumberOfRays;
+        var maxDepth = parsed.MaxDepth;
+        var rouletteLimit = parsed.RussianRouletteLimit;
+
+        var algs = new List<string> {"path-tracer", "point-light"};
+
+        if (!algs.Contains(algorithm))
+        {
+            Console.WriteLine("Unknown render option. Choose between: ");
+            Console.WriteLine("path-tracer\n" + "point-light\n");
+            Console.WriteLine("\nExiting application.");
+            return;
+        }
+
+        var samplesPerSide = MathF.Sqrt(pixelSamples);
+        if (Math.Abs(samplesPerSide * samplesPerSide - pixelSamples) > 10 - 4)
+        {
+            Console.WriteLine(
+                $"Error. Samples per pixels {pixelSamples} to use in anti aliasing is not a perfect square.");
+            Console.WriteLine("\nExiting application.");
+            return;
+        }
+
+        // Create scene 
+        var world = new World();
+
+        var skyMaterial = new Material(new DiffuseBrdf(new UniformPigment(new Color(0, 0, 0))),
+            new UniformPigment(new Color(1.0f, 0.9f, 0.5f)));
+
+        var groundMaterial = new Material(new DiffuseBrdf(new CheckeredPigment(
+            new Color(0.3f, 0.5f, 0.1f),
+            new Color(0.1f, 0.2f, 0.5f))));
+
+        var sphereMaterial = new Material(new DiffuseBrdf(new UniformPigment(new Color(0.3f, 0.4f, 0.8f))));
+        var mirrorMaterial = new Material(new SpecularBrdf(new UniformPigment(new Color(0.6f, 0.2f, 0.3f))));
+
+        world.add(new Sphere(Transformation.scaling(new Vec(200, 200, 200))
+                             * Transformation.translation(new Vec(0, 0, 0.4f)),
+            skyMaterial));
+        world.add(new Plane(groundMaterial));
+        world.add(new Sphere(Transformation.translation(new Vec(0, 0, 1)), sphereMaterial));
+        world.add(new Sphere(Transformation.translation(new Vec(1, 2.5f, 0)), mirrorMaterial));
+
+        // Define camera with rotation angle
+        var camTransformation = Transformation.rotation_z(angle) * Transformation.translation(new Vec(-1.0f, 0, 1));
+        ICamera camera;
+        string s;
+
+        // Choose camera
+        if (!cam)
+        {
+            camera = new PerspectiveCamera((float) width / height, camTransformation);
+            s = "perspective";
+        }
+        else
+        {
+            camera = new OrthogonalCamera((float) width / height, camTransformation);
+            s = "orthogonal";
+        }
+
+        var img = new HdrImage(width, height);
+        var imageTracer = new ImageTracer(img, camera, (int) samplesPerSide);
+        var stopWatch = new Stopwatch();
+
+        // Choose algorithm and render
+        switch (algorithm)
+        {
+            case "path-tracer":
+            {
+                Console.WriteLine($"Rendering full-demo image with {algorithm} renderer.");
+                Console.WriteLine($"Resolution is {width}x{height}\n");
+                var renderer = new PathTracer(world, new Pcg(initState, initSeq), numberOfRays, maxDepth,
+                    rouletteLimit);
+                // Trace image with path-trace method
+                stopWatch.Start();
+                imageTracer.fire_all_rays(renderer);
+                stopWatch.Stop();
+                break;
+            }
+            case "point-light":
+            {
+                Console.WriteLine($"Rendering full-demo image with {algorithm} renderer.");
+                Console.WriteLine($"Resolution is {width}x{height}\n");
+
+                world.add_light(new PointLight(new Point(-30, 30, 30), new Color(1, 1, 1)));
+
+                var renderer = new PointLightRenderer(world);
+                // Trace image with point-light method
+                stopWatch.Start();
+                imageTracer.fire_all_rays(renderer);
+                stopWatch.Stop();
+                break;
+            }
+        }
+
+        var ts = stopWatch.Elapsed;
+        var elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds / 10:00}";
+
+        // Save image in PFM format
+
+        if (pfmName == "default")
+        {
+            pfmName = s + "_full-demo.pfm";
+        }
+
+        Console.WriteLine($"Rendering of {pfmName} complete.");
+        Console.WriteLine("Time elapsed: " + elapsedTime);
+
+        using Stream outputFilePfm = File.OpenWrite(pfmName);
+        imageTracer.Image.write_pfm(outputFilePfm, -1.0);
+        Console.WriteLine("\nFile " + pfmName + " has been written to disk.");
+
+        // Save image in PNG format
+
+        // Adjusting image
+        imageTracer.Image.normalize_image(factor, luminosity);
+        imageTracer.Image.clamp_image();
+
+        if (pngName == "default")
+        {
+            pngName = s + "_full-demo.png";
+        }
+
+        imageTracer.Image.write_ldr_image(pngName, gamma);
+        Console.WriteLine("File " + pngName + " has been written to disk.");
+        Console.WriteLine("\nExiting application.");
     }
 }

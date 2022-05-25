@@ -67,7 +67,7 @@ public struct Vec
     /// <summary>
     /// Overloading for the scalar product of two Vectors.
     /// </summary>
-    public static double operator *(Vec v, Vec u)
+    public static float operator *(Vec v, Vec u)
     {
         return v.X * u.X + v.Y * u.Y + v.Z * u.Z;
     }
@@ -87,15 +87,15 @@ public struct Vec
     /// <summary>
     /// Returns the norm of the Vector.
     /// </summary>
-    public double norm()
+    public float norm()
     {
-        return Math.Sqrt(squared_norm());
+        return MathF.Sqrt(squared_norm());
     }
 
     /// <summary>
     /// Returns the squared norm of the Vector.
     /// </summary>
-    public double squared_norm()
+    public float squared_norm()
     {
         return X * X + Y * Y + Z * Z;
     }
@@ -103,11 +103,12 @@ public struct Vec
     /// <summary>
     /// Normalize the Vector by invoking norm().
     /// </summary>
-    public void normalize()
+    public Vec normalize()
     {
         X /= (float) norm();
         Y /= (float) norm();
         Z /= (float) norm();
+        return this;
     }
 
     public Normal to_normal()

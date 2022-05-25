@@ -10,15 +10,24 @@ namespace Trace;
 public abstract class Shape
 {
     protected Transformation Transformation;
+    public Material Material;
     
     public Shape()
     {
         Transformation = new Transformation();
+        Material = new Material();
     }
 
     public Shape(Transformation transformation)
     {
         Transformation = transformation;
+        Material = new Material();
+    }
+
+    public Shape(Transformation transformation, Material material)
+    {
+        Transformation = transformation;
+        Material = material;
     }
     
     /// <summary>
@@ -26,12 +35,18 @@ public abstract class Shape
     /// Returns a HitRecord, or Null if no intersection was found.
     /// </summary>
     public abstract HitRecord? ray_intersection(Ray ray);
+    
+    /// <summary>
+    /// Determine whether a ray hits the shape or not.
+    /// </summary>
+    public abstract bool quick_ray_intersection(Ray ray);
 }
 
 public class Sphere : Shape
 {
     public Sphere() : base(){}
     public Sphere(Transformation transformation) : base(transformation){}
+    public Sphere(Transformation transformation, Material material) : base(transformation, material){}
     
 
     /// <summary>
@@ -75,7 +90,9 @@ public class Sphere : Shape
             Transformation * hitPoint, 
             Transformation * sphere_normal(hitPoint,invRay.Dir),
             sphere_point_to_uv(hitPoint),
-            firstHitT, ray
+            firstHitT,
+            ray,
+            this
             );
 
     }
@@ -108,6 +125,30 @@ public class Sphere : Shape
 
         return new Vec2d(u, (float) (Math.Acos(point.Z) / Math.PI));
     }
+
+    /// <summary>
+    /// Quickly checks if a ray intersects the sphere.
+    /// </summary>
+    public override bool quick_ray_intersection(Ray ray)
+    {
+        var invRay = ray.transform(Transformation.inverse());
+        var originVec = invRay.Origin.to_vec();
+        var a = invRay.Dir.squared_norm();
+        var b = 2.0f * originVec*invRay.Dir;
+        var c = originVec.squared_norm() - 1.0f;
+
+        var delta = b * b - 4.0f * a * c;
+        if (delta <= 0.0)
+        {
+            return false;
+        }
+
+        var sqrtDelta = MathF.Sqrt(delta);
+        var tmin = (-b - sqrtDelta) / (2.0f * a);
+        var tmax = (-b + sqrtDelta) / (2.0f * a);
+
+        return (invRay.Tmin < tmin && tmin < invRay.Tmax)  || (invRay.Tmin < tmax && tmax < invRay.Tmax);
+    }
 }
 
 /// <summary>
@@ -118,7 +159,13 @@ public class Plane : Shape
 {
     public Plane() : base(){}
 
+    public Plane(Material material) : base()
+    {
+        Material = material;
+    }
+
     public Plane(Transformation transformation) : base(transformation){}
+    public Plane(Transformation transformation, Material material) : base(transformation, material){}
     
     /// <summary>
     /// Checks if a ray intersects the plane.
@@ -141,21 +188,39 @@ public class Plane : Shape
         }
         
         var hitPoint = invRay.at(t);
-        var plane_normal = new Normal(0.0f, 0.0f, 1.0f);
+        var planeNormal = new Normal(0.0f, 0.0f, 1.0f);
         if (invRay.Dir.Z >= 0)
         {
-            plane_normal.Z = -1.0f;
+            planeNormal.Z = -1.0f;
         }
         
         
         return new HitRecord(
             Transformation * hitPoint, 
-            Transformation * plane_normal,
+            Transformation * planeNormal,
             new Vec2d(hitPoint.X - (float)Math.Floor(hitPoint.X),hitPoint.Y - (float)Math.Floor(hitPoint.Y)),
-            t, ray
+            t,
+            ray,
+            this
         );
+        
+        
 
     }
-    
+
+    /// <summary>
+    /// Quickly checks if a ray intersects the plane.
+    /// </summary>
+    public override bool quick_ray_intersection(Ray ray)
+    {
+        var invRay = ray.transform(Transformation.inverse());
+        if (Math.Abs(invRay.Dir.Z) < 1e-5)
+        {
+            return false;
+        }
+
+        var t = -invRay.Origin.Z / invRay.Dir.Z;
+        return invRay.Tmin < t && t < invRay.Tmax;
+    }
 
 }

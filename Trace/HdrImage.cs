@@ -13,7 +13,7 @@ public class HdrImage
     public int Height { get; set; }
     public int Width { get; set; }
 
-    public Color[] Pixels;
+    public Color[] Pixels = null!;
 
     /// <summary>
     /// Constructor that initialize a black image with the specified dimensions.

@@ -14,14 +14,16 @@ public class HitRecord
     public Vec2d SurfacePoint { get; set; }
     public float T { get; set; }
     public Ray Ray { get; set; }
+    public Shape Shape { get; set; }
 
-    public HitRecord(Point worldPoint, Normal normal, Vec2d surfacePoint, float t, Ray ray)
+    public HitRecord(Point worldPoint, Normal normal, Vec2d surfacePoint, float t, Ray ray, Shape shape)
     {
         WorldPoint = worldPoint;
         Normal = normal;
         SurfacePoint = surfacePoint;
         T = t;
         Ray = ray;
+        Shape = shape;
     }
 
     /// <summary>
