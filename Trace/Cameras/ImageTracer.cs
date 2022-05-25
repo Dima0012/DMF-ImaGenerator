@@ -43,6 +43,7 @@ public class ImageTracer
     {
         for (var row = 0; row < Image.Height; row++)
         {
+            Console.Write($"Rendering progress: {row}/{Image.Height} rows rendered.\r");
             for (var col = 0; col < Image.Width; col++)
             {
                 var cumColor = new Color(0, 0, 0);
