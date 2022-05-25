@@ -1,3 +1,18 @@
+# Version 0.3.0
+
+- New version released on 05/25/22
+- Improved ``demo``, now can render the image with a ``flat``renderer; it generates colored and checkered spheres.
+- More parameters to personalize the image generated: luminosity, correction for PNG saving.
+- Implemented ``antialisin.``.
+- A new parser option ``samples-per-pixel``can be choose to reduce the granularity of the image generated with any method.
+- Added two new renderning methods: ``path-tracing``and ``point-light``.
+- New ``demo-full``command. It can be run with the above new rendering methods. It display a much more detailed image.
+- Added parameters to personalize the rendering of the image when using ``path-tracing``.
+- Now the program displays the progress time of the rendering and the total time elapsed.
+- New BRDF added, Specular and Diffusive.
+- Pigments added.
+- New materials added.
+
 # Version 0.2.0
 
 - New version released on 05/9/22
