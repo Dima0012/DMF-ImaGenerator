@@ -7,7 +7,7 @@ namespace Trace;
 /// - line_num: number of the line (starting from 1)
 /// - col_num: number of the column (starting from 1)
 /// </summary>
-public class SourceLocation
+public struct SourceLocation
 {
     public string FileName;
     public int LineNum;

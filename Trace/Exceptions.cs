@@ -37,3 +37,20 @@ public class InputError : FormatException
     
 }
 
+// <summary>
+/// Rudimentary implementation for a class exception for reading input stream (related to scene files).
+/// </summary>
+public class InputStreamError : FormatException
+{
+    public InputStreamError(string message)
+        : base(message)
+    {
+    }
+
+    public InputStreamError(string message, Exception err)
+        : base(message, err)
+    {
+    }
+    
+}
+

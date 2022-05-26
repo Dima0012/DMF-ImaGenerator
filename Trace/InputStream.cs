@@ -27,6 +27,7 @@ public class InputStream
     public InputStream(Stream stream, string filename = "")
     {
         Stream = stream;
+        //Note that we start counting lines/columns from 1, not from 0
         Location = new SourceLocation(filename, 1, 1);
         SavedChar = null;
         SavedLocation = Location;
@@ -83,8 +84,52 @@ public class InputStream
         }
 
         SavedLocation = Location;       //without using copy, might generate problems (!)
+                                        //maybe I solved turning SourceLocation into a struct
         update_pos(ch);
         
         return ch;
     }
+
+    /// <summary>
+    /// Push a character back to the stream.
+    /// </summary>
+    public void unread_char(char? ch)
+    {
+        if (SavedChar != null)
+        {
+            throw new InputStreamError("The saved char is not empty, you should not unread_char");
+        }
+
+        SavedChar = ch;
+        Location = SavedLocation;
+    }
+
+    /// <summary>
+    /// Keep reading characters until a non-whitespace/non-comment character is found.
+    /// </summary>
+    public void skip_whitespaces_and_comments()
+    {
+        char? ch = read_char();
+        while (ch is ' ' or '\t' or '\n' or '\r' or '#')
+        {
+            if (ch == '#')
+            {
+                // It's a comment! Keep reading until the end of the line (include the case "", the end-of-file)
+                while (read_char() is not '\r' or '\n' or null){}
+                
+            }
+
+            ch = read_char();
+            if (ch == null)
+            {
+                return;
+            }
+            
+        }
+        
+       //Put the non-whitespace character back
+        unread_char(ch);
+    }
+    
+    //public StringToken 
 }
