@@ -10,7 +10,7 @@ public class SceneFileTests
     [Fact]
     public void TestInputFile()
     {
-        byte[] buf = Encoding.ASCII.GetBytes("abc   \nd\nef");
+        var buf = Encoding.ASCII.GetBytes("abc   \nd\nef");
         using var memStream = new MemoryStream(buf);
         var stream = new InputStream(memStream);
 

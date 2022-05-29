@@ -1,4 +1,7 @@
+using System.Text.RegularExpressions;
+
 namespace Trace;
+
 /// <summary>
 /// A high-level wrapper around a stream, used to parse scene files
 /// This class implements a wrapper around a stream, with the following additional capabilities:
@@ -13,8 +16,9 @@ public class InputStream
     public SourceLocation SavedLocation;
     public int Tabulations;
     public Token? SavedToken;
-    
-    public InputStream(Stream stream, SourceLocation sourceLocation, char? savedChar, SourceLocation savedLocation, int tabulations, Token? savedToken)
+
+    public InputStream(Stream stream, SourceLocation sourceLocation, char? savedChar, SourceLocation savedLocation,
+        int tabulations, Token? savedToken)
     {
         Stream = stream;
         Location = sourceLocation;
@@ -40,15 +44,15 @@ public class InputStream
     /// </summary>
     public void update_pos(char? ch)
     {
-        if (ch == null) // Nothing to do!
+        switch (ch)
         {
-            return;
-        }
-
-        if (ch == '\n')
-        {
-            Location.LineNum += 1;
-            Location.ColNum = 1;
+            // Nothing to do!
+            case null:
+                return;
+            case '\n':
+                Location.LineNum += 1;
+                Location.ColNum = 1;
+                break;
         }
 
         if (ch == '\t')
@@ -57,7 +61,7 @@ public class InputStream
         }
         else
         {
-            Location.ColNum += 1; 
+            Location.ColNum += 1;
         }
     }
 
@@ -66,7 +70,7 @@ public class InputStream
     /// </summary>
     public char? read_char()
     {
-        char? ch = SavedChar;
+        var ch = SavedChar;
         if (SavedChar != null)
         {
             SavedChar = null;
@@ -79,14 +83,13 @@ public class InputStream
                 return null;
             }
 
-            ch = Convert.ToChar(buffer);
-
+            ch = Convert.ToChar(buffer.GetValue(0));
         }
 
-        SavedLocation = Location;       //without using copy, might generate problems (!)
-                                        //maybe I solved turning SourceLocation into a struct
+        SavedLocation = Location; //without using copy, might generate problems (!)
+        //maybe I solved turning SourceLocation into a struct
         update_pos(ch);
-        
+
         return ch;
     }
 
@@ -109,14 +112,15 @@ public class InputStream
     /// </summary>
     public void skip_whitespaces_and_comments()
     {
-        char? ch = read_char();
+        var ch = read_char();
         while (ch is ' ' or '\t' or '\n' or '\r' or '#')
         {
             if (ch == '#')
             {
                 // It's a comment! Keep reading until the end of the line (include the case "", the end-of-file)
-                while (read_char() is not '\r' or '\n' or null){}
-                
+                while (read_char() is not '\r' or '\n' or null)
+                {
+                }
             }
 
             ch = read_char();
@@ -124,12 +128,116 @@ public class InputStream
             {
                 return;
             }
-            
         }
-        
-       //Put the non-whitespace character back
+
+        //Put the non-whitespace character back
         unread_char(ch);
     }
+
+    /// <summary>
+    /// Parse a string token from file.
+    /// </summary>
+    public StringToken ParseStringToken(SourceLocation tokeLocation)
+    {
+        var token = "";
+        while (true)
+        {
+            var ch = read_char();
+
+            if (ch is '"')
+                break;
+
+            if (ch is null)
+                throw new GrammarError(tokeLocation, "Unterminated string");
+
+            token += ch;
+        }
+        
+        return new StringToken(tokeLocation, token);
+    }
+
+    public NumberToken ParseNumberToken(char? firstCh, SourceLocation tokenLocation)
+    {
+        var token = firstCh;
+
+        while (true)
+        {
+            var ch = read_char();
+            
+            if (ch is not '.' or 'E' or 'e' || !float.TryParse(ch.ToString(), out _) )
+            {
+                unread_char(ch);
+                break;
+            }
+            
+            token += ch;
+        }
+
+        float value = 0;
+        try
+        {
+            if (token != null) value = (float) token;
+        }
+        catch (Exception)
+        {
+            throw new GrammarError(tokenLocation, $"{token} is an invalid floating-point number.");
+        }
+
+        return new NumberToken(tokenLocation, (float) value);
+    }
+
+    public Token ParseKeywordOrIdentifier(string firstCh, SourceLocation tokenLocation)
+    {
+        var token = firstCh;
+        while (true)
+        {
+            var ch = read_char();
+            if (!Regex.IsMatch(ch.ToString() ?? string.Empty, @"^[a-zA-Z0-9_]+$"))
+            {
+                unread_char(ch);
+                break;
+            }
+
+            token += ch;
+        }
+
+        try
+        {
+            //return new KeywordToken(tokenLocation);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        return new IdentifierToken(tokenLocation, token);
+    }
     
-    //public StringToken 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
