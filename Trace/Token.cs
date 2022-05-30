@@ -11,10 +11,13 @@ public abstract class Token
     {
         Location = sourceLocation;
     }
-    
-    
+
+
 }
 
+/// <summary>
+/// Enumeration for all the possible keywords recognized by the lexer.
+/// </summary>
 public enum KeywordEnum : ushort
 {
     New = 1,
@@ -44,6 +47,11 @@ public enum KeywordEnum : ushort
 public class KeywordToken : Token
 {
     public KeywordEnum Keyword { get; set; }
+    
+    public Dictionary<ushort, string> Keywords = Enum.GetValues(typeof(KeywordEnum))
+    .Cast<KeywordEnum>()
+    .ToDictionary(t => (ushort)t, t => t.ToString() );
+
 
     public KeywordToken(SourceLocation sourceLocation, KeywordEnum keyword) : base(sourceLocation)
     {

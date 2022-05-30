@@ -57,4 +57,31 @@ public class SceneFileTests
 
         Assert.True(stream.read_char() == null);
     }
+
+    [Fact]
+    public void TestLexer()
+    {
+        void AssertKeyword(KeywordToken token, KeywordEnum keyword)
+        {
+            Assert.True( token.GetType() == typeof(KeywordEnum) );
+            Assert.True( token.Keyword == keyword );
+        }
+        
+        var buf = Encoding.ASCII.GetBytes(
+            "# This is a comment" +
+            "# This is another comment" +
+            "new material sky_material(" +
+            "diffuse(image(\"my file.pfm\"))," +
+            "<5.0, 500.0, 300.0>" +
+            ") # Comment at the end of the line"
+        );
+        using var memStream = new MemoryStream(buf);
+        var stream = new InputStream(memStream);
+        
+        //Assert.True( stream.ReadToken().GetType() == typeof(KeywordEnum) );
+        //Assert.True( stream.ReadToken().Keyword == keyword );
+        
+        
+        
+    }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics.SymbolStore;
 using System.Text.RegularExpressions;
 
 namespace Trace;
@@ -105,6 +106,7 @@ public class InputStream
 
         SavedChar = ch;
         Location = SavedLocation;
+        // Location = new SourceLocation(SavedLocation.FileName, SavedLocation.LineNum, SavedLocation.ColNum);
     }
 
     /// <summary>
@@ -117,7 +119,7 @@ public class InputStream
         {
             if (ch == '#')
             {
-                // It's a comment! Keep reading until the end of the line (include the case "", the end-of-file)
+                // It's a comment; keep reading until the end of the line (include the case null, the end-of-file)
                 while (read_char() is not '\r' or '\n' or null)
                 {
                 }
@@ -137,7 +139,7 @@ public class InputStream
     /// <summary>
     /// Parse a string token from file.
     /// </summary>
-    public StringToken ParseStringToken(SourceLocation tokeLocation)
+    public StringToken ParseStringToken(SourceLocation tokenLocation)
     {
         var token = "";
         while (true)
@@ -148,14 +150,17 @@ public class InputStream
                 break;
 
             if (ch is null)
-                throw new GrammarError(tokeLocation, "Unterminated string");
+                throw new GrammarError(tokenLocation, "Unterminated string");
 
             token += ch;
         }
-        
-        return new StringToken(tokeLocation, token);
+
+        return new StringToken(tokenLocation, token);
     }
 
+    /// <summary>
+    /// Parse a number token from file .
+    /// </summary>
     public NumberToken ParseNumberToken(char? firstCh, SourceLocation tokenLocation)
     {
         var token = firstCh;
@@ -163,13 +168,13 @@ public class InputStream
         while (true)
         {
             var ch = read_char();
-            
-            if (ch is not '.' or 'E' or 'e' || !float.TryParse(ch.ToString(), out _) )
+
+            if (ch is not '.' or 'E' or 'e' || !float.TryParse(ch.ToString(), out _))
             {
                 unread_char(ch);
                 break;
             }
-            
+
             token += ch;
         }
 
@@ -186,12 +191,17 @@ public class InputStream
         return new NumberToken(tokenLocation, (float) value);
     }
 
+    /// <summary>
+    /// Parse a Keyword or Identifier token, whether the keyword is recognized by the lexer.
+    /// </summary>
     public Token ParseKeywordOrIdentifier(string firstCh, SourceLocation tokenLocation)
     {
+        // In this function, firstCh is a string because of some function here that requires string
         var token = firstCh;
         while (true)
         {
             var ch = read_char();
+            // If is not alphanumeric or underscore
             if (!Regex.IsMatch(ch.ToString() ?? string.Empty, @"^[a-zA-Z0-9_]+$"))
             {
                 unread_char(ch);
@@ -201,43 +211,54 @@ public class InputStream
             token += ch;
         }
 
-        try
+        // if token is a keyword recognized by the lexer, return a KeywordToken
+        if (Enum.TryParse<KeywordEnum>(token, true, out var keyword))
         {
-            //return new KeywordToken(tokenLocation);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
+            return new KeywordToken(tokenLocation, keyword);
         }
 
+        // Else return an IdentifierToken
         return new IdentifierToken(tokenLocation, token);
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+    public Token ReadToken()
+    {
+        skip_whitespaces_and_comments();
+        var ch = read_char();
+
+        if (ch is null)
+        {
+            return new StopToken(Location);
+        }
+
+        var tokeLocation = Location;
+        var symbols = new List<char> {'(',')','<','>','[',']',',','*'};
+
+        // A Symbol 
+        if (symbols.Contains((char) ch))
+        {
+            return new SymbolToken(tokeLocation, (char) ch);
+        }
+        
+        // A literal string
+        if (ch == '"')
+        {
+            return ParseStringToken(tokeLocation);
+        }
+
+        // A floating-point number 
+        if (char.IsDigit((char) ch) || new List<char> {'+', '-', '.'}.Contains((char) ch))
+        {
+            return ParseNumberToken(ch, tokeLocation);
+        }
+        
+        // A keyword or an identifier (first char is alphabetic)
+        if (char.IsLetter((char) ch) || ch == '_')
+        {
+            return ParseKeywordOrIdentifier(ch.ToString()!, tokeLocation);
+        }
+
+        // Else ia a weird character, not recognized
+        throw new GrammarError(Location, $"Invalid character {ch}");
+    }
 }
