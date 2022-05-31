@@ -44,6 +44,7 @@ public class InputStream
     /// Update `location` after having read `ch` from the stream
     /// </summary>
     public void update_pos(char? ch)
+
     {
         switch (ch)
         {
@@ -54,15 +55,12 @@ public class InputStream
                 Location.LineNum += 1;
                 Location.ColNum = 1;
                 break;
-        }
-
-        if (ch == '\t')
-        {
-            Location.ColNum += Tabulations;
-        }
-        else
-        {
-            Location.ColNum += 1;
+            case '\t':
+                Location.ColNum += Tabulations;
+                break;
+            default:
+                Location.ColNum += 1;
+                break;
         }
     }
 
