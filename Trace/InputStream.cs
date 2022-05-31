@@ -120,9 +120,11 @@ public class InputStream
             if (ch == '#')
             {
                 // It's a comment; keep reading until the end of the line (include the case null, the end-of-file)
-                while (read_char() is not '\r' or '\n' or null)
+                char? cha;
+                do
                 {
-                }
+                    cha = read_char();
+                } while (cha != '\r' && cha != '\n' && cha != null);
             }
 
             ch = read_char();
