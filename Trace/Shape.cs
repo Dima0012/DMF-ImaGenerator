@@ -241,6 +241,10 @@ public class Cube : Shape
     public float YMax { get; set; } = 0;
     public float ZMin { get; set; } = 0;
     public float ZMax { get; set; } = 0;
+    
+    public Cube() {}
+
+    public Cube(Transformation transformation, Material material) : base(transformation,material) {}
 
 
     public override HitRecord? ray_intersection(Ray ray)
