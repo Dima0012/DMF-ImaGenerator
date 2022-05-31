@@ -63,10 +63,10 @@ public class SceneFileTests
     {
         void AssertKeyword(KeywordToken token, KeywordEnum keyword)
         {
-            Assert.True( token.GetType() == typeof(KeywordEnum) );
-            Assert.True( token.Keyword == keyword );
+            Assert.True(token.GetType() == typeof(KeywordEnum));
+            Assert.True(token.Keyword == keyword);
         }
-        
+
         var buf = Encoding.ASCII.GetBytes(
             "# This is a comment" +
             "# This is another comment" +
@@ -77,11 +77,8 @@ public class SceneFileTests
         );
         using var memStream = new MemoryStream(buf);
         var stream = new InputStream(memStream);
-        
-        //Assert.True( stream.ReadToken().GetType() == typeof(KeywordEnum) );
-        //Assert.True( stream.ReadToken().Keyword == keyword );
-        
-        
-        
+
+        //Assert.True(stream.ReadToken().GetType() == typeof(KeywordEnum));
+        // Assert.True( stream.ReadToken().Keyword == keyword );
     }
 }

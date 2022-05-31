@@ -16,8 +16,8 @@ public struct SourceLocation
     public SourceLocation()
     {
         FileName = "";
-        LineNum = 0;
-        ColNum = 0;
+        LineNum = 1;
+        ColNum = 1;
     }
 
     public SourceLocation(string fileName, int lineNum, int colNum)

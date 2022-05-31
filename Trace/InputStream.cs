@@ -1,4 +1,3 @@
-using System.Diagnostics.SymbolStore;
 using System.Text.RegularExpressions;
 
 namespace Trace;
@@ -87,6 +86,9 @@ public class InputStream
 
         SavedLocation = Location; //without using copy, might generate problems (!)
         //maybe I solved turning SourceLocation into a struct
+
+        //SavedLocation = new SourceLocation(Location.FileName, Location.LineNum, Location.ColNum);
+
         update_pos(ch);
 
         return ch;
@@ -186,7 +188,7 @@ public class InputStream
             throw new GrammarError(tokenLocation, $"{token} is an invalid floating-point number.");
         }
 
-        return new NumberToken(tokenLocation, (float) value);
+        return new NumberToken(tokenLocation, value);
     }
 
     /// <summary>
@@ -230,14 +232,14 @@ public class InputStream
         }
 
         var tokeLocation = Location;
-        var symbols = new List<char> {'(',')','<','>','[',']',',','*'};
+        var symbols = new List<char> {'(', ')', '<', '>', '[', ']', ',', '*'};
 
         // A Symbol 
         if (symbols.Contains((char) ch))
         {
             return new SymbolToken(tokeLocation, (char) ch);
         }
-        
+
         // A literal string
         if (ch == '"')
         {
@@ -249,7 +251,7 @@ public class InputStream
         {
             return ParseNumberToken(ch, tokeLocation);
         }
-        
+
         // A keyword or an identifier (first char is alphabetic)
         if (char.IsLetter((char) ch) || ch == '_')
         {
