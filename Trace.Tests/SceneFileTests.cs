@@ -2,6 +2,7 @@ using System.IO;
 using Xunit;
 using System.Text;
 using System;
+ 
 
 namespace Trace.Tests;
 
@@ -61,16 +62,10 @@ public class SceneFileTests
     [Fact]
     public void TestLexer()
     {
-        void AssertKeyword(KeywordToken token, KeywordEnum keyword)
-        {
-            Assert.True(token.GetType() == typeof(KeywordEnum));
-            Assert.True(token.Keyword == keyword);
-        }
-
         var buf = Encoding.ASCII.GetBytes(
             "# This is a comment" +
             "# This is another comment" +
-            "new material sky_material(" +
+            "\nnew material sky_material(" +
             "diffuse(image(\"my file.pfm\"))," +
             "<5.0, 500.0, 300.0>" +
             ") # Comment at the end of the line"
@@ -78,7 +73,16 @@ public class SceneFileTests
         using var memStream = new MemoryStream(buf);
         var stream = new InputStream(memStream);
 
-        //Assert.True(stream.ReadToken().GetType() == typeof(KeywordEnum));
-        // Assert.True( stream.ReadToken().Keyword == keyword );
+        
+        Assert.True(stream.ReadToken().Keyword == KeywordEnum.New);
+        Assert.True(stream.ReadToken().Keyword == KeywordEnum.Material);
+        Assert.True(stream.ReadToken().Identifier == "sky_material");
+        Assert.True(stream.ReadToken().Symbol == '(');
+        Assert.True(stream.ReadToken().Keyword == KeywordEnum.Diffuse);
+        Assert.True(stream.ReadToken().Symbol == '(');
+        Assert.True(stream.ReadToken().Keyword == KeywordEnum.Image);
+        Assert.True(stream.ReadToken().Symbol == '(');
+        Assert.True(stream.ReadToken().String == "my file.pfm");
+        Assert.True(stream.ReadToken().Symbol == ')');
     }
 }

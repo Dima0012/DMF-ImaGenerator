@@ -6,6 +6,11 @@ namespace Trace;
 public abstract class Token
 {
     public SourceLocation Location { get; set; }
+    public KeywordEnum Keyword { get; set; }
+    public string Identifier { get; set; }
+    public string String { get; set; }
+    public float Number { get; set; }
+    public char Symbol { get; set; }
 
     protected Token(SourceLocation sourceLocation)
     {
@@ -46,8 +51,7 @@ public enum KeywordEnum : ushort
 /// </summary>
 public class KeywordToken : Token
 {
-    public KeywordEnum Keyword { get; set; }
-    
+
     public Dictionary<ushort, string> Keywords = Enum.GetValues(typeof(KeywordEnum))
     .Cast<KeywordEnum>()
     .ToDictionary(t => (ushort)t, t => t.ToString() );
@@ -67,7 +71,7 @@ public class KeywordToken : Token
 /// </summary>
 public class IdentifierToken : Token
 {
-    public string Identifier { get; set; }
+    
 
     public IdentifierToken(SourceLocation sourceLocation, string s) : base(sourceLocation)
     {
@@ -80,7 +84,6 @@ public class IdentifierToken : Token
 /// </summary>
 public class StringToken : Token
 {
-    public string String { get; set; }
 
     public StringToken(SourceLocation sourceLocation, string s) : base(sourceLocation)
     {
@@ -93,7 +96,6 @@ public class StringToken : Token
 /// </summary>
 public class NumberToken : Token
 {
-    public float Number { get; set; }
 
     public NumberToken(SourceLocation sourceLocation, float f) : base(sourceLocation)
     {
@@ -106,8 +108,6 @@ public class NumberToken : Token
 /// </summary>
 public class SymbolToken : Token
 {
-    public char Symbol { get; set; }
-
     public SymbolToken(SourceLocation sourceLocation, char ch) : base(sourceLocation)
     {
         Symbol = ch;
