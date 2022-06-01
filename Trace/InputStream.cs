@@ -287,4 +287,43 @@ public Token ReadToken()
 
         SavedToken = token;
     }
+
+    /// <summary>
+    /// Returns the expected floating point number from the stream.
+    /// </summary>
+    public float expect_number(Scene scene)
+    {
+        var token = ReadToken();
+
+        if (token.GetType() == typeof(NumberToken))
+        {
+            return token.Number;
+        }
+
+        if (token.GetType() == typeof(IdentifierToken))
+        {
+            var varName = token.Identifier;
+            if (!scene.FloatVariables.ContainsKey(varName))
+            {
+                throw new GrammarError(token.Location, $"unknown variable '{varName}'");
+            }
+        }
+
+        throw new GrammarError(token.Location, $"got '{token}' instead of a number");
+    }
+
+    /// <summary>
+    /// Read a token from the stream and check if it is a string, then return its value as a string object.
+    /// </summary>
+    public string expect_string()
+    {
+        var token = ReadToken();
+
+        if (token.GetType() != typeof(StringToken))
+        {
+            throw new GrammarError(token.Location, $"got '{token}' instead of a string");
+        }
+
+        return token.String;
+    }
 }
