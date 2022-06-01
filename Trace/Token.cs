@@ -6,7 +6,7 @@ namespace Trace;
 public abstract class Token
 {
     public SourceLocation Location { get; set; }
-    public KeywordEnum Keyword { get; set; }
+    public KeywordEnum Keyword { get; set; } 
     public string Identifier { get; set; }
     public string String { get; set; }
     public float Number { get; set; }

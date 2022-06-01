@@ -326,4 +326,55 @@ public Token ReadToken()
 
         return token.String;
     }
+
+    /// <summary>
+    /// Read a token from `input_file` and check that it matches `symbol`.
+    /// </summary>
+    public void expect_symbol(char symbol)
+    {
+        var token = ReadToken();
+
+        if (token.Symbol != symbol || token.GetType() != typeof(SymbolToken))
+        {
+            throw new GrammarError(Location, $"got '{token.Symbol}' instead of '{symbol}");
+        }
+    }
+
+    /// <summary>
+    /// Read a token from `input_file` and check that it is one of the keywords in `keywords`.
+    /// Return the keyword as a 'KeywordEnum' object.
+    /// </summary>
+    public KeywordEnum expect_keywords(InputStream inputFile, List<KeywordEnum> keywords)
+    {
+        var token = inputFile.ReadToken();
+        if (token.GetType() != typeof(KeywordToken))
+        {
+            throw new GrammarError(token.Location, $"expected a keyword instead of '{token.GetType()}'");
+        }
+
+        if (!keywords.Contains(token.Keyword))
+        {
+            throw new GrammarError(token.Location,
+                $"expected one of the keywords {string.Join(',', keywords)} instead of '{token}'");
+        }
+
+        return token.Keyword;
+    }
+
+    /// <summary>
+    /// Read a token from `input_file` and check that it is an identifier.
+    /// Return the name of the identifier.
+    /// </summary>
+    public string expect_identifier()
+    {
+        var token = ReadToken();
+        if (token.GetType() != typeof(IdentifierToken))
+        {
+            throw new GrammarError(token.Location, $"expected an identifier instead of '{token.GetType()}'");
+        }
+
+        return token.Identifier;
+    }
+       
+    
 }
