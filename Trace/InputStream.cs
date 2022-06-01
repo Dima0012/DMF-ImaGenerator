@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Trace.Geometry;
 
 
 namespace Trace;
@@ -375,6 +376,30 @@ public Token ReadToken()
 
         return token.Identifier;
     }
-       
+
+    /// <summary>
+    /// Parse a vector form the scene and returns it as a Vec.
+    /// </summary>
+    public Vec parse_vector(Scene scene)
+    {
+        float x = 0, y = 0, z = 0;
+        
+        try
+        {
+            expect_symbol('[');
+            x = expect_number(scene);
+            expect_symbol(',');
+            y = expect_number(scene);
+            expect_symbol(',');
+            z = expect_number(scene);
+            expect_symbol(']');
+        }
+        catch (GrammarError ex)
+        {
+            Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+        }
+
+        return new Vec(x, y, z);
+    }
     
 }
