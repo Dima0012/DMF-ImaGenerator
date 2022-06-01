@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 
@@ -223,9 +224,18 @@ public class InputStream
         // Else return an IdentifierToken
         return new IdentifierToken(tokenLocation, token);
     }
-
-    public Token ReadToken()
+/// <summary>
+/// Read a token from the stream.
+/// </summary>
+public Token ReadToken()
     {
+        if (SavedToken != null)
+        {
+            var result = SavedToken;
+            SavedToken = null;
+            return result;
+        }
+        
         skip_whitespaces_and_comments();
         var ch = read_char();
 
@@ -263,5 +273,18 @@ public class InputStream
 
         // Else ia a weird character, not recognized
         throw new GrammarError(Location, $"Invalid character {ch}");
+    }
+
+    /// <summary>
+    /// Make as if `token` were never read from `input_file`
+    /// </summary>
+    public void unread_token(Token token)
+    {
+        if (SavedToken != null)
+        {
+            throw new InputStreamError("The saved token is not empty, you should not unread_token");
+        }
+
+        SavedToken = token;
     }
 }
