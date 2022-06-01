@@ -10,13 +10,16 @@ public class InvalidPfmFileFormat : FormatException
     }
 
     public InvalidPfmFileFormat(string message)
-        : base(message)
     {
+        Console.WriteLine("Error: "+message);
+        Environment.Exit(-1);
     }
 
     public InvalidPfmFileFormat(string message, Exception err)
-        : base(message, err)
     {
+
+        Console.WriteLine("Error: "+message);
+        Environment.Exit(-1);
     }
 }
 
@@ -38,22 +41,21 @@ public class InputError : FormatException
 }
 
 /// <summary>
-/// An error found by the lexer/parser while reading a scene file. <br />
-/// The fields of this type are the following: <br />
-/// - `file_name`: the name of the file, or the empty string if there is no real file <br />
-/// - `line_num`: the line number where the error was discovered (starting from 1) <br />
-/// - `col_num`: the column number where the error was discovered (starting from 1) <br />
-/// - `message`: a user-friendly error message
+/// An error found by the lexer/parser while reading a scene file.
 /// </summary>
 public class GrammarError : Exception
 {
-    public SourceLocation Location { get; set; } = new();
-    public new string Message { get; set; } = "";
+    public SourceLocation Location { get; set; }
+    public new string Message { get; set; }
 
     public GrammarError(SourceLocation sourceLocation, string message)
     {
         Location = sourceLocation;
         Message = message;
+        
+        Console.WriteLine($"\nError: {Message} at line {Location.LineNum}:{Location.ColNum} in file {Location.FileName}.");
+        Console.WriteLine("Exiting application");
+        Environment.Exit(-1);
     }
 
 }
