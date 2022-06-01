@@ -403,6 +403,9 @@ public Token ReadToken()
     }
     
 
+    /// <summary>
+    /// Parse a color from the scene and returns it as a Color.
+    /// </summary>
     public Color parse_color(Scene scene)
     {
         float red = 0, green = 0, blue = 0;
