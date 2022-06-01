@@ -402,4 +402,28 @@ public Token ReadToken()
         return new Vec(x, y, z);
     }
     
+
+    public Color parse_color(Scene scene)
+    {
+        float red = 0, green = 0, blue = 0;
+        try
+        {
+            expect_symbol('<');
+            red = expect_number(scene);
+            expect_symbol(',');
+            green = expect_number(scene);
+            expect_symbol(',');
+            blue = expect_number(scene);
+            expect_symbol('>');
+
+        }
+        catch(GrammarError ex)
+        {
+            Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+        }
+
+        return new Color(red, green, blue);
+    }
+
+
 }
