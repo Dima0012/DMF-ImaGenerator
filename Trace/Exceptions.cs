@@ -5,21 +5,12 @@ namespace Trace;
 /// </summary>
 public class InvalidPfmFileFormat : FormatException
 {
-    public InvalidPfmFileFormat()
+    public InvalidPfmFileFormat(string message) : base(message)
     {
     }
 
-    public InvalidPfmFileFormat(string message)
+    public InvalidPfmFileFormat(string message, Exception err) : base(message, err)
     {
-        // Console.WriteLine("Error: "+message);
-        // Environment.Exit(-1);
-    }
-
-    public InvalidPfmFileFormat(string message, Exception err)
-    {
-
-        // Console.WriteLine("Error: "+message);
-        // Environment.Exit(-1);
     }
 }
 
@@ -45,17 +36,14 @@ public class InputError : FormatException
 /// </summary>
 public class GrammarError : Exception
 {
+    /// <summary>
+    /// The Location of the error.
+    /// </summary>
     public SourceLocation Location { get; set; }
-    public new string Message { get; set; }
 
-    public GrammarError(SourceLocation sourceLocation, string message)
+    public GrammarError(SourceLocation sourceLocation, string message) : base(message)
     {
         Location = sourceLocation;
-        Message = message;
-        
-        // Console.WriteLine($"\nError: {Message} at line {Location.LineNum}:{Location.ColNum} in file {Location.FileName}.");
-        // Console.WriteLine("Exiting application");
-        // Environment.Exit(-1);
     }
 
 }
