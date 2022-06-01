@@ -11,15 +11,15 @@ public class InvalidPfmFileFormat : FormatException
 
     public InvalidPfmFileFormat(string message)
     {
-        Console.WriteLine("Error: "+message);
-        Environment.Exit(-1);
+        // Console.WriteLine("Error: "+message);
+        // Environment.Exit(-1);
     }
 
     public InvalidPfmFileFormat(string message, Exception err)
     {
 
-        Console.WriteLine("Error: "+message);
-        Environment.Exit(-1);
+        // Console.WriteLine("Error: "+message);
+        // Environment.Exit(-1);
     }
 }
 
@@ -53,9 +53,9 @@ public class GrammarError : Exception
         Location = sourceLocation;
         Message = message;
         
-        Console.WriteLine($"\nError: {Message} at line {Location.LineNum}:{Location.ColNum} in file {Location.FileName}.");
-        Console.WriteLine("Exiting application");
-        Environment.Exit(-1);
+        // Console.WriteLine($"\nError: {Message} at line {Location.LineNum}:{Location.ColNum} in file {Location.FileName}.");
+        // Console.WriteLine("Exiting application");
+        // Environment.Exit(-1);
     }
 
 }
