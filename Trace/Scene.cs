@@ -3,7 +3,7 @@ using Trace.Cameras;
 namespace Trace;
 
 /// <summary>
-/// A Scene 
+/// A Scene representing the image to render.
 /// </summary>
 public class Scene
 {

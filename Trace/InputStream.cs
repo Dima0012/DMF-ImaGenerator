@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Trace.Cameras;
 using Trace.Geometry;
 
 
@@ -428,5 +429,68 @@ public Token ReadToken()
         return new Color(red, green, blue);
     }
 
+    /// <summary>
+    /// Parse a pigment from the scene, and return it as a Pigment
+    /// </summary>
+    public IPigment parse_pigment(Scene scene)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Parse a BRDF from the scene, and return it as a Brdf.
+    /// </summary>
+    public Brdf parse_brdf(Scene scene)
+    {
+        throw new NotImplementedException();
+    }
+    
+    /// <summary>
+    /// Parse a material from the scene, and return it as a Material
+    /// </summary>
+    public (string, Material) parse_material(Scene scene)
+    {
+        throw new NotImplementedException();
+    }
+    
+    /// <summary>
+    /// Parse a transformation from the scene, and return it as a Transformation.
+    /// </summary>
+    public Transformation parse_transformation(Scene scene)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Parse a sphere from the scene, and return it as a Sphere.
+    /// </summary>
+    public Sphere parse_sphere(Scene scene)
+    {
+        throw new NotImplementedException();
+    }
+    
+    /// <summary>
+    /// Parse a plane from the scene, and return it as a Plane.
+    /// </summary>
+    public Plane parse_plane(Scene scene)
+    {
+        throw new NotImplementedException();
+    }
+    
+    /// <summary>
+    /// Parse a camera from the scene, and return it as a ICamera.
+    /// </summary>
+    public ICamera parse_camera(Scene scene)
+    {
+        throw new NotImplementedException();
+    }
+    
+    /// <summary>
+    /// Parse the scene from the input file.
+    /// </summary>
+    public Scene parse_scene(Scene scene)
+    {
+        throw new NotImplementedException();
+    }
 
 }
