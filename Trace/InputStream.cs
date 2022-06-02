@@ -346,9 +346,9 @@ public Token ReadToken()
     /// Read a token from `input_file` and check that it is one of the keywords in `keywords`.
     /// Return the keyword as a 'KeywordEnum' object.
     /// </summary>
-    public KeywordEnum expect_keywords(InputStream inputFile, List<KeywordEnum> keywords)
+    public KeywordEnum expect_keywords(List<KeywordEnum> keywords)
     {
-        var token = inputFile.ReadToken();
+        var token = ReadToken();
         if (token.GetType() != typeof(KeywordToken))
         {
             throw new GrammarError(token.Location, $"expected a keyword instead of '{token.GetType()}'");
@@ -434,7 +434,68 @@ public Token ReadToken()
     /// </summary>
     public IPigment parse_pigment(Scene scene)
     {
-        throw new NotImplementedException();
+        KeywordEnum keyword = 0;
+        IPigment result = new UniformPigment();
+        try
+        {
+            keyword = expect_keywords(new List<KeywordEnum>()
+                {KeywordEnum.Uniform, KeywordEnum.Checkered, KeywordEnum.Image});
+            expect_symbol('(');
+        }
+        catch (GrammarError ex)
+        {
+            Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+        }
+
+        if (keyword == KeywordEnum.Uniform)
+        {
+            var color = parse_color(scene);
+            result = new UniformPigment(color);
+        }
+        else if (keyword == KeywordEnum.Checkered)
+        {
+            try
+            {
+                var color1 = parse_color(scene);
+                expect_symbol(',');
+                var color2 = parse_color(scene);
+                expect_symbol(',');
+                var numOfSteps = (int) (expect_number(scene));
+                result = new CheckeredPigment(color1, color2, numOfSteps);
+            }
+            catch (GrammarError ex)
+            {
+                Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+            }
+        }
+        else if (keyword == KeywordEnum.Image)
+        {
+            try
+            {
+                var fileName = expect_string();
+                var image = new HdrImage(fileName);
+                result = new ImagePigment(image);
+            }
+            catch (GrammarError ex)
+            {
+                Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+            }
+        }
+        else
+        {
+            throw new InputStreamError("This line should be unreachable");
+        }
+
+        try
+        {
+            expect_symbol(')');
+        }
+        catch (GrammarError ex)
+        {
+            Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+        }
+
+        return result;
     }
 
     /// <summary>
