@@ -17,12 +17,12 @@ internal static class DfmImaGenerator
         var parser = new Parser(with => with.HelpWriter = null);
         var result =
             parser
-                .ParseArguments<ParserSettings.Pfm2PngOptions, ParserSettings.DemoOptions,
-                    ParserSettings.DemoFullOptions>(args);
+                .ParseArguments<ParserSettings.Pfm2PngOptions, ParserSettings.DemoOldOptions,
+                    ParserSettings.DemoOptions>(args);
 
         result.WithParsed<ParserSettings.Pfm2PngOptions>(Pfm2Png);
+        result.WithParsed<ParserSettings.DemoOldOptions>(DemoOld);
         result.WithParsed<ParserSettings.DemoOptions>(Demo);
-        result.WithParsed<ParserSettings.DemoFullOptions>(DemoFull);
 
         result.WithNotParsed(errs => ParserSettings.DisplayHelp(result, errs));
 
@@ -61,7 +61,7 @@ internal static class DfmImaGenerator
         Console.WriteLine($"File {outputFile} has been written to disk.");
     }
 
-    private static void Demo(ParserSettings.DemoOptions parsed)
+    private static void DemoOld(ParserSettings.DemoOldOptions parsed)
     {
         Console.WriteLine(HeadingInfo.Default);
         Console.WriteLine();
@@ -219,7 +219,7 @@ internal static class DfmImaGenerator
     }
 
 
-    private static void DemoFull(ParserSettings.DemoFullOptions parsed)
+    private static void Demo(ParserSettings.DemoOptions parsed)
     {
         Console.WriteLine(HeadingInfo.Default);
         Console.WriteLine();
@@ -241,12 +241,12 @@ internal static class DfmImaGenerator
         var maxDepth = parsed.MaxDepth;
         var rouletteLimit = parsed.RussianRouletteLimit;
 
-        var algs = new List<string> {"path-tracer", "point-light"};
+        var algorithms = new List<string> {"flat", "path-tracer", "point-light"};
 
-        if (!algs.Contains(algorithm))
+        if (!algorithms.Contains(algorithm))
         {
             Console.WriteLine("Unknown render option. Choose between: ");
-            Console.WriteLine("path-tracer\n" + "point-light\n");
+            Console.WriteLine(string.Join(" ", algorithms));
             Console.WriteLine("\nExiting application.");
             return;
         }
@@ -255,35 +255,81 @@ internal static class DfmImaGenerator
         if (Math.Abs(samplesPerSide * samplesPerSide - pixelSamples) > 10 - 4)
         {
             Console.WriteLine(
-                $"Error. Samples per pixels {pixelSamples} to use in anti aliasing is not a perfect square.");
+                $"Error: samples per pixels {pixelSamples} to use in anti-aliasing is not a perfect square.");
             Console.WriteLine("\nExiting application.");
             return;
         }
 
-        // Create scene 
+        // Create scene and define camera transformation
         var world = new World();
-
-        var skyMaterial = new Material(new DiffuseBrdf(new UniformPigment(new Color(0, 0, 0))),
-            new UniformPigment(new Color(1.0f, 0.9f, 0.5f)));
-
-        var groundMaterial = new Material(new DiffuseBrdf(new CheckeredPigment(
-            new Color(0.3f, 0.5f, 0.1f),
-            new Color(0.1f, 0.2f, 0.5f))));
-
-        var sphereMaterial = new Material(new DiffuseBrdf(new UniformPigment(new Color(0.3f, 0.4f, 0.8f))));
-        var mirrorMaterial = new Material(new SpecularBrdf(new UniformPigment(new Color(0.6f, 0.2f, 0.3f))));
-
-        world.add(new Sphere(Transformation.scaling(new Vec(200, 200, 200))
-                             * Transformation.translation(new Vec(0, 0, 0.4f)),
-            skyMaterial));
-        world.add(new Plane(groundMaterial));
-        world.add(new Sphere(Transformation.translation(new Vec(0, 0, 1)), sphereMaterial));
-        world.add(new Sphere(Transformation.translation(new Vec(1, 2.5f, 0)), mirrorMaterial));
-
-        // Define camera with rotation angle
-        var camTransformation = Transformation.rotation_z(angle) * Transformation.translation(new Vec(-1.0f, 0, 1));
         ICamera camera;
+        Transformation camTransformation;
         string s;
+
+        // Complex algorithm, complex scene
+        if (algorithm is "path-tracer" or "point-light")
+        {
+            var skyMaterial = new Material(new DiffuseBrdf(new UniformPigment(new Color(0, 0, 0))),
+                new UniformPigment(new Color(1.0f, 0.9f, 0.5f)));
+
+            var groundMaterial = new Material(new DiffuseBrdf(new CheckeredPigment(
+                new Color(0.3f, 0.5f, 0.1f),
+                new Color(0.1f, 0.2f, 0.5f))));
+
+            var sphereMaterial = new Material(new DiffuseBrdf(new UniformPigment(new Color(0.3f, 0.4f, 0.8f))));
+            var mirrorMaterial = new Material(new SpecularBrdf(new UniformPigment(new Color(0.6f, 0.2f, 0.3f))));
+
+            world.add(new Sphere(Transformation.scaling(new Vec(200, 200, 200))
+                                 * Transformation.translation(new Vec(0, 0, 0.4f)),
+                skyMaterial));
+            world.add(new Plane(groundMaterial));
+            world.add(new Sphere(Transformation.translation(new Vec(0, 0, 1)), sphereMaterial));
+            world.add(new Sphere(Transformation.translation(new Vec(1, 2.5f, 0)), mirrorMaterial));
+
+            camTransformation = Transformation.rotation_z(angle) * Transformation.translation(new Vec(-1.0f, 0, 1));
+        }
+        else // Algorithm is flat, simple scene
+        {
+            const float scalingFactor = 1 / 10f;
+            var scaling = Transformation.scaling(new Vec(scalingFactor, scalingFactor, scalingFactor));
+            var material = new Material(new DiffuseBrdf(new UniformPigment(new Color(1, 0, 0))));
+
+            // Add sphere to cube vertexes
+            for (var x = 0.5f; x >= -0.5f; x -= 1.0f)
+            {
+                for (var y = 0.5f; y >= -0.5f; y -= 1.0f)
+                {
+                    for (var z = 0.5f; z >= -0.5f; z -= 1.0f)
+                    {
+                        var translation = Transformation.translation(new Vec(x, y, z));
+                        var transformation = translation * scaling;
+
+                        var sphere = new Sphere(transformation, material);
+
+                        world.add(sphere);
+                    }
+                }
+            }
+
+            // Add sphere to cube faces
+            var transl = Transformation.translation(new Vec(0f, 0.5f, 0f));
+            var transf = transl * scaling;
+            var materiaf1 = new Material(new DiffuseBrdf(new UniformPigment()));
+            var spheref1 = new Sphere(transf, materiaf1);
+            world.add(spheref1);
+
+            transl = Transformation.translation(new Vec(0f, 0f, -0.5f));
+            transf = transl * scaling;
+
+            var green = new Color(0.3f, 0.9f, 0.5f);
+            var yellow = new Color(0.9f, 0.9f, 0.4f);
+
+            var materialf2 = new Material(new DiffuseBrdf(new CheckeredPigment(green, yellow, 2)));
+            var spheref2 = new Sphere(transf, materialf2);
+            world.add(spheref2);
+
+            camTransformation = Transformation.rotation_z(angle) * Transformation.translation(new Vec(-2.0f, 0, 0));
+        }
 
         // Choose camera
         if (!cam)
@@ -330,6 +376,17 @@ internal static class DfmImaGenerator
                 stopWatch.Stop();
                 break;
             }
+            default:
+            {
+                Console.WriteLine($"Rendering demo image with {algorithm} renderer.");
+                Console.WriteLine($"Resolution is {width}x{height}\n");
+                var renderer = new FlatRenderer(world);
+                // Trace image with flat method
+                stopWatch.Start();
+                imageTracer.fire_all_rays(renderer);
+                stopWatch.Stop();
+                break;
+            }
         }
 
         var ts = stopWatch.Elapsed;
@@ -357,7 +414,7 @@ internal static class DfmImaGenerator
 
         if (pngName == "default")
         {
-            pngName = s + "_full-demo.png";
+            pngName = s + "_demo.png";
         }
 
         imageTracer.Image.write_ldr_image(pngName, gamma);

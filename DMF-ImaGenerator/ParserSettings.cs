@@ -26,8 +26,8 @@ internal class ParserSettings
         }
     }
 
-    [Verb("demo", HelpText = "Generates a demo image, and saves it in PFM and PNG format.")]
-    public class DemoOptions
+    [Verb("demo-old", HelpText = "Debug demo command")]
+    public class DemoOldOptions
     {
         [Option('w', "width", MetaValue = "INT", Default = 480, Separator = ' ',
             HelpText = "The width of the image in pixels.")]
@@ -74,8 +74,8 @@ internal class ParserSettings
         public int PixelSamples { get; set; }
     }
 
-    [Verb("demo-full", HelpText = "Generates a full realistic demo image, and saves it in PFM and PNG format.")]
-    internal class DemoFullOptions
+    [Verb("demo", HelpText = "Generates a full realistic demo image, and saves it in PFM and PNG format.")]
+    internal class DemoOptions
     {
         [Option('w', "width", MetaValue = "INT", Default = 480, Separator = ' ',
             HelpText = "The width of the image in pixels.")]
