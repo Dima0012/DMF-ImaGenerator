@@ -43,7 +43,8 @@ public enum KeywordEnum : ushort
     Camera = 16,
     Orthogonal = 17,
     Perspective = 18,
-    Float = 19
+    Float = 19,
+    PointLight = 20
 }
 
 /// <summary>

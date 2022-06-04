@@ -156,7 +156,7 @@ public class InputStream
                 break;
 
             if (ch is null)
-                throw new GrammarError(tokenLocation, "Unterminated string");
+                throw new GrammarError(tokenLocation, "unterminated string");
 
             token += ch;
         }
@@ -274,7 +274,7 @@ public Token ReadToken()
         }
 
         // Else ia a weird character, not recognized
-        throw new GrammarError(Location, $"Invalid character {ch}");
+        throw new GrammarError(Location, $"Invalid character '{ch}'");
     }
 
     /// <summary>
@@ -423,7 +423,7 @@ public Token ReadToken()
         }
         catch(GrammarError ex)
         {
-            Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+            throw new GrammarError(ex.Location, ex.Message);
         }
 
         return new Color(red, green, blue);
@@ -444,7 +444,8 @@ public Token ReadToken()
         }
         catch (GrammarError ex)
         {
-            Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+            //Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+            throw new GrammarError(ex.Location, ex.Message);
         }
 
         if (keyword == KeywordEnum.Uniform)
@@ -465,7 +466,7 @@ public Token ReadToken()
             }
             catch (GrammarError ex)
             {
-                Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+                throw new GrammarError(ex.Location, ex.Message);
             }
         }
         else if (keyword == KeywordEnum.Image)
@@ -478,7 +479,7 @@ public Token ReadToken()
             }
             catch (GrammarError ex)
             {
-                Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+                throw new GrammarError(ex.Location, ex.Message);
             }
         }
         else
@@ -492,7 +493,7 @@ public Token ReadToken()
         }
         catch (GrammarError ex)
         {
-            Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+            throw new GrammarError(ex.Location, ex.Message);
         }
 
         return result;
@@ -545,11 +546,19 @@ public Token ReadToken()
     {
         throw new NotImplementedException();
     }
+
+    /// <summary>
+    /// Parse a light source in the scene for point light algorithm, and return it as a PointLight.
+    /// </summary>
+    public PointLight parse_pointlight(Scene scene)
+    {
+        throw new NotImplementedException();
+    }
     
     /// <summary>
     /// Parse the scene from the input file.
     /// </summary>
-    public Scene parse_scene(Scene scene)
+    public Scene parse_scene()
     {
         throw new NotImplementedException();
     }
