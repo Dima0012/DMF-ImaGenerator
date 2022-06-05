@@ -397,7 +397,8 @@ public Token ReadToken()
         }
         catch (GrammarError ex)
         {
-            Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+            //Console.WriteLine($"Error: {ex.Message} at line {ex.Location.LineNum}:{ex.Location.ColNum} in file {ex.Location.FileName}");
+            throw new GrammarError(ex.Location, ex.Message);
         }
 
         return new Vec(x, y, z);
@@ -434,8 +435,8 @@ public Token ReadToken()
     /// </summary>
     public IPigment parse_pigment(Scene scene)
     {
-        KeywordEnum keyword = 0;
-        IPigment result = new UniformPigment();
+        KeywordEnum keyword;
+        IPigment result;
         try
         {
             keyword = expect_keywords(new List<KeywordEnum>()
@@ -504,15 +505,59 @@ public Token ReadToken()
     /// </summary>
     public Brdf parse_brdf(Scene scene)
     {
-        throw new NotImplementedException();
+        KeywordEnum brdfKeyword;
+        IPigment pigment;
+        try
+        {
+            brdfKeyword = expect_keywords(new List<KeywordEnum>()
+                {KeywordEnum.Diffuse, KeywordEnum.Specular});
+            expect_symbol('(');
+            pigment = parse_pigment(scene);
+            expect_symbol(')');
+        }
+        catch (GrammarError ex)
+        {
+            throw new GrammarError(ex.Location, ex.Message);
+        }
+
+        switch (brdfKeyword)
+        {
+            case KeywordEnum.Diffuse:
+                return new DiffuseBrdf(pigment);
+            case KeywordEnum.Specular:
+                return new SpecularBrdf(pigment);
+        }
+        
+        
+        throw new InputStreamError("This line should be unreachable");        
+        
     }
     
     /// <summary>
     /// Parse a material from the scene, and return it as a Material
     /// </summary>
-    public (string, Material) parse_material(Scene scene)
+    public Tuple<string, Material> parse_material(Scene scene)
     {
-        throw new NotImplementedException();
+        string name;
+        Brdf brdf;
+        IPigment emittedRadiance;
+        try
+        {
+            name = expect_identifier();
+
+            expect_symbol('(');
+            brdf = parse_brdf(scene);
+            expect_symbol(',');
+            emittedRadiance = parse_pigment(scene);
+            expect_symbol(')');
+        }
+        catch (GrammarError ex)
+        {
+            throw new GrammarError(ex.Location, ex.Message);
+        }
+        
+    
+        return Tuple.Create(name, new Material(brdf, emittedRadiance));
     }
     
     /// <summary>
@@ -520,7 +565,77 @@ public Token ReadToken()
     /// </summary>
     public Transformation parse_transformation(Scene scene)
     {
-        throw new NotImplementedException();
+        Transformation result = new Transformation();
+        KeywordEnum transformationKw;
+        while (true)
+        {
+            try
+            {
+                transformationKw = expect_keywords(new List<KeywordEnum>()
+                {
+                    KeywordEnum.Identity,
+                    KeywordEnum.Translation,
+                    KeywordEnum.RotationX,
+                    KeywordEnum.RotationY,
+                    KeywordEnum.RotationZ,
+                    KeywordEnum.Scaling,
+                });
+
+                if (transformationKw == KeywordEnum.Identity)
+                {
+                    // Do nothing (this is a primitive form of optimization!) 
+                }
+                else if (transformationKw == KeywordEnum.Translation)
+                {
+                    expect_symbol('(');
+                    result *= Transformation.translation(parse_vector(scene));
+                    expect_symbol(')');
+                }
+                else if (transformationKw == KeywordEnum.RotationX)
+                {
+                    expect_symbol('(');
+                    result *= Transformation.rotation_x(expect_number(scene));
+                    expect_symbol(')');
+                }
+                else if (transformationKw == KeywordEnum.RotationY)
+                {
+                    expect_symbol('(');
+                    result *= Transformation.rotation_y(expect_number(scene));
+                    expect_symbol(')');
+                }
+                else if (transformationKw == KeywordEnum.RotationZ)
+                {
+                    expect_symbol('(');
+                    result *= Transformation.rotation_z(expect_number(scene));
+                    expect_symbol(')');
+                }
+                else if (transformationKw == KeywordEnum.Scaling)
+                {
+                    expect_symbol('(');
+                    result *= Transformation.scaling(parse_vector(scene));
+                    expect_symbol(')');
+                }
+                
+               
+            }
+            catch (GrammarError ex)
+            {
+                throw new GrammarError(ex.Location, ex.Message);
+            }
+             //We must peek the next token to check if there is another transformation that is being
+             //chained or if the sequence ends. Thus, this is a LL(1) parser.   
+             var nextKw = ReadToken();
+             if (nextKw.GetType() != typeof(SymbolToken) || nextKw.Symbol != '*')
+             {
+                 //Pretend you never read this token and put it back!
+                 unread_token(nextKw); 
+                 break;
+             }
+         
+        }
+
+        return result;
+
     }
 
     /// <summary>
@@ -528,7 +643,29 @@ public Token ReadToken()
     /// </summary>
     public Sphere parse_sphere(Scene scene)
     {
-        throw new NotImplementedException();
+        Transformation transformation;
+        string materialName;
+        try
+        {
+            expect_symbol('(');
+
+            materialName = expect_identifier();
+            if (!scene.Materials.ContainsKey(materialName))
+            {
+                // We raise the exception here because input_file is pointing to the end of the wrong identifier
+                throw new GrammarError(Location, $"unknown material {materialName}");
+            }
+
+            expect_symbol(',');
+            transformation = parse_transformation(scene);
+            expect_symbol(')');
+        }
+        catch (GrammarError ex)
+        {
+            throw new GrammarError(ex.Location, ex.Message);
+        }
+
+        return new Sphere(transformation, scene.Materials[materialName]);
     }
     
     /// <summary>
