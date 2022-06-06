@@ -8,6 +8,9 @@ namespace Trace.Cameras;
 /// </summary>
 public interface ICamera
 {
+    public Transformation Transformation { get; set; }
+    public float AspectRatio { get; set; }
+    public float Distance { get; set; }
     /// <summary>
     /// Fires a Ray through the camera, at screen coordinates (u,v).
     /// </summary>
@@ -26,6 +29,9 @@ public class OrthogonalCamera : ICamera
     public float AspectRatio { get; set; } = 1.0f;
 
     public Transformation Transformation { get; set; }
+    
+    public float Distance { get; set; } //useless, we need it because in this way it can me a member of
+                                //ICamera and we can access it when we have ICamera object
 
     public OrthogonalCamera(float aspectRatio, Transformation transformation)
     {

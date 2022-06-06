@@ -226,10 +226,11 @@ public class InputStream
         // Else return an IdentifierToken
         return new IdentifierToken(tokenLocation, token);
     }
-/// <summary>
-/// Read a token from the stream.
-/// </summary>
-public Token ReadToken()
+
+    /// <summary>
+    /// Read a token from the stream.
+    /// </summary>
+    public Token ReadToken()
     {
         if (SavedToken != null)
         {
@@ -237,7 +238,7 @@ public Token ReadToken()
             SavedToken = null;
             return result;
         }
-        
+
         skip_whitespaces_and_comments();
         var ch = read_char();
 
@@ -384,7 +385,7 @@ public Token ReadToken()
     public Vec parse_vector(Scene scene)
     {
         float x = 0, y = 0, z = 0;
-        
+
         try
         {
             expect_symbol('[');
@@ -403,7 +404,7 @@ public Token ReadToken()
 
         return new Vec(x, y, z);
     }
-    
+
 
     /// <summary>
     /// Parse a color from the scene and returns it as a Color.
@@ -422,7 +423,7 @@ public Token ReadToken()
             expect_symbol('>');
 
         }
-        catch(GrammarError ex)
+        catch (GrammarError ex)
         {
             throw new GrammarError(ex.Location, ex.Message);
         }
@@ -527,12 +528,12 @@ public Token ReadToken()
             case KeywordEnum.Specular:
                 return new SpecularBrdf(pigment);
         }
-        
-        
-        throw new InputStreamError("This line should be unreachable");        
-        
+
+
+        throw new InputStreamError("This line should be unreachable");
+
     }
-    
+
     /// <summary>
     /// Parse a material from the scene, and return it as a Material
     /// </summary>
@@ -555,11 +556,11 @@ public Token ReadToken()
         {
             throw new GrammarError(ex.Location, ex.Message);
         }
-        
-    
+
+
         return Tuple.Create(name, new Material(brdf, emittedRadiance));
     }
-    
+
     /// <summary>
     /// Parse a transformation from the scene, and return it as a Transformation.
     /// </summary>
@@ -615,23 +616,24 @@ public Token ReadToken()
                     result *= Transformation.scaling(parse_vector(scene));
                     expect_symbol(')');
                 }
-                
-               
+
+
             }
             catch (GrammarError ex)
             {
                 throw new GrammarError(ex.Location, ex.Message);
             }
-             //We must peek the next token to check if there is another transformation that is being
-             //chained or if the sequence ends. Thus, this is a LL(1) parser.   
-             var nextKw = ReadToken();
-             if (nextKw.GetType() != typeof(SymbolToken) || nextKw.Symbol != '*')
-             {
-                 //Pretend you never read this token and put it back!
-                 unread_token(nextKw); 
-                 break;
-             }
-         
+
+            //We must peek the next token to check if there is another transformation that is being
+            //chained or if the sequence ends. Thus, this is a LL(1) parser.   
+            var nextKw = ReadToken();
+            if (nextKw.GetType() != typeof(SymbolToken) || nextKw.Symbol != '*')
+            {
+                //Pretend you never read this token and put it back!
+                unread_token(nextKw);
+                break;
+            }
+
         }
 
         return result;
@@ -667,21 +669,80 @@ public Token ReadToken()
 
         return new Sphere(transformation, scene.Materials[materialName]);
     }
-    
+
     /// <summary>
     /// Parse a plane from the scene, and return it as a Plane.
     /// </summary>
     public Plane parse_plane(Scene scene)
     {
-        throw new NotImplementedException();
+        Transformation transformation;
+        string materialName;
+        try
+        {
+            expect_symbol('(');
+
+            materialName = expect_identifier();
+            if (!scene.Materials.ContainsKey(materialName))
+            {
+                // We raise the exception here because input_file is pointing to the end of the wrong identifier
+                throw new GrammarError(Location, $"unknown material {materialName}");
+            }
+
+            expect_symbol(',');
+            transformation = parse_transformation(scene);
+            expect_symbol(')');
+        }
+        catch (GrammarError ex)
+        {
+            throw new GrammarError(ex.Location, ex.Message);
+        }
+
+        return new Plane(transformation, scene.Materials[materialName]);
     }
-    
+
     /// <summary>
     /// Parse a camera from the scene, and return it as a ICamera.
     /// </summary>
     public ICamera parse_camera(Scene scene)
     {
-        throw new NotImplementedException();
+        KeywordEnum typeKw;
+        Transformation transformation;
+        float aspectRatio;
+        float distance;
+        ICamera result = new PerspectiveCamera(new Transformation());
+        try
+        {
+            expect_symbol('(');
+            typeKw = expect_keywords(new List<KeywordEnum>()
+            {
+                KeywordEnum.Perspective,
+                KeywordEnum.Orthogonal
+            });
+
+            expect_symbol(',');
+            transformation = parse_transformation(scene);
+            expect_symbol(',');
+            aspectRatio = expect_number(scene);
+            expect_symbol(',');
+            distance = expect_number(scene);
+            expect_symbol(')');
+        }
+        catch (GrammarError ex)
+        {
+            throw new GrammarError(ex.Location, ex.Message);
+        }
+
+        switch (typeKw)
+        {
+            case KeywordEnum.Perspective:
+                result = new PerspectiveCamera(distance, aspectRatio, transformation);
+                break;
+            case KeywordEnum.Orthogonal:
+                result = new OrthogonalCamera(aspectRatio, transformation);
+                break;
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -691,13 +752,121 @@ public Token ReadToken()
     {
         throw new NotImplementedException();
     }
+
     
     /// <summary>
-    /// Parse the scene from the input file.
+    /// Parse the scene from the input file (read a scene description from a stream).
     /// </summary>
-    public Scene parse_scene()
+    public Scene parse_scene(Dictionary<string, float>? variables =  null)
     {
-        throw new NotImplementedException();
-    }
+        if(variables == null) variables = new Dictionary<string,float>();
+        var scene = new Scene();
+        scene.FloatVariables = variables;
+        foreach (var s in variables.Keys)
+        {
+            scene.OverriddenVariables.Add(s);
+        }
 
+        string variableName;
+        SourceLocation variableLoc;
+        float variableValue;
+        Tuple<string, Material> tuple;
+
+        while (true)
+        {
+            var what = ReadToken();
+            if (what.GetType() == typeof(StopToken))
+            {
+                break;
+            }
+
+            if (what.GetType() != typeof(KeywordToken))
+            {
+                throw new GrammarError(what.Location, $"expected a keyword instead of '{what}'");
+            }
+
+            if (what.Keyword == KeywordEnum.Float)
+            {
+                try
+                {
+                    variableName = expect_identifier();
+                    // Save this for the error message
+                    variableLoc = Location;
+                    expect_symbol('(');
+                    variableValue = expect_number(scene);
+                    expect_symbol(')');
+                }
+                catch (GrammarError ex)
+                {
+                    throw new GrammarError(ex.Location, ex.Message);
+                }
+
+                if (scene.FloatVariables.ContainsKey(variableName) && !scene.OverriddenVariables.Contains(variableName))
+                {
+                    throw new GrammarError(variableLoc, $"variable «{variableName}» cannot be redefined");
+                }
+
+                if (!scene.OverriddenVariables.Contains(variableName))
+                {
+                    // Only define the variable if it was not defined by the user *outside* the scene file
+                    // (e.g., from the command line)
+                    scene.FloatVariables[variableName] = variableValue;
+                }
+            }
+
+            else if (what.Keyword == KeywordEnum.Sphere)
+            {
+                try
+                {
+                    scene.World.add(parse_sphere(scene));
+                }
+                catch (GrammarError ex)
+                {
+                    throw new GrammarError(ex.Location, ex.Message);
+                }
+            }
+            else if (what.Keyword == KeywordEnum.Plane)
+            {
+                try
+                {
+                    scene.World.add(parse_plane(scene));
+                }
+                catch (GrammarError ex)
+                {
+                    throw new GrammarError(ex.Location, ex.Message);
+                }
+            }
+            else if (what.Keyword == KeywordEnum.Camera)
+            {
+                if (scene.Camera != null)
+                {
+                    throw new GrammarError(what.Location, "You cannot define more than one camera");
+                }
+
+                try
+                {
+                    scene.Camera = parse_camera(scene);
+                }
+                catch (GrammarError ex)
+                {
+                    throw new GrammarError(ex.Location, ex.Message);
+                }
+            }
+            else if (what.Keyword == KeywordEnum.Material)
+            {
+                try
+                {
+                    tuple = parse_material(scene);
+                }
+                catch (GrammarError ex)
+                {
+                    throw new GrammarError(ex.Location, ex.Message);
+                }
+
+                scene.Materials[tuple.Item1] = tuple.Item2;
+            }
+        }
+
+        return scene;
+    }
 }
