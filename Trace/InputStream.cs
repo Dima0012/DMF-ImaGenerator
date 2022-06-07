@@ -187,7 +187,7 @@ public class InputStream
         float value = 0;
         try
         {
-            if (token != null) value = (float) token;
+            if (token != null) value = (float)token;
         }
         catch (Exception)
         {
@@ -578,9 +578,9 @@ public class InputStream
                 {
                     KeywordEnum.Identity,
                     KeywordEnum.Translation,
-                    KeywordEnum.RotationX,
+                    KeywordEnum.Rotation_X,
                     KeywordEnum.Rotation_Y,
-                    KeywordEnum.RotationZ,
+                    KeywordEnum.Rotation_Z,
                     KeywordEnum.Scaling,
                 });
 
@@ -594,7 +594,7 @@ public class InputStream
                     result *= Transformation.translation(parse_vector(scene));
                     expect_symbol(')');
                 }
-                else if (transformationKw == KeywordEnum.RotationX)
+                else if (transformationKw == KeywordEnum.Rotation_X)
                 {
                     expect_symbol('(');
                     result *= Transformation.rotation_x(expect_number(scene));
@@ -606,7 +606,7 @@ public class InputStream
                     result *= Transformation.rotation_y(expect_number(scene));
                     expect_symbol(')');
                 }
-                else if (transformationKw == KeywordEnum.RotationZ)
+                else if (transformationKw == KeywordEnum.Rotation_Z)
                 {
                     expect_symbol('(');
                     result *= Transformation.rotation_z(expect_number(scene));
