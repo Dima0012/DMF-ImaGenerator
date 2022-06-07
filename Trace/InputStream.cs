@@ -314,7 +314,7 @@ public class InputStream
             return scene.FloatVariables[varName];
         }
 
-        throw new GrammarError(token.Location, $"got '{token}' instead of a number");
+        throw new GrammarError(token.Location, $"got '{token.Symbol}' instead of a number");
     }
 
     /// <summary>
@@ -326,7 +326,7 @@ public class InputStream
 
         if (token.GetType() != typeof(StringToken))
         {
-            throw new GrammarError(token.Location, $"got '{token}' instead of a string");
+            throw new GrammarError(token.Location, $"got '{token.String}' instead of a string");
         }
 
         return token.String;
@@ -341,7 +341,7 @@ public class InputStream
 
         if (token.Symbol != symbol || token.GetType() != typeof(SymbolToken))
         {
-            throw new GrammarError(Location, $"got '{token.Symbol}' instead of '{symbol}'");
+            throw new GrammarError(Location, $"got '{token.Identifier}' instead of '{symbol}'");
         }
     }
 
@@ -360,7 +360,7 @@ public class InputStream
         if (!keywords.Contains(token.Keyword))
         {
             throw new GrammarError(token.Location,
-                $"expected one of the keywords {string.Join(',', keywords)} instead of '{token}'");
+                $"expected one of the keywords {string.Join(',', keywords)} instead of '{token.Symbol}'");
         }
 
         return token.Keyword;
@@ -380,6 +380,32 @@ public class InputStream
 
         return token.Identifier;
     }
+    
+    /// <summary>
+    /// Parse a point form the scene and returns it as a Point.
+    /// </summary>
+    public Point parse_point(Scene scene)
+    {
+        float x = 0, y = 0, z = 0;
+
+        try
+        {
+            expect_symbol('(');
+            x = expect_number(scene);
+            expect_symbol(',');
+            y = expect_number(scene);
+            expect_symbol(',');
+            z = expect_number(scene);
+            expect_symbol(')');
+        }
+        catch (GrammarError ex)
+        {
+            throw new GrammarError(ex.Location, ex.Message);
+        }
+
+        return new Point(x, y, z);
+    }
+    
 
     /// <summary>
     /// Parse a vector form the scene and returns it as a Vec.
@@ -752,7 +778,26 @@ public class InputStream
     /// </summary>
     public PointLight parse_pointlight(Scene scene)
     {
-        throw new NotImplementedException();
+        var point = new Point();
+        var color = new Color();
+        var linearRadius = 0f;
+
+        try
+        {
+            expect_symbol('(');
+            point = parse_point(scene);
+            expect_symbol(',');
+            color = parse_color(scene);
+            expect_symbol(',');
+            linearRadius = expect_number(scene);
+            expect_symbol(')');
+        }
+        catch (GrammarError ex)
+        {
+            throw new GrammarError(ex.Location, ex.Message);
+        }
+
+        return new PointLight(point, color, linearRadius);
     }
 
     
@@ -787,85 +832,95 @@ public class InputStream
                 throw new GrammarError(what.Location, $"expected a keyword instead of '{what}'");
             }
 
-            if (what.Keyword == KeywordEnum.Float)
+            switch (what.Keyword)
             {
-                try
+                case KeywordEnum.Float:
                 {
-                    variableName = expect_identifier();
-                    // Save this for the error message
-                    variableLoc = Location;
-                    expect_symbol('(');
-                    variableValue = expect_number(scene);
-                    expect_symbol(')');
-                }
-                catch (GrammarError ex)
-                {
-                    throw new GrammarError(ex.Location, ex.Message);
-                }
+                    try
+                    {
+                        variableName = expect_identifier();
+                        // Save this for the error message
+                        variableLoc = Location;
+                        expect_symbol('(');
+                        variableValue = expect_number(scene);
+                        expect_symbol(')');
+                    }
+                    catch (GrammarError ex)
+                    {
+                        throw new GrammarError(ex.Location, ex.Message);
+                    }
 
-                if (scene.FloatVariables.ContainsKey(variableName) && !scene.OverriddenVariables.Contains(variableName))
-                {
-                    throw new GrammarError(variableLoc, $"variable «{variableName}» cannot be redefined");
-                }
+                    if (scene.FloatVariables.ContainsKey(variableName) && !scene.OverriddenVariables.Contains(variableName))
+                    {
+                        throw new GrammarError(variableLoc, $"variable «{variableName}» cannot be redefined");
+                    }
 
-                if (!scene.OverriddenVariables.Contains(variableName))
-                {
-                    // Only define the variable if it was not defined by the user *outside* the scene file
-                    // (e.g., from the command line)
-                    scene.FloatVariables[variableName] = variableValue;
-                }
-            }
+                    if (!scene.OverriddenVariables.Contains(variableName))
+                    {
+                        // Only define the variable if it was not defined by the user *outside* the scene file
+                        // (e.g., from the command line)
+                        scene.FloatVariables[variableName] = variableValue;
+                    }
 
-            else if (what.Keyword == KeywordEnum.Sphere)
-            {
-                try
-                {
-                    scene.World.add(parse_sphere(scene));
+                    break;
                 }
-                catch (GrammarError ex)
-                {
-                    throw new GrammarError(ex.Location, ex.Message);
-                }
-            }
-            else if (what.Keyword == KeywordEnum.Plane)
-            {
-                try
-                {
-                    scene.World.add(parse_plane(scene));
-                }
-                catch (GrammarError ex)
-                {
-                    throw new GrammarError(ex.Location, ex.Message);
-                }
-            }
-            else if (what.Keyword == KeywordEnum.Camera)
-            {
-                if (scene.Camera != null)
-                {
+                case KeywordEnum.Sphere:
+                    try
+                    {
+                        scene.World.add(parse_sphere(scene));
+                    }
+                    catch (GrammarError ex)
+                    {
+                        throw new GrammarError(ex.Location, ex.Message);
+                    }
+
+                    break;
+                case KeywordEnum.Plane:
+                    try
+                    {
+                        scene.World.add(parse_plane(scene));
+                    }
+                    catch (GrammarError ex)
+                    {
+                        throw new GrammarError(ex.Location, ex.Message);
+                    }
+
+                    break;
+                case KeywordEnum.Camera when scene.Camera != null:
                     throw new GrammarError(what.Location, "You cannot define more than one camera");
-                }
+                case KeywordEnum.Camera:
+                    try
+                    {
+                        scene.Camera = parse_camera(scene);
+                    }
+                    catch (GrammarError ex)
+                    {
+                        throw new GrammarError(ex.Location, ex.Message);
+                    }
 
-                try
-                {
-                    scene.Camera = parse_camera(scene);
-                }
-                catch (GrammarError ex)
-                {
-                    throw new GrammarError(ex.Location, ex.Message);
-                }
-            }
-            else if (what.Keyword == KeywordEnum.Material)
-            {
-                try
-                {
-                    tuple = parse_material(scene);
-                }
-                catch (GrammarError ex)
-                {
-                    throw new GrammarError(ex.Location, ex.Message);
-                }
+                    break;
+                case KeywordEnum.Material:
+                    try
+                    {
+                        tuple = parse_material(scene);
+                    }
+                    catch (GrammarError ex)
+                    {
+                        throw new GrammarError(ex.Location, ex.Message);
+                    }
 
-                scene.Materials[tuple.Item1] = tuple.Item2;
+                    scene.Materials[tuple.Item1] = tuple.Item2;
+                    break;
+                case KeywordEnum.PointLight:
+                    try
+                    {
+                        scene.World.add_light(parse_pointlight(scene));
+                    }
+                    catch (GrammarError ex)
+                    {
+                        throw new GrammarError(ex.Location, ex.Message);
+                    }
+                    break;
             }
         }
 

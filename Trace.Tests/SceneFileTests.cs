@@ -109,7 +109,9 @@ public class SceneFileTests
             
             "sphere(sphere_material, translation([0, 0, 1]))\n" +
             
-            "camera(perspective, rotation_z(30) * translation([-4, 0, 1]), 1.0, 2.0)"
+            "camera(perspective, rotation_z(30) * translation([-4, 0, 1]), 1.0, 2.0)\n" +
+            
+            "pointlight( (-30, 40, 50) , <0.2, 0.5, 1> , 0 )"
         );
         using var memStream = new MemoryStream(buf);
         var stream = new InputStream(memStream);
@@ -128,30 +130,30 @@ public class SceneFileTests
         Assert.True(scene.Materials.ContainsKey("sky_material"));
         Assert.True(scene.Materials.ContainsKey("ground_material"));
 
-        var sphere_material = scene.Materials["sphere_material"];
-        var sky_material = scene.Materials["sky_material"];
-        var ground_material = scene.Materials["ground_material"];
+        var sphereMaterial = scene.Materials["sphere_material"];
+        var skyMaterial = scene.Materials["sky_material"];
+        var groundMaterial = scene.Materials["ground_material"];
         
-        Assert.True(sky_material.Brdf.GetType() == typeof(DiffuseBrdf));
-        Assert.True(sky_material.Brdf.Pigment.GetType() == typeof(UniformPigment));
-        Assert.True(sky_material.Brdf.Pigment.Color.is_close(new Color(0, 0, 0)));
+        Assert.True(skyMaterial.Brdf.GetType() == typeof(DiffuseBrdf));
+        Assert.True(skyMaterial.Brdf.Pigment.GetType() == typeof(UniformPigment));
+        Assert.True(skyMaterial.Brdf.Pigment.Color.is_close(new Color(0, 0, 0)));
         
-        Assert.True(ground_material.Brdf.GetType() == typeof(DiffuseBrdf));
-        Assert.True(ground_material.Brdf.Pigment.GetType() == typeof(CheckeredPigment));
-        Assert.True(ground_material.Brdf.Pigment.Color1.is_close(new Color(0.3f, 0.5f, 0.1f)));
-        Assert.True(ground_material.Brdf.Pigment.Color2.is_close(new Color(0.1f, 0.2f, 0.5f)));
-        Assert.True(ground_material.Brdf.Pigment.NumOfSteps == 4);
+        Assert.True(groundMaterial.Brdf.GetType() == typeof(DiffuseBrdf));
+        Assert.True(groundMaterial.Brdf.Pigment.GetType() == typeof(CheckeredPigment));
+        Assert.True(groundMaterial.Brdf.Pigment.Color1.is_close(new Color(0.3f, 0.5f, 0.1f)));
+        Assert.True(groundMaterial.Brdf.Pigment.Color2.is_close(new Color(0.1f, 0.2f, 0.5f)));
+        Assert.True(groundMaterial.Brdf.Pigment.NumOfSteps == 4);
         
-        Assert.True(sphere_material.Brdf.GetType() == typeof(SpecularBrdf));
-        Assert.True(sphere_material.Brdf.Pigment.GetType() == typeof(UniformPigment));
-        Assert.True(sphere_material.Brdf.Pigment.Color.is_close(new Color(0.5f, 0.5f, 0.5f)));
+        Assert.True(sphereMaterial.Brdf.GetType() == typeof(SpecularBrdf));
+        Assert.True(sphereMaterial.Brdf.Pigment.GetType() == typeof(UniformPigment));
+        Assert.True(sphereMaterial.Brdf.Pigment.Color.is_close(new Color(0.5f, 0.5f, 0.5f)));
         
-        Assert.True(sky_material.EmittedRadiance.GetType() == typeof(UniformPigment));
-        Assert.True(sky_material.EmittedRadiance.Color.is_close(new Color(0.7f, 0.5f, 1.0f)));
-        Assert.True(ground_material.EmittedRadiance.GetType() == typeof(UniformPigment));
-        Assert.True(ground_material.EmittedRadiance.Color.is_close(new Color(0, 0, 0)));
-        Assert.True(sphere_material.EmittedRadiance.GetType() == typeof(UniformPigment));
-        Assert.True(sphere_material.EmittedRadiance.Color.is_close(new Color(0, 0, 0)));
+        Assert.True(skyMaterial.EmittedRadiance.GetType() == typeof(UniformPigment));
+        Assert.True(skyMaterial.EmittedRadiance.Color.is_close(new Color(0.7f, 0.5f, 1.0f)));
+        Assert.True(groundMaterial.EmittedRadiance.GetType() == typeof(UniformPigment));
+        Assert.True(groundMaterial.EmittedRadiance.Color.is_close(new Color(0, 0, 0)));
+        Assert.True(sphereMaterial.EmittedRadiance.GetType() == typeof(UniformPigment));
+        Assert.True(sphereMaterial.EmittedRadiance.Color.is_close(new Color(0, 0, 0)));
         
         //Check that the shapes are ok
 
@@ -166,10 +168,17 @@ public class SceneFileTests
         
         //Check that the camera is ok
 
-        Assert.True(scene.Camera.GetType() == typeof(PerspectiveCamera));
+        Assert.True(scene.Camera!.GetType() == typeof(PerspectiveCamera));
         Assert.True(scene.Camera.Transformation.is_close(Transformation.rotation_z(30) * Transformation.translation(new Vec(-4, 0, 1))));
         Assert.True(Math.Abs(1.0 - scene.Camera.AspectRatio) < 1e-5); 
         Assert.True(Math.Abs(2.0 - scene.Camera.Distance) < 1e-5);
+        
+        // Check pointlight is ok
+        
+        Assert.True(scene.World.PointLights[0].GetType() == typeof(PointLight));
+        Assert.True(scene.World.PointLights[0].Position.is_close(new Point(-30,40,50)));
+        Assert.True(scene.World.PointLights[0].Color.is_close(new Color(0.2f, 0.5f, 1)));
+        
     }
 
     [Fact]
