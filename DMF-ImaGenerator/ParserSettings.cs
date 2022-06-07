@@ -183,7 +183,7 @@ internal class ParserSettings
                        "This option overrides the width and height specifications.")]
         public string ImageResolution { get; set; } = null!;
         
-        [Value(0, MetaName = "SCENE", HelpText = "The input file scene. Must be a proper .txt file that describes the scene.", Required = true)]
+        [Value(0, MetaName = "SCENE", HelpText = "The input file scene. Must be a proper text file that describes the scene.", Required = true)]
         public string SceneFile { get; set; } = null!;
     }
 }

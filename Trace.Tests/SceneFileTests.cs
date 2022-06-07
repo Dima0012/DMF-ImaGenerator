@@ -93,22 +93,22 @@ public class SceneFileTests
     public void TestParser()
     {
         var buf = Encoding.ASCII.GetBytes(
-            "float clock(150)" + 
+            "float clock(120)\n" + 
             "material sky_material(diffuse(uniform(<0, 0, 0>)), " +
                                     "uniform(<0.7, 0.5, 1>))\n" +
             "# Here is a comment\n" + 
             "material ground_material(diffuse(checkered(<0.3, 0.5, 0.1>,<0.1, 0.2, 0.5>, 4)), \n" +
                                     "uniform(<0, 0, 0>))" +
-    
+            
             "material sphere_material(specular(uniform(<0.5, 0.5, 0.5>)), \n" +
                                     "uniform(<0, 0, 0>))" +
             
             "plane (sky_material, translation([0, 0, 100]) * rotation_y(clock))\n" +
-        
+            
             "plane (ground_material, identity)\n" +
-    
+            
             "sphere(sphere_material, translation([0, 0, 1]))\n" +
-    
+            
             "camera(perspective, rotation_z(30) * translation([-4, 0, 1]), 1.0, 2.0)"
         );
         using var memStream = new MemoryStream(buf);
@@ -120,7 +120,7 @@ public class SceneFileTests
 
         Assert.True(scene.FloatVariables.Count == 1);
         Assert.True(scene.FloatVariables.ContainsKey("clock"));
-        Assert.True(scene.FloatVariables["clock"] == 150.0);
+        Assert.True(Math.Abs(scene.FloatVariables["clock"] - 120.0) < 10E-5);
         
         //Check that the materials are ok
         Assert.True(scene.Materials.Count == 3);

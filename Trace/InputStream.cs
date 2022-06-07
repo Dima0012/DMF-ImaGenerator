@@ -169,7 +169,7 @@ public class InputStream
     /// </summary>
     public NumberToken ParseNumberToken(char? firstCh, SourceLocation tokenLocation)
     {
-        var token = firstCh;
+        var token = firstCh.ToString();
 
         while (true)
         {
@@ -187,7 +187,7 @@ public class InputStream
         float value = 0;
         try
         {
-            if (token != null) value = (float)token;
+            if (token != null) value =  Convert.ToSingle(token);
         }
         catch (Exception)
         {
@@ -341,7 +341,7 @@ public class InputStream
 
         if (token.Symbol != symbol || token.GetType() != typeof(SymbolToken))
         {
-            throw new GrammarError(Location, $"got '{token.Symbol}' instead of '{symbol}");
+            throw new GrammarError(Location, $"got '{token.Symbol}' instead of '{symbol}'");
         }
     }
 

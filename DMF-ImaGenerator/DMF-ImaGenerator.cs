@@ -331,7 +331,7 @@ internal static class DfmImaGenerator
 
         if (!resolutions.Contains(imageResolution, StringComparer.OrdinalIgnoreCase))
         {
-            Console.WriteLine($"Unknown resolution '{imageResolution}'. Choose between: ");
+            Console.WriteLine($"Unknown image resolution '{imageResolution}'. Choose between: ");
             Console.WriteLine("SD (720x480)\nHD (1280x720)\nFHD (1920x1080)");
             Console.WriteLine("\nExiting application.");
             return;
@@ -472,7 +472,7 @@ internal static class DfmImaGenerator
 
         if (png == "")
         {
-            png = camName + "_demo.png";
+            png = camName + "_image.png";
         }
 
         imageTracer.Image.write_ldr_image(png, gamma);
