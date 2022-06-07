@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using CommandLine;
 using CommandLine.Text;
@@ -374,7 +375,6 @@ internal static class DfmImaGenerator
         }
 
         using Stream sceneStream = File.OpenRead(sceneFile);
-        var img = new HdrImage(sceneStream);
         Console.WriteLine($"File {sceneFile} has been read from disk.");
 
         Scene scene;
@@ -400,7 +400,6 @@ internal static class DfmImaGenerator
         // Model scene 
         var world = scene.World;
         var camera = scene.Camera;
-        var camName = nameof(camera);
         var aspectRatio = (float) width / height;
 
         // Check if camera is defined
@@ -411,6 +410,7 @@ internal static class DfmImaGenerator
             var camTransformation = Transformation.rotation_z(angle) * Transformation.translation(new Vec(-5.0f, 0, 0));
             camera = new PerspectiveCamera(aspectRatio, camTransformation);
         }
+        var camName = camera.GetType() == typeof(PerspectiveCamera) ? "a Perspective camera" : "an Orthogonal camera";
 
         var image = new HdrImage(width, height);
         var imageTracer = new ImageTracer(image, camera, (int) samplesPerSide);
@@ -419,8 +419,8 @@ internal static class DfmImaGenerator
 
         // Choose algorithm and render
         Console.WriteLine($"Rendering demo image with {algorithm} renderer.");
-        Console.WriteLine($"Using a {camName}.");
-        Console.WriteLine($"Resolution is {width}x{height}\n");
+        Console.WriteLine($"Using {camName}.");
+        Console.WriteLine($"Resolution is {width}x{height} .\n");
 
         switch (algorithm)
         {
@@ -456,6 +456,10 @@ internal static class DfmImaGenerator
         {
             pfm = camName + "_image.pfm";
         }
+        else
+        {
+            pfm += ".pfm";
+        }
 
         Console.WriteLine($"Rendering of {pfm} complete.");
         Console.WriteLine("Time elapsed: " + elapsedTime);
@@ -473,6 +477,10 @@ internal static class DfmImaGenerator
         if (png == "")
         {
             png = camName + "_image.png";
+        }
+        else
+        {
+            png += ".png";
         }
 
         imageTracer.Image.write_ldr_image(png, gamma);

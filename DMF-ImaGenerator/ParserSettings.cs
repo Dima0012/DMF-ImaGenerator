@@ -135,7 +135,7 @@ internal class ParserSettings
         public float Angle { get; set; }
 
         [Option('n', "image-name", Default = "", Separator = ' ',
-            HelpText = "Name of the output PNG and PFM files.")]
+            HelpText = "Name of the output PNG and PFM files, excluding file extensions.")]
         public string OutputName { get; set; } = null!;
 
         [Option('a', "algorithm", Default = "path-tracer", Separator = ' ',
@@ -180,7 +180,7 @@ internal class ParserSettings
         
         [Option('e',"image-resolution", Default = "SD", Separator = ' ',
             HelpText = "The resolution of the image. Choose between SD (720x480), HD (1280x720), FHD (1920x1080)." +
-                       "This option overrides the width and height specifications.")]
+                       "This option overrides any width and height specifications.")]
         public string ImageResolution { get; set; } = null!;
         
         [Value(0, MetaName = "SCENE", HelpText = "The input file scene. Must be a proper text file that describes the scene.", Required = true)]
