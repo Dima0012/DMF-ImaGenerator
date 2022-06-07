@@ -187,7 +187,7 @@ public class InputStream
         float value = 0;
         try
         {
-            if (token != null) value =  Convert.ToSingle(token);
+            if (token != null) value = Convert.ToSingle(token);
         }
         catch (Exception)
         {

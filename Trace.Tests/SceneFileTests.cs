@@ -93,7 +93,7 @@ public class SceneFileTests
     public void TestParser()
     {
         var buf = Encoding.ASCII.GetBytes(
-            "float clock(120)\n" + 
+            "float clock(150)\n" + 
             "material sky_material(diffuse(uniform(<0, 0, 0>)), " +
                                     "uniform(<0.7, 0.5, 1>))\n" +
             "# Here is a comment\n" + 
@@ -120,7 +120,7 @@ public class SceneFileTests
 
         Assert.True(scene.FloatVariables.Count == 1);
         Assert.True(scene.FloatVariables.ContainsKey("clock"));
-        Assert.True(Math.Abs(scene.FloatVariables["clock"] - 120.0) < 10E-5);
+        Assert.True(Math.Abs(scene.FloatVariables["clock"] - 150.0) < 10E-5);
         
         //Check that the materials are ok
         Assert.True(scene.Materials.Count == 3);
