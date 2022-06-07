@@ -175,7 +175,7 @@ public class InputStream
         {
             var ch = read_char();
 
-            if (ch is not '.' or 'E' or 'e' || !float.TryParse(ch.ToString(), out _))
+            if (ch is not '.' or 'E' or 'e' && !float.TryParse(ch.ToString(), out _))
             {
                 unread_char(ch);
                 break;
@@ -303,13 +303,15 @@ public class InputStream
             return token.Number;
         }
 
-        if (token.GetType() == typeof(IdentifierToken))
+        else if (token.GetType() == typeof(IdentifierToken))
         {
             var varName = token.Identifier;
             if (!scene.FloatVariables.ContainsKey(varName))
             {
                 throw new GrammarError(token.Location, $"unknown variable '{varName}'");
             }
+
+            return scene.FloatVariables[varName];
         }
 
         throw new GrammarError(token.Location, $"got '{token}' instead of a number");
@@ -577,7 +579,7 @@ public class InputStream
                     KeywordEnum.Identity,
                     KeywordEnum.Translation,
                     KeywordEnum.RotationX,
-                    KeywordEnum.RotationY,
+                    KeywordEnum.Rotation_Y,
                     KeywordEnum.RotationZ,
                     KeywordEnum.Scaling,
                 });
@@ -598,7 +600,7 @@ public class InputStream
                     result *= Transformation.rotation_x(expect_number(scene));
                     expect_symbol(')');
                 }
-                else if (transformationKw == KeywordEnum.RotationY)
+                else if (transformationKw == KeywordEnum.Rotation_Y)
                 {
                     expect_symbol('(');
                     result *= Transformation.rotation_y(expect_number(scene));

@@ -37,7 +37,7 @@ public enum KeywordEnum : ushort
     Identity = 10,
     Translation = 11,
     RotationX = 12,
-    RotationY = 13,
+    Rotation_Y = 13,
     RotationZ = 14,
     Scaling = 15,
     Camera = 16,

@@ -94,7 +94,7 @@ public class SceneFileTests
     {
         var buf = Encoding.ASCII.GetBytes(
             "float clock(150)" + 
-            "material sky_material(diffuse(uniform(<0, 0, 0>)), \n" +
+            "material sky_material(diffuse(uniform(<0, 0, 0>)), " +
                                     "uniform(<0.7, 0.5, 1>))\n" +
             "# Here is a comment\n" + 
             "material ground_material(diffuse(checkered(<0.3, 0.5, 0.1>,<0.1, 0.2, 0.5>, 4)), \n" +
