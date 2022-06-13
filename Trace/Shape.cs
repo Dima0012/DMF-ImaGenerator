@@ -9,7 +9,7 @@ namespace Trace;
 /// </summary>
 public abstract class Shape
 {
-    protected Transformation Transformation;
+    public Transformation Transformation;
     public Material Material;
     
     public Shape()

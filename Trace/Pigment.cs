@@ -15,6 +15,13 @@ public interface IPigment
     /// </summary>
     public Color get_color(Vec2d uv);
     
+    //In order to be able to access these members from a IPigment object
+    public Color Color { get; set; }
+    public Color Color1 { get; set; }
+    public Color Color2 { get; set; }
+    public int NumOfSteps { get; set; }
+    
+    
 }
 
 /// <summary>
@@ -22,6 +29,11 @@ public interface IPigment
 /// </summary>
 public class UniformPigment : IPigment
 {
+    public Color Color1 { get; set; }//
+    public Color Color2 { get; set; }//
+    public int NumOfSteps { get; set; }//useless, we need it because in this way it can me a member of
+                                        //IPigment and we can access it when we have IPigment object
+    
     public Color Color { get; set; }
 
     /// <summary>
@@ -47,7 +59,13 @@ public class UniformPigment : IPigment
 /// A textured pigment. The texture is given through a PFM image.
 /// </summary>
 public class ImagePigment : IPigment
-{
+{   
+    
+    
+    public Color Color { get; set; }//
+    public Color Color1 { get; set; }//useless, we need it because in this way it can me a member of
+    public Color Color2 { get; set; }//IPigment and we can access it when we have IPigment object
+    public int NumOfSteps { get; set; }//
     public HdrImage Image { get; set; }
 
     public ImagePigment(HdrImage image)
@@ -81,6 +99,8 @@ public class ImagePigment : IPigment
 /// </summary>
 public class CheckeredPigment : IPigment
 {
+    public Color Color { get; set; } //useless, we need it because in this way it can me a member of
+                                     //IPigment and we can access it when we have IPigment object
     public Color Color1 { get; set; }
     public Color Color2 { get; set; }
     public int NumOfSteps { get; set; }
