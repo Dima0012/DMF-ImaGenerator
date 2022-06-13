@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using CommandLine;
 using CommandLine.Text;
 using Trace;
@@ -15,7 +16,7 @@ internal static class DfmImaGenerator
         Console.WriteLine();
 
         var parserSettings = new ParserSettings();
-        var parser = new Parser();
+        var parser = new Parser(with => with.HelpWriter = null);
         var result =
             parser
                 .ParseArguments<ParserSettings.Pfm2PngOptions, ParserSettings.DemoOptions,
@@ -25,14 +26,15 @@ internal static class DfmImaGenerator
         result.WithParsed<ParserSettings.DemoOptions>(Demo);
         result.WithParsed<ParserSettings.RenderOptions>(Render);
 
-        result.WithNotParsed(errs => ParserSettings.DisplayHelp(result, errs));
+        result.WithNotParsed(_ => ParserSettings.DisplayHelp(result));
 
         Console.WriteLine();
     }
 
     private static void Pfm2Png(ParserSettings.Pfm2PngOptions parsed)
     {
-        Console.WriteLine(HeadingInfo.Default);
+        Console.WriteLine("DMF-ImaGenerator 1.0.0");
+        Console.WriteLine("Copyright (c) 2022 DMF");
         Console.WriteLine();
 
         var gamma = parsed.Gamma;
@@ -64,7 +66,8 @@ internal static class DfmImaGenerator
 
     private static void Demo(ParserSettings.DemoOptions parsed)
     {
-        Console.WriteLine(HeadingInfo.Default);
+        Console.WriteLine("DMF-ImaGenerator 1.0.0");
+        Console.WriteLine("Copyright (c) 2022 DMF");
         Console.WriteLine();
 
         var width = parsed.Width;
@@ -296,7 +299,8 @@ internal static class DfmImaGenerator
 
     private static void Render(ParserSettings.RenderOptions parsed)
     {
-        Console.WriteLine(HeadingInfo.Default);
+        Console.WriteLine("DMF-ImaGenerator 1.0.0");
+        Console.WriteLine("Copyright (c) 2022 DMF");
         Console.WriteLine();
 
         var width = parsed.Width;
@@ -315,6 +319,7 @@ internal static class DfmImaGenerator
         var rouletteLimit = parsed.RussianRouletteLimit;
         var imageResolution = parsed.ImageResolution;
         var sceneFile = parsed.SceneFile;
+        var floatVariable = parsed.FloatVariable;
 
         var algorithms = new List<string> {"path-tracer", "point-light"};
         var resolutions = new List<string> {"SD", "HD", "FHD"};
@@ -365,6 +370,14 @@ internal static class DfmImaGenerator
             return;
         }
 
+        if (!(floatVariable.Contains('=') || floatVariable.Contains(' ')) && floatVariable != "")
+        {
+            Console.WriteLine(
+                "Error: use the syntax --declare-float NAME1=VALUE1 NAME2=VALUE2 ... when declaring a variable. ");
+            Console.WriteLine("\nExiting application.");
+            return;
+        }
+
         // Read scene from file
         if (!File.Exists(sceneFile))
         {
@@ -375,7 +388,7 @@ internal static class DfmImaGenerator
         }
 
         using Stream sceneStream = File.OpenRead(sceneFile);
-        Console.WriteLine($"File {sceneFile} has been read from disk.");
+        Console.WriteLine($"File '{sceneFile}' has been read from disk.");
 
         Scene scene;
         var inputStream = new InputStream(sceneStream, sceneFile);
@@ -383,9 +396,37 @@ internal static class DfmImaGenerator
 
         Console.WriteLine("Processing the scene ... ");
 
-        try
+        // Create declared variables
+        Dictionary<string, float>? dict = new();
+
+        if (floatVariable == "")
         {
-            scene = inputStream.parse_scene();
+            dict = null;
+        }
+        else
+        {
+            try
+            {
+                var stringSequence = floatVariable.Split('=', ' ');
+                for (var i = 1; i <= stringSequence.Length; i += 2)
+                {
+                    var varName = stringSequence[i - 1];
+                    var varValue = Convert.ToSingle(stringSequence[i]);
+                    dict!.Add(varName, varValue);
+                }
+            }
+            catch (FormatException e)
+            {
+                Console.WriteLine($"Error: {e.Message}");
+                Console.WriteLine("\nExiting application.");
+                return;
+            }
+        }
+
+        try
+
+        {
+            scene = inputStream.parse_scene(dict);
         }
         catch (GrammarError e)
         {
@@ -410,6 +451,7 @@ internal static class DfmImaGenerator
             var camTransformation = Transformation.rotation_z(angle) * Transformation.translation(new Vec(-5.0f, 0, 0));
             camera = new PerspectiveCamera(aspectRatio, camTransformation);
         }
+
         var camName = camera.GetType() == typeof(PerspectiveCamera) ? "a Perspective camera" : "an Orthogonal camera";
 
         var image = new HdrImage(width, height);
@@ -420,7 +462,7 @@ internal static class DfmImaGenerator
         // Choose algorithm and render
         Console.WriteLine($"Rendering demo image with {algorithm} renderer.");
         Console.WriteLine($"Using {camName}.");
-        Console.WriteLine($"Resolution is {width}x{height} .\n");
+        Console.WriteLine($"Resolution is {width}x{height}.\n");
 
         switch (algorithm)
         {
@@ -444,7 +486,7 @@ internal static class DfmImaGenerator
                 break;
             }
         }
-        
+
         var ts = stopWatch.Elapsed;
         var elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds / 10:00}";
 
@@ -461,12 +503,12 @@ internal static class DfmImaGenerator
             pfm += ".pfm";
         }
 
-        Console.WriteLine($"Rendering of {pfm} complete.");
+        Console.WriteLine($"Rendering of '{pfm}' completed.");
         Console.WriteLine("Time elapsed: " + elapsedTime);
 
         using Stream outputFilePfm = File.OpenWrite(pfm);
         imageTracer.Image.write_pfm(outputFilePfm, -1.0);
-        Console.WriteLine("\nFile " + pfm + " has been written to disk.");
+        Console.WriteLine("\nFile '" + pfm + "' has been written to disk.");
 
         // Save image in PNG format
 
@@ -484,7 +526,7 @@ internal static class DfmImaGenerator
         }
 
         imageTracer.Image.write_ldr_image(png, gamma);
-        Console.WriteLine("File " + png + " has been written to disk.");
+        Console.WriteLine("File '" + png + "' has been written to disk.");
         Console.WriteLine("\nExiting application.");
     }
 }

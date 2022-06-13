@@ -5,29 +5,22 @@ using CommandLine.Text;
 
 internal class ParserSettings
 {
-    public static void DisplayHelp<T>(ParserResult<T> result, IEnumerable<Error> errs)
+    public static void DisplayHelp(ParserResult<object> parserResult)
     {
-        HelpText helpText;
-        if (errs.IsVersion()) //check if error is version request
-            helpText = HelpText.AutoBuild(result);
-        else
+        Console.WriteLine(HelpText.AutoBuild(parserResult, h =>
         {
-            helpText = HelpText.AutoBuild(result, h =>
-            {
-                h.AdditionalNewLineAfterOption = true;
-                // h.Heading = "DMF-ImaGenerator 0.2.0"; //change header
-                // h.Copyright = "Copyright (c) 2022 DMF"; //change copyright text
-                h.AutoVersion = false;
-                h.AutoHelp = true;
-
-                return HelpText.DefaultParsingErrorsHandler(result, h);
-            }, e => e, false);
-            Console.WriteLine(helpText);
-        }
+            h.AdditionalNewLineAfterOption = true;
+            h.Heading = "DMF-ImaGenerator 1.0.0"; //change header
+            h.Copyright = "Copyright (c) 2022 DMF"; //change copyright text
+            h.AutoVersion = false;
+            h.AutoHelp = true;
+            return h;
+        }));
     }
 
-    [Verb("demo", HelpText = "Generates a demo image, and saves it in PFM and PNG format.\n The image is trivial in the default case (flat), but is" +
-                             " more realistic if using path-tracer or point-light algorithm.")]
+    [Verb("demo", HelpText =
+        "Generates a demo image, and saves it in PFM and PNG format. The image is trivial in the default case (flat), but is" +
+        " more realistic if using path-tracer or point-light algorithm.")]
     internal class DemoOptions
     {
         [Option('w', "width", MetaValue = "INT", Default = 480, Separator = ' ',
@@ -90,8 +83,8 @@ internal class ParserSettings
         [Option('u', "roulette-limit", MetaValue = "INT", Default = 3, Separator = ' ',
             HelpText = "The minimum numbers of iterations before applying Russian roulette selection.")]
         public int RussianRouletteLimit { get; set; }
-        
-        [Option('e',"image-resolution", Default = "SD", Separator = ' ',
+
+        [Option('e', "image-resolution", Default = "SD", Separator = ' ',
             HelpText = "The resolution of the image. Choose between SD (720x480), HD (1280x720), FHD (1920x1080)." +
                        "This option overrides the width and height specifications.")]
         public string ImageResolution { get; set; } = null!;
@@ -118,7 +111,7 @@ internal class ParserSettings
             HelpText = "Luminosity value for tone mapping.")]
         public float? Luminosity { get; set; }
     }
-    
+
     [Verb("render", HelpText = "Render an image from a scene read from file.")]
     internal class RenderOptions
     {
@@ -126,7 +119,7 @@ internal class ParserSettings
             HelpText = "The width of the image in pixels.")]
         public int Width { get; set; }
 
-        [Option('h', "height", MetaValue = "INT", Default = 480, Separator = ' ',
+        [Option('h', "height", MetaValue = "INT", Default = 720, Separator = ' ',
             HelpText = "The height of the image in pixels.")]
         public int Height { get; set; }
 
@@ -177,13 +170,19 @@ internal class ParserSettings
         [Option('u', "roulette-limit", MetaValue = "INT", Default = 3, Separator = ' ',
             HelpText = "The minimum numbers of iterations before applying Russian roulette selection.")]
         public int RussianRouletteLimit { get; set; }
-        
-        [Option('e',"image-resolution", Default = "SD", Separator = ' ',
+
+        [Option('e', "image-resolution", Default = "SD", Separator = ' ',
             HelpText = "The resolution of the image. Choose between SD (720x480), HD (1280x720), FHD (1920x1080)." +
                        "This option overrides any width and height specifications.")]
         public string ImageResolution { get; set; } = null!;
-        
-        [Value(0, MetaName = "SCENE", HelpText = "The input file scene. Must be a proper text file that describes the scene.", Required = true)]
+
+        [Value(0, MetaName = "SCENE",
+            HelpText = "The input file scene. Must be a proper text file that describes the scene.", Required = true)]
         public string SceneFile { get; set; } = null!;
+
+        [Option('t', "declare-float", MetaValue = "FLOAT", Default = "", Separator = ' ',
+            HelpText = "Specify a floating point variable. Use the syntax NAME=VALUE." +
+                       "You can specify multiple variables separated by a space. Variables must be already declared in the file scene." )]
+        public string FloatVariable { get; set; } = null!;
     }
 }
