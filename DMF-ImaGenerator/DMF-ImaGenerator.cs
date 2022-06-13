@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using CommandLine;
 using CommandLine.Text;
 using Trace;
@@ -305,7 +306,6 @@ internal static class DfmImaGenerator
 
         var width = parsed.Width;
         var height = parsed.Height;
-        var angle = parsed.Angle;
         var outputName = parsed.OutputName;
         var algorithm = parsed.Algorithm;
         var factor = parsed.Factor;
@@ -326,8 +326,10 @@ internal static class DfmImaGenerator
 
         if (!algorithms.Contains(algorithm, StringComparer.OrdinalIgnoreCase))
         {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Unknown render option '{algorithm}'. Choose between: ");
             Console.WriteLine(string.Join("\n", algorithms));
+            Console.ResetColor();
             Console.WriteLine("\nExiting application.");
             return;
         }
@@ -337,12 +339,15 @@ internal static class DfmImaGenerator
 
         if (!resolutions.Contains(imageResolution, StringComparer.OrdinalIgnoreCase))
         {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Unknown image resolution '{imageResolution}'. Choose between: ");
             Console.WriteLine("SD (720x480)\nHD (1280x720)\nFHD (1920x1080)");
+            Console.ResetColor();
             Console.WriteLine("\nExiting application.");
             return;
         }
 
+        // Choose image resolution
         switch (imageResolution)
         {
             case "SD":
@@ -364,16 +369,21 @@ internal static class DfmImaGenerator
         var samplesPerSide = MathF.Sqrt(pixelSamples);
         if (Math.Abs(samplesPerSide * samplesPerSide - pixelSamples) > 10 - 4)
         {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(
                 $"Error: samples per pixels {pixelSamples} to use in anti-aliasing is not a perfect square.");
+            Console.ResetColor();
             Console.WriteLine("\nExiting application.");
             return;
         }
 
-        if (!(floatVariable.Contains('=') || floatVariable.Contains(' ')) && floatVariable != "")
+        // Check che declared variables; error if does not match rule, or is just numbers or strings 
+        if (!(floatVariable.Contains('=') || floatVariable.Contains(' ')) && floatVariable != "") // If string is not empty
         {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(
-                "Error: use the syntax --declare-float NAME1=VALUE1 NAME2=VALUE2 ... when declaring a variable. ");
+                "Error: use the syntax --declare-float NAME1=VALUE1 NAME2=VALUE2 ... when declaring a variable.");
+            Console.ResetColor();
             Console.WriteLine("\nExiting application.");
             return;
         }
@@ -381,8 +391,10 @@ internal static class DfmImaGenerator
         // Read scene from file
         if (!File.Exists(sceneFile))
         {
-            Console.WriteLine("Could not find the specified file.");
-            Console.WriteLine("File name: " + sceneFile);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Error: could not find the specified file.");
+            Console.WriteLine($"File name: {sceneFile}");
+            Console.ResetColor();
             Console.WriteLine("\nExiting application.");
             return;
         }
@@ -396,8 +408,9 @@ internal static class DfmImaGenerator
 
         Console.WriteLine("Processing the scene ... ");
 
-        // Create declared variables
+        // Create declared variables dictionary to pass to parse_scene
         Dictionary<string, float>? dict = new();
+        var varName = "";
 
         if (floatVariable == "")
         {
@@ -406,32 +419,33 @@ internal static class DfmImaGenerator
         else
         {
             try
-            {
+            {   //Separate the string in =, and create name and value, in pairs separated by a space
                 var stringSequence = floatVariable.Split('=', ' ');
-                for (var i = 1; i <= stringSequence.Length; i += 2)
+                for (var i = 1; i < stringSequence.Length; i += 2)
                 {
-                    var varName = stringSequence[i - 1];
+                    varName = stringSequence[i - 1];
                     var varValue = Convert.ToSingle(stringSequence[i]);
-                    dict!.Add(varName, varValue);
+                    dict.Add(varName, varValue);
                 }
             }
-            catch (FormatException e)
+            catch (FormatException)
             {
-                Console.WriteLine($"Error: {e.Message}");
+                Console.WriteLine($"\nError: value of {varName} is not a floating-point number.", Console.ForegroundColor = ConsoleColor.Red);
+                Console.ResetColor();
                 Console.WriteLine("\nExiting application.");
                 return;
             }
         }
 
         try
-
         {
             scene = inputStream.parse_scene(dict);
         }
         catch (GrammarError e)
         {
             var loc = e.Location;
-            Console.WriteLine($"\nError in file: {loc.FileName} at line {loc.LineNum}:{loc.ColNum}: \n {e.Message}");
+            Console.WriteLine($"\nError in file: {loc.FileName} at line {loc.LineNum}:{loc.ColNum}:\n{e.Message}",Console.ForegroundColor = ConsoleColor.Red );
+            Console.ResetColor();
             Console.WriteLine("\nExiting application.");
             return;
         }
@@ -446,9 +460,11 @@ internal static class DfmImaGenerator
         // Check if camera is defined
         if (camera is null)
         {
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(
                 "Warning: the camera has not been defined in the scene. Using a default perspective camera centered in [-5,0,0]\n");
-            var camTransformation = Transformation.rotation_z(angle) * Transformation.translation(new Vec(-5.0f, 0, 0));
+            Console.ResetColor();
+            var camTransformation = Transformation.translation(new Vec(-5.0f, 0, 0));
             camera = new PerspectiveCamera(aspectRatio, camTransformation);
         }
 
@@ -478,6 +494,15 @@ internal static class DfmImaGenerator
             }
             case "point-light":
             {
+                if (!world.PointLights.Any())
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(
+                        "Warning: the scene does not contain any point light sources. Using a default point light in (0, 0, 0) of color <0.5, 0.5, 0.5>.\n");
+                    Console.ResetColor();
+                    world.add_light(new PointLight(new Point(0,0,0), new Color(0.5f,0.5f,0.5f)));
+                }
+                
                 var renderer = new PointLightRenderer(world);
                 // Trace image with point-light method
                 stopWatch.Start();
@@ -504,11 +529,11 @@ internal static class DfmImaGenerator
         }
 
         Console.WriteLine($"Rendering of '{pfm}' completed.");
-        Console.WriteLine("Time elapsed: " + elapsedTime);
+        Console.WriteLine($"Time elapsed: {elapsedTime}");
 
         using Stream outputFilePfm = File.OpenWrite(pfm);
         imageTracer.Image.write_pfm(outputFilePfm, -1.0);
-        Console.WriteLine("\nFile '" + pfm + "' has been written to disk.");
+        Console.WriteLine($"\nFile '{pfm}' has been written to disk.");
 
         // Save image in PNG format
 
@@ -526,7 +551,7 @@ internal static class DfmImaGenerator
         }
 
         imageTracer.Image.write_ldr_image(png, gamma);
-        Console.WriteLine("File '" + png + "' has been written to disk.");
+        Console.WriteLine($"File '{png}' has been written to disk.");
         Console.WriteLine("\nExiting application.");
     }
 }

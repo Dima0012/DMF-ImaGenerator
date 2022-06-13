@@ -123,10 +123,6 @@ internal class ParserSettings
             HelpText = "The height of the image in pixels.")]
         public int Height { get; set; }
 
-        [Option('d', "angle-deg", Default = 0f, Separator = ' ',
-            HelpText = "Rotation angle for the camera / observer")]
-        public float Angle { get; set; }
-
         [Option('n', "image-name", Default = "", Separator = ' ',
             HelpText = "Name of the output PNG and PFM files, excluding file extensions.")]
         public string OutputName { get; set; } = null!;
@@ -180,7 +176,7 @@ internal class ParserSettings
             HelpText = "The input file scene. Must be a proper text file that describes the scene.", Required = true)]
         public string SceneFile { get; set; } = null!;
 
-        [Option('t', "declare-float", MetaValue = "FLOAT", Default = "", Separator = ' ',
+        [Option('d', "declare-float", MetaValue = "FLOAT", Default = "", Separator = ' ',
             HelpText = "Specify a floating point variable. Use the syntax NAME=VALUE." +
                        "You can specify multiple variables separated by a space. Variables must be already declared in the file scene." )]
         public string FloatVariable { get; set; } = null!;
