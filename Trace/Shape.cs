@@ -42,6 +42,10 @@ public abstract class Shape
     public abstract bool quick_ray_intersection(Ray ray);
 }
 
+/// <summary>
+/// A Sphere in 3D space, centered in the origin and of unitary radius. It stores a Transformation
+/// which tells its position and shape in real space.
+/// </summary>
 public class Sphere : Shape
 {
     public Sphere() : base(){}
@@ -153,8 +157,8 @@ public class Sphere : Shape
 
 /// <summary>
 /// A 3D infinite plane parallel to the x and y axis and passing through the origin.
+/// It stores a Transformation which tells its position and shape in real space.
 /// </summary>
-
 public class Plane : Shape
 {
     public Plane() : base(){}
@@ -223,4 +227,33 @@ public class Plane : Shape
         return invRay.Tmin < t && t < invRay.Tmax;
     }
 
+}
+
+/// <summary>
+/// A 3D cube, whose faces are parallel to the coordinates planes.
+/// It stores a Transformation which tells its position and shape in real space.
+/// </summary>
+public class Cube : Shape
+{
+    public float XMin { get; set; } = 0;
+    public float XMax { get; set; } = 0;
+    public float YMin { get; set; } = 0;
+    public float YMax { get; set; } = 0;
+    public float ZMin { get; set; } = 0;
+    public float ZMax { get; set; } = 0;
+    
+    public Cube() {}
+
+    public Cube(Transformation transformation, Material material) : base(transformation,material) {}
+
+
+    public override HitRecord? ray_intersection(Ray ray)
+    {
+        throw new NotImplementedException();
+    }
+    
+    public override bool quick_ray_intersection(Ray ray)
+    {
+        throw new NotImplementedException();
+    }
 }
