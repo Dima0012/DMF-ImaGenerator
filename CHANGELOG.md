@@ -1,3 +1,12 @@
+# HEAD 
+- New version released on 06/17/22
+- Implemented a lexer and a parser to read scene files written using a simple textual syntax.
+- New command ``renderer`` which reads a scene from a file and generates an image.
+- Merged the two demo commands into one single ``demo`` command. Now it generates different images based on the chosen renderer.
+- New and improved error displaying for erroneus scenes' decleration and bad application's usage. 
+- New option ``--declare-float`` to declare a floating point variable from the command line.
+
+
 # Version 0.3.0
 
 - New version released on 05/25/22
