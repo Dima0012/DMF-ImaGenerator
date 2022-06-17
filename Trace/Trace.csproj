@@ -1,18 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.9.0-preview1" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CommandLineParser" Version="2.9.0-preview1"/>
+        <PackageReference Include="SixLabors.ImageSharp" Version="2.1.0"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Geometry" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Geometry"/>
+    </ItemGroup>
 
 </Project>

@@ -3,7 +3,7 @@
 namespace Trace.Geometry;
 
 /// <summary>
-/// An affine Transformation.
+///     An affine Transformation.
 /// </summary>
 public struct Transformation
 {
@@ -11,7 +11,7 @@ public struct Transformation
     public Matrix4x4 InvM { get; set; }
 
     /// <summary>
-    /// Initialize a Transformation with the specified matrix and inverse.
+    ///     Initialize a Transformation with the specified matrix and inverse.
     /// </summary>
     public Transformation(Matrix4x4 m, Matrix4x4 invM)
     {
@@ -20,7 +20,7 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Initialize the identity Transformation.
+    ///     Initialize the identity Transformation.
     /// </summary>
     public Transformation()
     {
@@ -29,7 +29,7 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Check if two matrices are equal with an epsilon precision.
+    ///     Check if two matrices are equal with an epsilon precision.
     /// </summary>
     private static bool are_matr_close(Matrix4x4 ma, Matrix4x4 mb, double epsilon = 1e-5)
     {
@@ -65,17 +65,14 @@ public struct Transformation
             var elemA = (float) (first.GetValue(ma) ?? 0.0f);
             var elemB = (float) (second.GetValue(mb) ?? 0.0f);
 
-            if (Math.Abs(elemA - elemB) > epsilon)
-            {
-                return false;
-            }
+            if (Math.Abs(elemA - elemB) > epsilon) return false;
         }
 
         return true;
     }
 
     /// <summary>
-    /// Check if the transformation passed as argument represents the same transformation.
+    ///     Check if the transformation passed as argument represents the same transformation.
     /// </summary>
     public bool is_close(Transformation t)
     {
@@ -83,8 +80,8 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Check if the Transformation is consistent (M and invM product to identity) with
-    /// an epsilon precision.
+    ///     Check if the Transformation is consistent (M and invM product to identity) with
+    ///     an epsilon precision.
     /// </summary>
     public bool is_consistent(double epsilon = 1e-5)
     {
@@ -93,8 +90,8 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Return a Transformation object encoding a rigid translation.
-    /// The parameter `vec` specifies the amount of shift to be applied along the three axes.
+    ///     Return a Transformation object encoding a rigid translation.
+    ///     The parameter `vec` specifies the amount of shift to be applied along the three axes.
     /// </summary>
     public static Transformation translation(Vec vec)
     {
@@ -114,8 +111,8 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Return a Transformation object encoding a scaling.
-    /// The parameter vec specifies the amount of scaling along the three directions X, Y, Z.
+    ///     Return a Transformation object encoding a scaling.
+    ///     The parameter vec specifies the amount of scaling along the three directions X, Y, Z.
     /// </summary>
     public static Transformation scaling(Vec vec)
     {
@@ -135,14 +132,14 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Return a Transformation object encoding a rotation around the X axis
-    ///The parameter `angle_deg` specifies the rotation angle (in degrees).
-    /// The positive sign is given by the right-hand rule.
+    ///     Return a Transformation object encoding a rotation around the X axis
+    ///     The parameter `angle_deg` specifies the rotation angle (in degrees).
+    ///     The positive sign is given by the right-hand rule.
     /// </summary>
     public static Transformation rotation_x(float angleDeg)
     {
-        var sinang = (float) Math.Sin((Math.PI / 180) * angleDeg);
-        var cosang = (float) Math.Cos((Math.PI / 180) * angleDeg);
+        var sinang = (float) Math.Sin(Math.PI / 180 * angleDeg);
+        var cosang = (float) Math.Cos(Math.PI / 180 * angleDeg);
 
         var m = new Matrix4x4(
             1.0f, 0.0f, 0.0f, 0.0f,
@@ -160,14 +157,14 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Return a Transformation object encoding a rotation around the Y axis
-    /// The parameter angle_deg specifies the rotation angle (in degrees).
-    /// The positive sign is given by the right-hand rule.
+    ///     Return a Transformation object encoding a rotation around the Y axis
+    ///     The parameter angle_deg specifies the rotation angle (in degrees).
+    ///     The positive sign is given by the right-hand rule.
     /// </summary>
     public static Transformation rotation_y(float angleDeg)
     {
-        var sinang = (float) Math.Sin((Math.PI / 180) * angleDeg);
-        var cosang = (float) Math.Cos((Math.PI / 180) * angleDeg);
+        var sinang = (float) Math.Sin(Math.PI / 180 * angleDeg);
+        var cosang = (float) Math.Cos(Math.PI / 180 * angleDeg);
 
         var m = new Matrix4x4(
             cosang, 0.0f, sinang, 0.0f,
@@ -185,14 +182,14 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Return a Transformation object encoding a rotation around the Z axis
-    /// The parameter angleDeg specifies the rotation angle (in degrees).
-    /// The positive sign is given by the right-hand rule.
+    ///     Return a Transformation object encoding a rotation around the Z axis
+    ///     The parameter angleDeg specifies the rotation angle (in degrees).
+    ///     The positive sign is given by the right-hand rule.
     /// </summary>
     public static Transformation rotation_z(float angleDeg)
     {
-        var sinang = (float) Math.Sin((Math.PI / 180) * angleDeg);
-        var cosang = (float) Math.Cos((Math.PI / 180) * angleDeg);
+        var sinang = (float) Math.Sin(Math.PI / 180 * angleDeg);
+        var cosang = (float) Math.Cos(Math.PI / 180 * angleDeg);
 
         var m = new Matrix4x4(
             cosang, -sinang, 0.0f, 0.0f,
@@ -210,7 +207,7 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Returns the inverse Transformation, switching M and invM
+    ///     Returns the inverse Transformation, switching M and invM
     /// </summary>
     public Transformation inverse()
     {
@@ -237,7 +234,7 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Overloading of multiplication for Transformation of a Point.
+    ///     Overloading of multiplication for Transformation of a Point.
     /// </summary>
     public static Point operator *(Transformation t, Point p)
     {
@@ -249,11 +246,13 @@ public struct Transformation
 
         var w = p.X * m.M41 + p.Y * m.M42 + p.Z * m.M43 + m.M44;
 
-        return Math.Abs(w - 1.0f) < 1e-5 ? resultPoint : new Point(resultPoint.X / w, resultPoint.Y / w, resultPoint.Z / w);
+        return Math.Abs(w - 1.0f) < 1e-5
+            ? resultPoint
+            : new Point(resultPoint.X / w, resultPoint.Y / w, resultPoint.Z / w);
     }
 
     /// <summary>
-    /// Overloading of multiplication for Transformation of a Vector.
+    ///     Overloading of multiplication for Transformation of a Vector.
     /// </summary>
     public static Vec operator *(Transformation t, Vec vec)
     {
@@ -267,7 +266,7 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Overloading of multiplication for Transformation of a Normal.
+    ///     Overloading of multiplication for Transformation of a Normal.
     /// </summary>
     public static Normal operator *(Transformation t, Normal n)
     {

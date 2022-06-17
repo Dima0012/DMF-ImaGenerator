@@ -24,20 +24,20 @@ public class OnbTests
 
             // Verify that the z axis is aligned with the normal
             Assert.True(onb.E3.is_close(normalizedVec));
-            
+
             const double tolerance = 10e-1;
             // Verify that the base is orthogonal
             var temp = onb.E1 * onb.E2;
             Assert.True(temp < tolerance);
-            
+
             var temp2 = onb.E2 * onb.E3;
             Assert.True(temp2 < tolerance);
-            
-            
+
+
             Assert.True(onb.E3 * onb.E1 < tolerance);
 
             // Verify that each component is normalized
-            
+
             Assert.True(Math.Abs(onb.E1.squared_norm() - 1f) < tolerance);
             Assert.True(Math.Abs(onb.E2.squared_norm() - 1f) < tolerance);
 

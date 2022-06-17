@@ -1,9 +1,7 @@
-﻿using System.ComponentModel;
-
-namespace Trace;
+﻿namespace Trace;
 
 /// <summary>
-/// A class to memorize a Color in RGB format.
+///     A class to memorize a Color in RGB format.
 /// </summary>
 public struct Color
 {
@@ -12,7 +10,7 @@ public struct Color
     public float B { get; set; }
 
     /// <summary>
-    /// Initialize a new instance of Color, with every component set to zero.
+    ///     Initialize a new instance of Color, with every component set to zero.
     /// </summary>
     public Color()
     {
@@ -20,8 +18,9 @@ public struct Color
         G = 0.0f;
         B = 0.0f;
     }
+
     /// <summary>
-    /// Initialize a new instance of Color, with the specified components.
+    ///     Initialize a new instance of Color, with the specified components.
     /// </summary>
     /// <param name="r"> The red component.</param>
     /// <param name="g"> The green component.</param>
@@ -32,10 +31,11 @@ public struct Color
         G = g;
         B = b;
     }
+
     // Operators overloading
     public static Color operator +(Color a, Color b)
     {
-        Color newCol = new Color(a.R + b.R, a.G + b.G, a.B + b.B);
+        var newCol = new Color(a.R + b.R, a.G + b.G, a.B + b.B);
         return newCol;
     }
 
@@ -70,7 +70,7 @@ public struct Color
     {
         return Math.Abs(R - a.R) < epsilon && Math.Abs(G - a.G) < epsilon && Math.Abs(B - a.B) < epsilon;
     }
-    
+
     public bool float_is_close(float a, float b, double epsilon = 1e-5)
     {
         return Math.Abs(a - b) < epsilon;
@@ -82,7 +82,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Compute te luminosity of a Color object, as the half sum of the min and max component.
+    ///     Compute te luminosity of a Color object, as the half sum of the min and max component.
     /// </summary>
     public float luminosity()
     {

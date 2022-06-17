@@ -1,15 +1,10 @@
 ﻿namespace Trace.Cameras;
 
 /// <summary>
-/// Trace an image by shooting light Rays through each of its pixels
+///     Trace an image by shooting light Rays through each of its pixels
 /// </summary>
 public class ImageTracer
 {
-    public HdrImage Image { get; set; }
-    public ICamera Camera { get; set; }
-    public Pcg Pcg { get; set; }
-    public int SamplesPerSide { get; set; }
-
     public ImageTracer(HdrImage image, ICamera camera, int samplesPerSide = 0)
     {
         Image = image;
@@ -26,8 +21,13 @@ public class ImageTracer
         Pcg = pcg;
     }
 
+    public HdrImage Image { get; set; }
+    public ICamera Camera { get; set; }
+    public Pcg Pcg { get; set; }
+    public int SamplesPerSide { get; set; }
+
     /// <summary>
-    /// Shoot one Ray through a pixel of the Image. 
+    ///     Shoot one Ray through a pixel of the Image.
     /// </summary>
     public Ray fire_ray(int col, int row, float uPixel = 0.5f, float vPixel = 0.5f)
     {
@@ -37,7 +37,7 @@ public class ImageTracer
     }
 
     /// <summary>
-    /// Shoots several Rays crossing each of the pixel in the Image.  
+    ///     Shoots several Rays crossing each of the pixel in the Image.
     /// </summary>
     public void fire_all_rays(Renderer renderer)
     {
@@ -52,14 +52,12 @@ public class ImageTracer
                 {
                     // Run stratified sampling for anti-aliasing
                     for (var interPixelRow = 0; interPixelRow < SamplesPerSide; interPixelRow++)
+                    for (var interPixelCol = 0; interPixelCol < SamplesPerSide; interPixelCol++)
                     {
-                        for (var interPixelCol = 0; interPixelCol < SamplesPerSide; interPixelCol++)
-                        {
-                            var uPixel = (interPixelCol + Pcg.random_float()) / SamplesPerSide;
-                            var vPixel = (interPixelRow + Pcg.random_float()) / SamplesPerSide;
-                            var ray = fire_ray(col, row, uPixel, vPixel);
-                            cumColor += renderer.Render(ray);
-                        }
+                        var uPixel = (interPixelCol + Pcg.random_float()) / SamplesPerSide;
+                        var vPixel = (interPixelRow + Pcg.random_float()) / SamplesPerSide;
+                        var ray = fire_ray(col, row, uPixel, vPixel);
+                        cumColor += renderer.Render(ray);
                     }
 
                     Image.set_pixel(col, row, cumColor * (1.0f / (SamplesPerSide * SamplesPerSide)));

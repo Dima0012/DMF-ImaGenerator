@@ -6,8 +6,8 @@ namespace Trace.Tests;
 
 public class RendererTests
 {
-    private Color Black = new(0, 0, 0);
-    private Color White = new(1, 1, 1);
+    private readonly Color Black = new(0, 0, 0);
+    private readonly Color White = new(1, 1, 1);
 
     [Fact]
     public void TestOnOff()
@@ -73,7 +73,7 @@ public class RendererTests
         var pcg = new Pcg();
 
         //Run the furnace test several times using random values for the emitted radiance and reflectance
-        for (int i = 1; i<=5; i++)
+        for (var i = 1; i <= 5; i++)
         {
             var world = new World();
 
@@ -83,7 +83,7 @@ public class RendererTests
                 new DiffuseBrdf(new UniformPigment(new Color(1.0f, 1.0f, 1.0f) * reflectance)),
                 new UniformPigment(new Color(1.0f, 1.0f, 1.0f) * emittedRadiance));
 
-            world.add(new Sphere(new Transformation(),enclosureMaterial));
+            world.add(new Sphere(new Transformation(), enclosureMaterial));
 
             var pathTracer = new PathTracer(world, pcg, 1, 100, 101);
 

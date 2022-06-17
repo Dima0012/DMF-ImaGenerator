@@ -1,14 +1,14 @@
-using Xunit;
 using Trace.Cameras;
 using Trace.Geometry;
+using Xunit;
 
 namespace Trace.Tests;
 
 public class SphereTests
 {
-    private Vec VecX = new Vec(1f, 0f, 0f);
-    private Vec VecY = new Vec(0f, 1f, 0f);
-    private Vec VecZ = new Vec(0f, 0f, 1f);
+    private Vec VecX = new(1f, 0f, 0f);
+    private Vec VecY = new(0f, 1f, 0f);
+    private Vec VecZ = new(0f, 0f, 1f);
 
     [Fact]
     public void TestHit()

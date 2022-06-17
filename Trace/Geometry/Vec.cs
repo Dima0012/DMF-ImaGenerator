@@ -1,7 +1,7 @@
 ﻿namespace Trace.Geometry;
 
 /// <summary>
-/// A Vector in 3D space.
+///     A Vector in 3D space.
 /// </summary>
 public struct Vec
 {
@@ -23,7 +23,7 @@ public struct Vec
     }
 
     /// <summary>
-    /// Checks if two Vectors are equal within a epsilon threshold.
+    ///     Checks if two Vectors are equal within a epsilon threshold.
     /// </summary>
     public bool is_close(Vec v, double epsilon = 1e-5)
     {
@@ -41,7 +41,7 @@ public struct Vec
     }
 
     /// <summary>
-    /// Overloading for product of a Vector and a scalar. 
+    ///     Overloading for product of a Vector and a scalar.
     /// </summary>
     public static Vec operator *(Vec v, float alpha)
     {
@@ -49,7 +49,7 @@ public struct Vec
     }
 
     /// <summary>
-    /// Overloading for product of a Vector and a scalar. 
+    ///     Overloading for product of a Vector and a scalar.
     /// </summary>
     public static Vec operator *(float alpha, Vec v)
     {
@@ -57,7 +57,7 @@ public struct Vec
     }
 
     /// <summary>
-    /// Returns the negation of the Vector -v .
+    ///     Returns the negation of the Vector -v .
     /// </summary>
     public Vec neg()
     {
@@ -65,7 +65,7 @@ public struct Vec
     }
 
     /// <summary>
-    /// Overloading for the scalar product of two Vectors.
+    ///     Overloading for the scalar product of two Vectors.
     /// </summary>
     public static float operator *(Vec v, Vec u)
     {
@@ -73,7 +73,7 @@ public struct Vec
     }
 
     /// <summary>
-    /// Returns the vector product of the Vector with the Vector v.
+    ///     Returns the vector product of the Vector with the Vector v.
     /// </summary>
     public Vec vec_prod(Vec v)
     {
@@ -85,7 +85,7 @@ public struct Vec
     }
 
     /// <summary>
-    /// Returns the norm of the Vector.
+    ///     Returns the norm of the Vector.
     /// </summary>
     public float norm()
     {
@@ -93,7 +93,7 @@ public struct Vec
     }
 
     /// <summary>
-    /// Returns the squared norm of the Vector.
+    ///     Returns the squared norm of the Vector.
     /// </summary>
     public float squared_norm()
     {
@@ -101,13 +101,13 @@ public struct Vec
     }
 
     /// <summary>
-    /// Normalize the Vector by invoking norm().
+    ///     Normalize the Vector by invoking norm().
     /// </summary>
     public Vec normalize()
     {
-        X /= (float) norm();
-        Y /= (float) norm();
-        Z /= (float) norm();
+        X /= norm();
+        Y /= norm();
+        Z /= norm();
         return this;
     }
 

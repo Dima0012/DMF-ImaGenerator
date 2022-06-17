@@ -1,14 +1,14 @@
-using Xunit;
 using Trace.Cameras;
 using Trace.Geometry;
+using Xunit;
 
 namespace Trace.Tests;
 
 public class PlaneTests
 {
-    private Vec VecX = new Vec(1f, 0f, 0f);
-    private Vec VecY = new Vec(0f, 1f, 0f);
-    private Vec VecZ = new Vec(0f, 0f, 1f);
+    private Vec VecX = new(1f, 0f, 0f);
+    private readonly Vec VecY = new(0f, 1f, 0f);
+    private Vec VecZ = new(0f, 0f, 1f);
 
     [Fact]
     public void TestHit()
@@ -28,15 +28,14 @@ public class PlaneTests
         var ray2 = new Ray(new Point(0f, 0f, 1f), VecZ);
         var intersection2 = plane.ray_intersection(ray2);
         Assert.True(intersection2 == null);
-        
+
         var ray3 = new Ray(new Point(0f, 0f, 1f), VecX);
         var intersection3 = plane.ray_intersection(ray3);
         Assert.True(intersection3 == null);
-        
+
         var ray4 = new Ray(new Point(0f, 0f, 1f), VecY);
         var intersection4 = plane.ray_intersection(ray4);
         Assert.True(intersection4 == null);
-
     }
 
     [Fact]
@@ -62,12 +61,12 @@ public class PlaneTests
         var ray3 = new Ray(new Point(0f, 0f, 1f), VecX);
         var intersection3 = plane.ray_intersection(ray3);
         Assert.True(intersection3 == null);
-        
+
         var ray4 = new Ray(new Point(0f, 0f, 1f), VecY);
         var intersection4 = plane.ray_intersection(ray4);
         Assert.True(intersection4 == null);
     }
-    
+
     [Fact]
     public void TestUvCoordinates()
     {
@@ -76,14 +75,13 @@ public class PlaneTests
         var ray1 = new Ray(new Point(0.0f, 0.0f, 1.0f), VecZ.neg());
         var intersection1 = plane.ray_intersection(ray1);
         Assert.True(intersection1?.SurfacePoint.is_close(new Vec2d(0.0f, 0.0f)));
-        
+
         var ray2 = new Ray(new Point(0.25f, 0.75f, 1.0f), VecZ.neg());
         var intersection2 = plane.ray_intersection(ray2);
         Assert.True(intersection2?.SurfacePoint.is_close(new Vec2d(0.25f, 0.75f)));
-        
+
         var ray3 = new Ray(new Point(4.25f, 7.75f, 1.0f), VecZ.neg());
         var intersection3 = plane.ray_intersection(ray3);
         Assert.True(intersection3?.SurfacePoint.is_close(new Vec2d(0.25f, 0.75f)));
-
     }
 }

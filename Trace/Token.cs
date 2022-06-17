@@ -1,27 +1,25 @@
 namespace Trace;
 
 /// <summary>
-/// A lexical token, used when parsing a scene file.
+///     A lexical token, used when parsing a scene file.
 /// </summary>
 public abstract class Token
 {
-    public SourceLocation Location { get; set; }
-    public KeywordEnum Keyword { get; set; } 
-    public string Identifier { get; set; }
-    public string String { get; set; }
-    public float Number { get; set; }
-    public char Symbol { get; set; }
-
     protected Token(SourceLocation sourceLocation)
     {
         Location = sourceLocation;
     }
 
-
+    public SourceLocation Location { get; set; }
+    public KeywordEnum Keyword { get; set; }
+    public string Identifier { get; set; } = null!;
+    public string String { get; set; } = null!;
+    public float Number { get; set; }
+    public char Symbol { get; set; }
 }
 
 /// <summary>
-/// Enumeration for all the possible keywords recognized by the lexer.
+///     Enumeration for all the possible keywords recognized by the lexer.
 /// </summary>
 public enum KeywordEnum : ushort
 {
@@ -48,32 +46,26 @@ public enum KeywordEnum : ushort
 }
 
 /// <summary>
-/// A Token containing a keyword.
+///     A Token containing a keyword.
 /// </summary>
 public class KeywordToken : Token
 {
-
     public Dictionary<ushort, string> Keywords = Enum.GetValues(typeof(KeywordEnum))
-    .Cast<KeywordEnum>()
-    .ToDictionary(t => (ushort)t, t => t.ToString() );
+        .Cast<KeywordEnum>()
+        .ToDictionary(t => (ushort) t, t => t.ToString());
 
 
     public KeywordToken(SourceLocation sourceLocation, KeywordEnum keyword) : base(sourceLocation)
     {
         Keyword = keyword;
     }
-
 }
 
-
-
 /// <summary>
-/// A Token containing an identifier, a string s.
+///     A Token containing an identifier, a string s.
 /// </summary>
 public class IdentifierToken : Token
 {
-    
-
     public IdentifierToken(SourceLocation sourceLocation, string s) : base(sourceLocation)
     {
         Identifier = s;
@@ -81,11 +73,10 @@ public class IdentifierToken : Token
 }
 
 /// <summary>
-/// A Token containing a literal string s.
+///     A Token containing a literal string s.
 /// </summary>
 public class StringToken : Token
 {
-
     public StringToken(SourceLocation sourceLocation, string s) : base(sourceLocation)
     {
         String = s;
@@ -93,11 +84,10 @@ public class StringToken : Token
 }
 
 /// <summary>
-/// A Token containing a floating-point number.
+///     A Token containing a floating-point number.
 /// </summary>
 public class NumberToken : Token
 {
-
     public NumberToken(SourceLocation sourceLocation, float f) : base(sourceLocation)
     {
         Number = f;
@@ -105,7 +95,7 @@ public class NumberToken : Token
 }
 
 /// <summary>
-/// A Token containing a Symbol, a char ch.
+///     A Token containing a Symbol, a char ch.
 /// </summary>
 public class SymbolToken : Token
 {
@@ -116,7 +106,7 @@ public class SymbolToken : Token
 }
 
 /// <summary>
-/// A Token signalling the end of a file.
+///     A Token signalling the end of a file.
 /// </summary>
 public class StopToken : Token
 {

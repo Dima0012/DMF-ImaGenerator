@@ -1,14 +1,14 @@
-using Xunit;
 using Trace.Cameras;
 using Trace.Geometry;
+using Xunit;
 
 namespace Trace.Tests;
 
 public class WorldTests
 {
-    private Vec VecX = new Vec(1f, 0f, 0f);
-    private Vec VecY = new Vec(0f, 1f, 0f);
-    private Vec VecZ = new Vec(0f, 0f, 1f);
+    private Vec VecX = new(1f, 0f, 0f);
+    private Vec VecY = new(0f, 1f, 0f);
+    private Vec VecZ = new(0f, 0f, 1f);
 
     [Fact]
     public void TestRayIntersections()
@@ -44,7 +44,7 @@ public class WorldTests
         Assert.False(world.is_point_visible(new Point(5.0f, 0.0f, 0.0f),
             new Point(0.0f, 0.0f, 0.0f)));
         Assert.True(world.is_point_visible(new Point(5.0f, 0.0f, 0.0f),
-            new  Point(4.0f, 0.0f, 0.0f)));
+            new Point(4.0f, 0.0f, 0.0f)));
         Assert.True(world.is_point_visible(new Point(0.5f, 0.0f, 0.0f),
             new Point(0.0f, 0.0f, 0.0f)));
         Assert.True(world.is_point_visible(new Point(0.0f, 10.0f, 0.0f),

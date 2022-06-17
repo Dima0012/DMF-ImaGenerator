@@ -9,7 +9,7 @@ public class HdrImageTests
     [Fact]
     public void TestImageCreation()
     {
-        HdrImage img = new HdrImage(7, 4);
+        var img = new HdrImage(7, 4);
         Assert.True(7 == img.Width);
         Assert.True(4 == img.Height);
     }
@@ -17,7 +17,7 @@ public class HdrImageTests
     [Fact]
     public void TestCoordinates()
     {
-        HdrImage img = new HdrImage(7, 4);
+        var img = new HdrImage(7, 4);
 
         Assert.True(img.valid_coordinates(0, 0));
         Assert.True(img.valid_coordinates(6, 3));
@@ -30,7 +30,7 @@ public class HdrImageTests
     [Fact]
     public void TestPixelOffset()
     {
-        HdrImage img = new HdrImage(7, 4);
+        var img = new HdrImage(7, 4);
 
         Assert.True(0 == img.pixel_offset(0, 0));
         Assert.True(17 == img.pixel_offset(3, 2));
@@ -40,9 +40,9 @@ public class HdrImageTests
     [Fact]
     public void TestPixelAccess()
     {
-        HdrImage img = new HdrImage(7, 4);
+        var img = new HdrImage(7, 4);
 
-        Color referenceColor = new Color(1.0f, 2.0f, 3.0f);
+        var referenceColor = new Color(1.0f, 2.0f, 3.0f);
         img.set_pixel(3, 2, referenceColor);
         Assert.True(referenceColor.is_close(img.get_pixel(3, 2)));
     }
@@ -50,7 +50,7 @@ public class HdrImageTests
     [Fact]
     public void TestWritePfm()
     {
-        HdrImage img = new HdrImage(3, 2);
+        var img = new HdrImage(3, 2);
 
         img.set_pixel(0, 0, new Color(1.0e1f, 2.0e1f, 3.0e1f));
         img.set_pixel(1, 0, new Color(4.0e1f, 5.0e1f, 6.0e1f));
@@ -76,10 +76,7 @@ public class HdrImageTests
         img.write_pfm(memStream, -1.0);
         var buf = memStream.GetBuffer();
 
-        for (var i = 0; i < referenceBytesLe.Length; i++)
-        {
-            Assert.True(referenceBytesLe[i] == buf[i]);
-        }
+        for (var i = 0; i < referenceBytesLe.Length; i++) Assert.True(referenceBytesLe[i] == buf[i]);
 
         //Big-endian format 
         byte[] referenceBytesBe =
@@ -98,18 +95,15 @@ public class HdrImageTests
         img.write_pfm(memStream_B, 1.0);
         var buf_B = memStream_B.GetBuffer();
 
-        for (var i = 0; i < referenceBytesBe.Length; i++)
-        {
-            Assert.True(referenceBytesBe[i] == buf_B[i]);
-        }
+        for (var i = 0; i < referenceBytesBe.Length; i++) Assert.True(referenceBytesBe[i] == buf_B[i]);
     }
 
     [Fact]
     public void TestReadLine()
     {
-        HdrImage img = new HdrImage(0, 0);
+        var img = new HdrImage(0, 0);
 
-        byte[] buf = Encoding.ASCII.GetBytes("hello\nworld");
+        var buf = Encoding.ASCII.GetBytes("hello\nworld");
         using var memStream = new MemoryStream(buf);
 
         Assert.True(img.read_line(memStream) == "hello");
@@ -123,7 +117,7 @@ public class HdrImageTests
         var img = new HdrImage(0, 0);
 
         Assert.True(false == img.parse_endianness("1.0"));
-        Assert.True(true == img.parse_endianness("-1.0"));
+        Assert.True(img.parse_endianness("-1.0"));
 
         // Throws exception (via lambda expression) and check if are raised correctly
         Assert.Throws<InvalidPfmFileFormat>(() => img.parse_endianness("0.0"));
@@ -163,13 +157,13 @@ public class HdrImageTests
         Assert.True(3 == imgLe.Width);
         Assert.True(2 == imgLe.Height);
 
-        Assert.True(imgLe.get_pixel(0, 0).is_close((new Color(1.0e1f, 2.0e1f, 3.0e1f))));
-        Assert.True(imgLe.get_pixel(1, 0).is_close((new Color(4.0e1f, 5.0e1f, 6.0e1f))));
-        Assert.True(imgLe.get_pixel(2, 0).is_close((new Color(7.0e1f, 8.0e1f, 9.0e1f))));
-        Assert.True(imgLe.get_pixel(0, 1).is_close((new Color(1.0e2f, 2.0e2f, 3.0e2f))));
-        Assert.True(imgLe.get_pixel(0, 0).is_close((new Color(1.0e1f, 2.0e1f, 3.0e1f))));
-        Assert.True(imgLe.get_pixel(1, 1).is_close((new Color(4.0e2f, 5.0e2f, 6.0e2f))));
-        Assert.True(imgLe.get_pixel(2, 1).is_close((new Color(7.0e2f, 8.0e2f, 9.0e2f))));
+        Assert.True(imgLe.get_pixel(0, 0).is_close(new Color(1.0e1f, 2.0e1f, 3.0e1f)));
+        Assert.True(imgLe.get_pixel(1, 0).is_close(new Color(4.0e1f, 5.0e1f, 6.0e1f)));
+        Assert.True(imgLe.get_pixel(2, 0).is_close(new Color(7.0e1f, 8.0e1f, 9.0e1f)));
+        Assert.True(imgLe.get_pixel(0, 1).is_close(new Color(1.0e2f, 2.0e2f, 3.0e2f)));
+        Assert.True(imgLe.get_pixel(0, 0).is_close(new Color(1.0e1f, 2.0e1f, 3.0e1f)));
+        Assert.True(imgLe.get_pixel(1, 1).is_close(new Color(4.0e2f, 5.0e2f, 6.0e2f)));
+        Assert.True(imgLe.get_pixel(2, 1).is_close(new Color(7.0e2f, 8.0e2f, 9.0e2f)));
 
 
         //Big-endian format 
@@ -190,13 +184,13 @@ public class HdrImageTests
         Assert.True(3 == imgBe.Width);
         Assert.True(2 == imgBe.Height);
 
-        Assert.True(imgBe.get_pixel(0, 0).is_close((new Color(1.0e1f, 2.0e1f, 3.0e1f))));
-        Assert.True(imgBe.get_pixel(1, 0).is_close((new Color(4.0e1f, 5.0e1f, 6.0e1f))));
-        Assert.True(imgBe.get_pixel(2, 0).is_close((new Color(7.0e1f, 8.0e1f, 9.0e1f))));
-        Assert.True(imgBe.get_pixel(0, 1).is_close((new Color(1.0e2f, 2.0e2f, 3.0e2f))));
-        Assert.True(imgBe.get_pixel(0, 0).is_close((new Color(1.0e1f, 2.0e1f, 3.0e1f))));
-        Assert.True(imgBe.get_pixel(1, 1).is_close((new Color(4.0e2f, 5.0e2f, 6.0e2f))));
-        Assert.True(imgBe.get_pixel(2, 1).is_close((new Color(7.0e2f, 8.0e2f, 9.0e2f))));
+        Assert.True(imgBe.get_pixel(0, 0).is_close(new Color(1.0e1f, 2.0e1f, 3.0e1f)));
+        Assert.True(imgBe.get_pixel(1, 0).is_close(new Color(4.0e1f, 5.0e1f, 6.0e1f)));
+        Assert.True(imgBe.get_pixel(2, 0).is_close(new Color(7.0e1f, 8.0e1f, 9.0e1f)));
+        Assert.True(imgBe.get_pixel(0, 1).is_close(new Color(1.0e2f, 2.0e2f, 3.0e2f)));
+        Assert.True(imgBe.get_pixel(0, 0).is_close(new Color(1.0e1f, 2.0e1f, 3.0e1f)));
+        Assert.True(imgBe.get_pixel(1, 1).is_close(new Color(4.0e2f, 5.0e2f, 6.0e2f)));
+        Assert.True(imgBe.get_pixel(2, 1).is_close(new Color(7.0e2f, 8.0e2f, 9.0e2f)));
     }
 
     [Fact]
@@ -222,8 +216,8 @@ public class HdrImageTests
     [Fact]
     public void TestDoubleClose()
     {
-        HdrImage img = new HdrImage(2, 1);
-        double a = 2.0;
+        var img = new HdrImage(2, 1);
+        var a = 2.0;
         Assert.True(img.double_is_close(a, 2.0));
         Assert.False(img.double_is_close(a, 4.0));
     }

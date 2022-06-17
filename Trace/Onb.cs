@@ -3,7 +3,7 @@ using Trace.Geometry;
 namespace Trace;
 
 /// <summary>
-/// An orthonormal base in 3D space.
+///     An orthonormal base in 3D space.
 /// </summary>
 public struct Onb
 {
@@ -12,7 +12,7 @@ public struct Onb
     public Vec E3 { get; set; } = new();
 
     /// <summary>
-    /// Create a new ONB from Vec v.
+    ///     Create a new ONB from Vec v.
     /// </summary>
     public Onb(Vec v)
     {
@@ -20,7 +20,7 @@ public struct Onb
     }
 
     /// <summary>
-    /// Create a ONB from Z component of a Vec v using Duff et al. algorithm. The Vec v must be normalized.
+    ///     Create a ONB from Z component of a Vec v using Duff et al. algorithm. The Vec v must be normalized.
     /// </summary>
     public void CreateOnbFromZ(Vec v)
     {

@@ -1,37 +1,29 @@
 ﻿using Trace.Geometry;
 
-
 namespace Trace.Cameras;
 
 /// <summary>
-/// Interface representing an observer.
+///     Interface representing an observer.
 /// </summary>
 public interface ICamera
 {
     public Transformation Transformation { get; set; }
     public float AspectRatio { get; set; }
     public float Distance { get; set; }
+
     /// <summary>
-    /// Fires a Ray through the camera, at screen coordinates (u,v).
+    ///     Fires a Ray through the camera, at screen coordinates (u,v).
     /// </summary>
     public Ray fire_ray(float u, float v);
 }
 
 /// <summary>
-/// A class representing an observer seeing the world
-///  through an Orthogonal projection 3D -> 2D.
+///     A class representing an observer seeing the world
+///     through an Orthogonal projection 3D -> 2D.
 /// </summary>
 public class OrthogonalCamera : ICamera
 {
-    /// <summary>
-    /// The Aspect Ration of the screen. Most common value is 16:9.
-    /// </summary>
-    public float AspectRatio { get; set; } = 1.0f;
-
-    public Transformation Transformation { get; set; }
-    
-    public float Distance { get; set; } //useless, we need it because in this way it can me a member of
-                                //ICamera and we can access it when we have ICamera object
+    //ICamera and we can access it when we have ICamera object
 
     public OrthogonalCamera(float aspectRatio, Transformation transformation)
     {
@@ -44,9 +36,18 @@ public class OrthogonalCamera : ICamera
         Transformation = transformation;
     }
 
+    /// <summary>
+    ///     The Aspect Ration of the screen. Most common value is 16:9.
+    /// </summary>
+    public float AspectRatio { get; set; } = 1.0f;
+
+    public Transformation Transformation { get; set; }
+
+    public float Distance { get; set; } //useless, we need it because in this way it can me a member of
+
 
     /// <summary>
-    /// Implementation of fire_ray for a Orthogonal Camera.
+    ///     Implementation of fire_ray for a Orthogonal Camera.
     /// </summary>
     public Ray fire_ray(float u, float v)
     {
@@ -57,23 +58,11 @@ public class OrthogonalCamera : ICamera
 }
 
 /// <summary>
-/// A class representing an observer seeing the world
-///  through an Perspective projection 3D -> 2D.
+///     A class representing an observer seeing the world
+///     through an Perspective projection 3D -> 2D.
 /// </summary>
 public class PerspectiveCamera : ICamera
 {
-    /// <summary>
-    /// The distance of the observer from the screen.
-    /// </summary>
-    public float Distance { get; set; } = 1.0f;
-
-    /// <summary>
-    /// The Aspect Ration of the screen. Most common value is 16:9.
-    /// </summary>
-    public float AspectRatio { get; set; } = 1.0f;
-
-    public Transformation Transformation { get; set; }
-
     public PerspectiveCamera(float distance, float aspectRatio, Transformation transformation)
     {
         Distance = distance;
@@ -92,9 +81,21 @@ public class PerspectiveCamera : ICamera
         Transformation = transformation;
     }
 
+    /// <summary>
+    ///     The distance of the observer from the screen.
+    /// </summary>
+    public float Distance { get; set; } = 1.0f;
 
     /// <summary>
-    /// Implementation of fire_ray for a Perspective Camera.
+    ///     The Aspect Ration of the screen. Most common value is 16:9.
+    /// </summary>
+    public float AspectRatio { get; set; } = 1.0f;
+
+    public Transformation Transformation { get; set; }
+
+
+    /// <summary>
+    ///     Implementation of fire_ray for a Perspective Camera.
     /// </summary>
     public Ray fire_ray(float u, float v)
     {

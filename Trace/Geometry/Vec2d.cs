@@ -1,9 +1,9 @@
 ﻿namespace Trace.Geometry;
 
 /// <summary>
-/// A 2D vector used to represent a point on a surface
-/// The fields are named u and v to distinguish them
-/// from the usual 3D coordinates x, y, z.
+///     A 2D vector used to represent a point on a surface
+///     The fields are named u and v to distinguish them
+///     from the usual 3D coordinates x, y, z.
 /// </summary>
 public struct Vec2d
 {
@@ -22,7 +22,7 @@ public struct Vec2d
     }
 
     /// <summary>
-    /// Checks if two Vectors2d are equal within a epsilon threshold.
+    ///     Checks if two Vectors2d are equal within a epsilon threshold.
     /// </summary>
     public bool is_close(Vec2d vec, double epsilon = 1e-5)
     {

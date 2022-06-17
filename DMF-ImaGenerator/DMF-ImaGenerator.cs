@@ -1,9 +1,5 @@
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
 using CommandLine;
-using CommandLine.Text;
 using Trace;
 using Trace.Cameras;
 using Trace.Geometry;
@@ -16,7 +12,6 @@ internal static class DfmImaGenerator
     {
         Console.WriteLine();
 
-        var parserSettings = new ParserSettings();
         var parser = new Parser(with => with.HelpWriter = null);
         var result =
             parser
@@ -173,19 +168,15 @@ internal static class DfmImaGenerator
 
             // Add sphere to cube vertexes
             for (var x = 0.5f; x >= -0.5f; x -= 1.0f)
+            for (var y = 0.5f; y >= -0.5f; y -= 1.0f)
+            for (var z = 0.5f; z >= -0.5f; z -= 1.0f)
             {
-                for (var y = 0.5f; y >= -0.5f; y -= 1.0f)
-                {
-                    for (var z = 0.5f; z >= -0.5f; z -= 1.0f)
-                    {
-                        var translation = Transformation.translation(new Vec(x, y, z));
-                        var transformation = translation * scaling;
+                var translation = Transformation.translation(new Vec(x, y, z));
+                var transformation = translation * scaling;
 
-                        var sphere = new Sphere(transformation, material);
+                var sphere = new Sphere(transformation, material);
 
-                        world.add(sphere);
-                    }
-                }
+                world.add(sphere);
             }
 
             // Add sphere to cube faces
@@ -270,10 +261,7 @@ internal static class DfmImaGenerator
         var pfm = outputName;
         var png = outputName;
 
-        if (outputName == "default")
-        {
-            pfm = s + "_demo.pfm";
-        }
+        if (outputName == "default") pfm = s + "_demo.pfm";
 
         Console.WriteLine($"Rendering of {pfm} complete.");
         Console.WriteLine("Time elapsed: " + elapsedTime);
@@ -288,10 +276,7 @@ internal static class DfmImaGenerator
         imageTracer.Image.normalize_image(factor, luminosity);
         imageTracer.Image.clamp_image();
 
-        if (png == "default")
-        {
-            png = s + "_demo.png";
-        }
+        if (png == "default") png = s + "_demo.png";
 
         imageTracer.Image.write_ldr_image(png, gamma);
         Console.WriteLine("File " + png + " has been written to disk.");
@@ -378,7 +363,8 @@ internal static class DfmImaGenerator
         }
 
         // Check che declared variables; error if does not match rule, or is just numbers or strings 
-        if (!(floatVariable.Contains('=') || floatVariable.Contains(' ')) && floatVariable != "") // If string is not empty
+        if (!(floatVariable.Contains('=') || floatVariable.Contains(' ')) &&
+            floatVariable != "") // If string is not empty
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(
@@ -413,13 +399,11 @@ internal static class DfmImaGenerator
         var varName = "";
 
         if (floatVariable == "")
-        {
             dict = null;
-        }
         else
-        {
             try
-            {   //Separate the string in =, and create name and value, in pairs separated by a space
+            {
+                //Separate the string in =, and create name and value, in pairs separated by a space
                 var stringSequence = floatVariable.Split('=', ' ');
                 for (var i = 1; i < stringSequence.Length; i += 2)
                 {
@@ -430,12 +414,12 @@ internal static class DfmImaGenerator
             }
             catch (FormatException)
             {
-                Console.WriteLine($"\nError: value of {varName} is not a floating-point number.", Console.ForegroundColor = ConsoleColor.Red);
+                Console.WriteLine($"\nError: value of {varName} is not a floating-point number.",
+                    Console.ForegroundColor = ConsoleColor.Red);
                 Console.ResetColor();
                 Console.WriteLine("\nExiting application.");
                 return;
             }
-        }
 
         try
         {
@@ -444,7 +428,8 @@ internal static class DfmImaGenerator
         catch (GrammarError e)
         {
             var loc = e.Location;
-            Console.WriteLine($"\nError in file: {loc.FileName} at line {loc.LineNum}:{loc.ColNum}:\n{e.Message}",Console.ForegroundColor = ConsoleColor.Red );
+            Console.WriteLine($"\nError in file: {loc.FileName} at line {loc.LineNum}:{loc.ColNum}:\n{e.Message}",
+                Console.ForegroundColor = ConsoleColor.Red);
             Console.ResetColor();
             Console.WriteLine("\nExiting application.");
             return;
@@ -500,9 +485,9 @@ internal static class DfmImaGenerator
                     Console.WriteLine(
                         "Warning: the scene does not contain any point light sources. Using a default point light in (0, 0, 0) of color <0.5, 0.5, 0.5>.\n");
                     Console.ResetColor();
-                    world.add_light(new PointLight(new Point(0,0,0), new Color(0.5f,0.5f,0.5f)));
+                    world.add_light(new PointLight(new Point(0, 0, 0), new Color(0.5f, 0.5f, 0.5f)));
                 }
-                
+
                 var renderer = new PointLightRenderer(world);
                 // Trace image with point-light method
                 stopWatch.Start();
@@ -520,13 +505,9 @@ internal static class DfmImaGenerator
         var png = outputName;
 
         if (outputName == "")
-        {
             pfm = camName + "_image.pfm";
-        }
         else
-        {
             pfm += ".pfm";
-        }
 
         Console.WriteLine($"Rendering of '{pfm}' completed.");
         Console.WriteLine($"Time elapsed: {elapsedTime}");
@@ -542,13 +523,9 @@ internal static class DfmImaGenerator
         imageTracer.Image.clamp_image();
 
         if (png == "")
-        {
             png = camName + "_image.png";
-        }
         else
-        {
             png += ".png";
-        }
 
         imageTracer.Image.write_ldr_image(png, gamma);
         Console.WriteLine($"File '{png}' has been written to disk.");

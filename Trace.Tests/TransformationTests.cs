@@ -28,12 +28,12 @@ public class TransformationTests
         var t2 = new Transformation(t1.M, t1.InvM);
         Assert.True(t1.is_close(t2));
 
-        Matrix4x4 m3 = t1.M;
+        var m3 = t1.M;
         m3.M33 += 1.0f;
         var t3 = new Transformation(m3, t1.InvM);
         Assert.False(t1.is_close(t3));
 
-        Matrix4x4 invm4 = t1.InvM;
+        var invm4 = t1.InvM;
         invm4.M33 += 1.0f;
         var t4 = new Transformation(t1.M, invm4);
         Assert.False(t1.is_close(t4));

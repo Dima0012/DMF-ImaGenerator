@@ -1,25 +1,23 @@
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Trace.Cameras;
 using Trace.Geometry;
 
-
 namespace Trace;
 
 /// <summary>
-/// A high-level wrapper around a stream, used to parse scene files
-/// This class implements a wrapper around a stream, with the following additional capabilities:
-/// - It tracks the line number and column number;
-/// - It permits to "un-read" characters and tokens.
+///     A high-level wrapper around a stream, used to parse scene files
+///     This class implements a wrapper around a stream, with the following additional capabilities:
+///     - It tracks the line number and column number;
+///     - It permits to "un-read" characters and tokens.
 /// </summary>
 public class InputStream
 {
-    public Stream Stream;
     public SourceLocation Location;
     public char? SavedChar;
     public SourceLocation SavedLocation;
-    public int Tabulations;
     public Token? SavedToken;
+    public Stream Stream;
+    public int Tabulations;
 
     public InputStream(Stream stream, SourceLocation sourceLocation, char? savedChar, SourceLocation savedLocation,
         int tabulations, Token? savedToken)
@@ -44,7 +42,7 @@ public class InputStream
     }
 
     /// <summary>
-    /// Update `location` after having read `ch` from the stream
+    ///     Update `location` after having read `ch` from the stream
     /// </summary>
     public void update_pos(char? ch)
 
@@ -68,7 +66,7 @@ public class InputStream
     }
 
     /// <summary>
-    /// Read a new character from the stream.
+    ///     Read a new character from the stream.
     /// </summary>
     public char? read_char()
     {
@@ -80,10 +78,7 @@ public class InputStream
         else
         {
             var buffer = new byte[1];
-            if (Stream.Read(buffer, 0, 1) == 0)
-            {
-                return null;
-            }
+            if (Stream.Read(buffer, 0, 1) == 0) return null;
 
             ch = Convert.ToChar(buffer.GetValue(0));
         }
@@ -99,14 +94,11 @@ public class InputStream
     }
 
     /// <summary>
-    /// Push a character back to the stream.
+    ///     Push a character back to the stream.
     /// </summary>
     public void unread_char(char? ch)
     {
-        if (SavedChar != null)
-        {
-            throw new InputStreamError("The saved char is not empty, you should not unread_char");
-        }
+        if (SavedChar != null) throw new InputStreamError("The saved char is not empty, you should not unread_char");
 
         SavedChar = ch;
         Location = SavedLocation;
@@ -114,7 +106,7 @@ public class InputStream
     }
 
     /// <summary>
-    /// Keep reading characters until a non-whitespace/non-comment character is found.
+    ///     Keep reading characters until a non-whitespace/non-comment character is found.
     /// </summary>
     public void skip_whitespaces_and_comments()
     {
@@ -132,10 +124,7 @@ public class InputStream
             }
 
             ch = read_char();
-            if (ch == null)
-            {
-                return;
-            }
+            if (ch == null) return;
         }
 
         //Put the non-whitespace character back
@@ -143,7 +132,7 @@ public class InputStream
     }
 
     /// <summary>
-    /// Parse a string token from file.
+    ///     Parse a string token from file.
     /// </summary>
     public StringToken ParseStringToken(SourceLocation tokenLocation)
     {
@@ -165,7 +154,7 @@ public class InputStream
     }
 
     /// <summary>
-    /// Parse a number token from file .
+    ///     Parse a number token from file .
     /// </summary>
     public NumberToken ParseNumberToken(char? firstCh, SourceLocation tokenLocation)
     {
@@ -198,7 +187,7 @@ public class InputStream
     }
 
     /// <summary>
-    /// Parse a Keyword or Identifier token, whether the keyword is recognized by the lexer.
+    ///     Parse a Keyword or Identifier token, whether the keyword is recognized by the lexer.
     /// </summary>
     public Token ParseKeywordOrIdentifier(string firstCh, SourceLocation tokenLocation)
     {
@@ -218,17 +207,14 @@ public class InputStream
         }
 
         // if token is a keyword recognized by the lexer, return a KeywordToken
-        if (Enum.TryParse<KeywordEnum>(token, true, out var keyword))
-        {
-            return new KeywordToken(tokenLocation, keyword);
-        }
+        if (Enum.TryParse<KeywordEnum>(token, true, out var keyword)) return new KeywordToken(tokenLocation, keyword);
 
         // Else return an IdentifierToken
         return new IdentifierToken(tokenLocation, token);
     }
 
     /// <summary>
-    /// Read a token from the stream.
+    ///     Read a token from the stream.
     /// </summary>
     public Token ReadToken()
     {
@@ -242,57 +228,40 @@ public class InputStream
         skip_whitespaces_and_comments();
         var ch = read_char();
 
-        if (ch is null)
-        {
-            return new StopToken(Location);
-        }
+        if (ch is null) return new StopToken(Location);
 
         var tokeLocation = Location;
         var symbols = new List<char> {'(', ')', '<', '>', '[', ']', ',', '*'};
 
         // A Symbol 
-        if (symbols.Contains((char) ch))
-        {
-            return new SymbolToken(tokeLocation, (char) ch);
-        }
+        if (symbols.Contains((char) ch)) return new SymbolToken(tokeLocation, (char) ch);
 
         // A literal string
-        if (ch == '"')
-        {
-            return ParseStringToken(tokeLocation);
-        }
+        if (ch == '"') return ParseStringToken(tokeLocation);
 
         // A floating-point number 
         if (char.IsDigit((char) ch) || new List<char> {'+', '-', '.'}.Contains((char) ch))
-        {
             return ParseNumberToken(ch, tokeLocation);
-        }
 
         // A keyword or an identifier (first char is alphabetic)
-        if (char.IsLetter((char) ch) || ch == '_')
-        {
-            return ParseKeywordOrIdentifier(ch.ToString()!, tokeLocation);
-        }
+        if (char.IsLetter((char) ch) || ch == '_') return ParseKeywordOrIdentifier(ch.ToString()!, tokeLocation);
 
         // Else ia a weird character, not recognized
         throw new GrammarError(Location, $"Invalid character '{ch}'");
     }
 
     /// <summary>
-    /// Make as if `token` were never read from `input_file`
+    ///     Make as if `token` were never read from `input_file`
     /// </summary>
     public void unread_token(Token token)
     {
-        if (SavedToken != null)
-        {
-            throw new InputStreamError("The saved token is not empty, you should not unread_token");
-        }
+        if (SavedToken != null) throw new InputStreamError("The saved token is not empty, you should not unread_token");
 
         SavedToken = token;
     }
 
     /// <summary>
-    /// Returns the expected floating point number from the stream.
+    ///     Returns the expected floating point number from the stream.
     /// </summary>
     public float expect_number(Scene scene)
     {
@@ -303,13 +272,11 @@ public class InputStream
             return token.Number;
         }
 
-        else if (token.GetType() == typeof(IdentifierToken))
+        if (token.GetType() == typeof(IdentifierToken))
         {
             var varName = token.Identifier;
             if (!scene.FloatVariables.ContainsKey(varName))
-            {
                 throw new GrammarError(token.Location, $"unknown variable '{varName}'");
-            }
 
             return scene.FloatVariables[varName];
         }
@@ -318,71 +285,61 @@ public class InputStream
     }
 
     /// <summary>
-    /// Read a token from the stream and check if it is a string, then return its value as a string object.
+    ///     Read a token from the stream and check if it is a string, then return its value as a string object.
     /// </summary>
     public string expect_string()
     {
         var token = ReadToken();
 
         if (token.GetType() != typeof(StringToken))
-        {
             throw new GrammarError(token.Location, $"got '{token.String}' instead of a string");
-        }
 
         return token.String;
     }
 
     /// <summary>
-    /// Read a token from `input_file` and check that it matches `symbol`.
+    ///     Read a token from `input_file` and check that it matches `symbol`.
     /// </summary>
     public void expect_symbol(char symbol)
     {
         var token = ReadToken();
 
         if (token.Symbol != symbol || token.GetType() != typeof(SymbolToken))
-        {
             throw new GrammarError(Location, $"got '{token.Identifier}' instead of '{symbol}'");
-        }
     }
 
     /// <summary>
-    /// Read a token from `input_file` and check that it is one of the keywords in `keywords`.
-    /// Return the keyword as a 'KeywordEnum' object.
+    ///     Read a token from `input_file` and check that it is one of the keywords in `keywords`.
+    ///     Return the keyword as a 'KeywordEnum' object.
     /// </summary>
     public KeywordEnum expect_keywords(List<KeywordEnum> keywords)
     {
         var token = ReadToken();
         if (token.GetType() != typeof(KeywordToken))
-        {
             throw new GrammarError(token.Location, $"expected a keyword instead of '{token.GetType()}'");
-        }
 
         if (!keywords.Contains(token.Keyword))
-        {
             throw new GrammarError(token.Location,
                 $"expected one of the keywords {string.Join(',', keywords)} instead of '{token.Symbol}'");
-        }
 
         return token.Keyword;
     }
 
     /// <summary>
-    /// Read a token from `input_file` and check that it is an identifier.
-    /// Return the name of the identifier.
+    ///     Read a token from `input_file` and check that it is an identifier.
+    ///     Return the name of the identifier.
     /// </summary>
     public string expect_identifier()
     {
         var token = ReadToken();
         if (token.GetType() != typeof(IdentifierToken))
-        {
             throw new GrammarError(token.Location, $"expected an identifier instead of '{token.GetType()}'");
-        }
 
         return token.Identifier;
     }
-    
+
     /// <summary>
-    /// Parse a point form the scene and returns it as a Point.
+    ///     Parse a point form the scene and returns it as a Point.
     /// </summary>
     public Point parse_point(Scene scene)
     {
@@ -405,10 +362,10 @@ public class InputStream
 
         return new Point(x, y, z);
     }
-    
+
 
     /// <summary>
-    /// Parse a vector form the scene and returns it as a Vec.
+    ///     Parse a vector form the scene and returns it as a Vec.
     /// </summary>
     public Vec parse_vector(Scene scene)
     {
@@ -435,7 +392,7 @@ public class InputStream
 
 
     /// <summary>
-    /// Parse a color from the scene and returns it as a Color.
+    ///     Parse a color from the scene and returns it as a Color.
     /// </summary>
     public Color parse_color(Scene scene)
     {
@@ -449,7 +406,6 @@ public class InputStream
             expect_symbol(',');
             blue = expect_number(scene);
             expect_symbol('>');
-
         }
         catch (GrammarError ex)
         {
@@ -460,7 +416,7 @@ public class InputStream
     }
 
     /// <summary>
-    /// Parse a pigment from the scene, and return it as a Pigment
+    ///     Parse a pigment from the scene, and return it as a Pigment
     /// </summary>
     public IPigment parse_pigment(Scene scene)
     {
@@ -468,7 +424,7 @@ public class InputStream
         IPigment result;
         try
         {
-            keyword = expect_keywords(new List<KeywordEnum>()
+            keyword = expect_keywords(new List<KeywordEnum>
                 {KeywordEnum.Uniform, KeywordEnum.Checkered, KeywordEnum.Image});
             expect_symbol('(');
         }
@@ -491,7 +447,7 @@ public class InputStream
                 expect_symbol(',');
                 var color2 = parse_color(scene);
                 expect_symbol(',');
-                var numOfSteps = (int) (expect_number(scene));
+                var numOfSteps = (int) expect_number(scene);
                 result = new CheckeredPigment(color1, color2, numOfSteps);
             }
             catch (GrammarError ex)
@@ -530,7 +486,7 @@ public class InputStream
     }
 
     /// <summary>
-    /// Parse a BRDF from the scene, and return it as a Brdf.
+    ///     Parse a BRDF from the scene, and return it as a Brdf.
     /// </summary>
     public Brdf parse_brdf(Scene scene)
     {
@@ -538,8 +494,7 @@ public class InputStream
         IPigment pigment;
         try
         {
-            brdfKeyword = expect_keywords(new List<KeywordEnum>()
-                {KeywordEnum.Diffuse, KeywordEnum.Specular});
+            brdfKeyword = expect_keywords(new List<KeywordEnum> {KeywordEnum.Diffuse, KeywordEnum.Specular});
             expect_symbol('(');
             pigment = parse_pigment(scene);
             expect_symbol(')');
@@ -559,11 +514,10 @@ public class InputStream
 
 
         throw new InputStreamError("This line should be unreachable");
-
     }
 
     /// <summary>
-    /// Parse a material from the scene, and return it as a Material
+    ///     Parse a material from the scene, and return it as a Material
     /// </summary>
     public Tuple<string, Material> parse_material(Scene scene)
     {
@@ -590,24 +544,24 @@ public class InputStream
     }
 
     /// <summary>
-    /// Parse a transformation from the scene, and return it as a Transformation.
+    ///     Parse a transformation from the scene, and return it as a Transformation.
     /// </summary>
     public Transformation parse_transformation(Scene scene)
     {
-        Transformation result = new Transformation();
+        var result = new Transformation();
         KeywordEnum transformationKw;
         while (true)
         {
             try
             {
-                transformationKw = expect_keywords(new List<KeywordEnum>()
+                transformationKw = expect_keywords(new List<KeywordEnum>
                 {
                     KeywordEnum.Identity,
                     KeywordEnum.Translation,
                     KeywordEnum.Rotation_X,
                     KeywordEnum.Rotation_Y,
                     KeywordEnum.Rotation_Z,
-                    KeywordEnum.Scaling,
+                    KeywordEnum.Scaling
                 });
 
                 if (transformationKw == KeywordEnum.Identity)
@@ -644,8 +598,6 @@ public class InputStream
                     result *= Transformation.scaling(parse_vector(scene));
                     expect_symbol(')');
                 }
-
-
             }
             catch (GrammarError ex)
             {
@@ -661,15 +613,13 @@ public class InputStream
                 unread_token(nextKw);
                 break;
             }
-
         }
 
         return result;
-
     }
 
     /// <summary>
-    /// Parse a sphere from the scene, and return it as a Sphere.
+    ///     Parse a sphere from the scene, and return it as a Sphere.
     /// </summary>
     public Sphere parse_sphere(Scene scene)
     {
@@ -681,10 +631,8 @@ public class InputStream
 
             materialName = expect_identifier();
             if (!scene.Materials.ContainsKey(materialName))
-            {
                 // We raise the exception here because input_file is pointing to the end of the wrong identifier
                 throw new GrammarError(Location, $"unknown material {materialName}");
-            }
 
             expect_symbol(',');
             transformation = parse_transformation(scene);
@@ -699,7 +647,7 @@ public class InputStream
     }
 
     /// <summary>
-    /// Parse a plane from the scene, and return it as a Plane.
+    ///     Parse a plane from the scene, and return it as a Plane.
     /// </summary>
     public Plane parse_plane(Scene scene)
     {
@@ -711,10 +659,8 @@ public class InputStream
 
             materialName = expect_identifier();
             if (!scene.Materials.ContainsKey(materialName))
-            {
                 // We raise the exception here because input_file is pointing to the end of the wrong identifier
                 throw new GrammarError(Location, $"unknown material {materialName}");
-            }
 
             expect_symbol(',');
             transformation = parse_transformation(scene);
@@ -729,7 +675,7 @@ public class InputStream
     }
 
     /// <summary>
-    /// Parse a camera from the scene, and return it as a ICamera.
+    ///     Parse a camera from the scene, and return it as a ICamera.
     /// </summary>
     public ICamera parse_camera(Scene scene)
     {
@@ -741,7 +687,7 @@ public class InputStream
         try
         {
             expect_symbol('(');
-            typeKw = expect_keywords(new List<KeywordEnum>()
+            typeKw = expect_keywords(new List<KeywordEnum>
             {
                 KeywordEnum.Perspective,
                 KeywordEnum.Orthogonal
@@ -774,7 +720,7 @@ public class InputStream
     }
 
     /// <summary>
-    /// Parse a light source in the scene for point light algorithm, and return it as a PointLight.
+    ///     Parse a light source in the scene for point light algorithm, and return it as a PointLight.
     /// </summary>
     public PointLight parse_pointlight(Scene scene)
     {
@@ -800,19 +746,16 @@ public class InputStream
         return new PointLight(point, color, linearRadius);
     }
 
-    
+
     /// <summary>
-    /// Parse the scene from the input file (read a scene description from a stream).
+    ///     Parse the scene from the input file (read a scene description from a stream).
     /// </summary>
-    public Scene parse_scene(Dictionary<string, float>? variables =  null)
+    public Scene parse_scene(Dictionary<string, float>? variables = null)
     {
-        if(variables == null) variables = new Dictionary<string,float>();
+        if (variables == null) variables = new Dictionary<string, float>();
         var scene = new Scene();
         scene.FloatVariables = variables;
-        foreach (var s in variables.Keys)
-        {
-            scene.OverriddenVariables.Add(s);
-        }
+        foreach (var s in variables.Keys) scene.OverriddenVariables.Add(s);
 
         string variableName;
         SourceLocation variableLoc;
@@ -822,15 +765,10 @@ public class InputStream
         while (true)
         {
             var what = ReadToken();
-            if (what.GetType() == typeof(StopToken))
-            {
-                break;
-            }
+            if (what.GetType() == typeof(StopToken)) break;
 
             if (what.GetType() != typeof(KeywordToken))
-            {
                 throw new GrammarError(what.Location, $"expected a keyword instead of '{what}'");
-            }
 
             switch (what.Keyword)
             {
@@ -850,17 +788,14 @@ public class InputStream
                         throw new GrammarError(ex.Location, ex.Message);
                     }
 
-                    if (scene.FloatVariables.ContainsKey(variableName) && !scene.OverriddenVariables.Contains(variableName))
-                    {
+                    if (scene.FloatVariables.ContainsKey(variableName) &&
+                        !scene.OverriddenVariables.Contains(variableName))
                         throw new GrammarError(variableLoc, $"variable «{variableName}» cannot be redefined");
-                    }
 
                     if (!scene.OverriddenVariables.Contains(variableName))
-                    {
                         // Only define the variable if it was not defined by the user *outside* the scene file
                         // (e.g., from the command line)
                         scene.FloatVariables[variableName] = variableValue;
-                    }
 
                     break;
                 }
@@ -920,6 +855,7 @@ public class InputStream
                     {
                         throw new GrammarError(ex.Location, ex.Message);
                     }
+
                     break;
             }
         }

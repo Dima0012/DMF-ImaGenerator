@@ -11,13 +11,10 @@ public struct Parameters
 
     public Parameters(string[] args)
     {
-        if (args.Length != 4)
-        {
-            throw new InputError("Usage: dotnet run INPUT_PFM_FILE FACTOR GAMMA OUTPUT_PNG_FILE");
-        }
+        if (args.Length != 4) throw new InputError("Usage: dotnet run INPUT_PFM_FILE FACTOR GAMMA OUTPUT_PNG_FILE");
 
         InputPfmFilename = args[0];
-       
+
         try
         {
             Factor = float.Parse(args[1]);
@@ -26,7 +23,7 @@ public struct Parameters
         {
             throw new InputError($"Invalid factor ('{args[1]}'), it must be a floating-point number.", err);
         }
-        
+
         try
         {
             Gamma = float.Parse(args[2]);
@@ -35,8 +32,7 @@ public struct Parameters
         {
             throw new InputError($"Invalid gamma ('{args[2]}'), it must be a floating-point number.", err);
         }
-        
+
         OutputPngFilename = args[3];
     }
-
 }

@@ -1,8 +1,6 @@
-using System;
-using Xunit;
-using Trace;
 using Trace.Cameras;
 using Trace.Geometry;
+using Xunit;
 
 namespace Trace.Tests;
 
@@ -14,7 +12,7 @@ public class RayTests
         var ray1 = new Ray(new Point(1.0f, 2.0f, 3.0f), new Vec(5.0f, 4.0f, -1.0f));
         var ray2 = new Ray(new Point(1.0f, 2.0f, 3.0f), new Vec(5.0f, 4.0f, -1.0f));
         var ray3 = new Ray(new Point(5.0f, 1.0f, 4.0f), new Vec(3.0f, 9.0f, 4.0f));
-        
+
         Assert.True(ray1.is_close(ray2));
         Assert.False(ray1.is_close(ray3));
     }
@@ -37,7 +35,6 @@ public class RayTests
         var transformed = ray.transform(rotation).transform(translation);
 
         Assert.True(transformed.Origin.is_close(new Point(11.0f, 8.0f, 14.0f)));
-        Assert.True(transformed.Dir.is_close(new Vec(6.0f,-4.0f,5.0f)));
-
+        Assert.True(transformed.Dir.is_close(new Vec(6.0f, -4.0f, 5.0f)));
     }
 }

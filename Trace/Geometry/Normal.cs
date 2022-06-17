@@ -1,14 +1,14 @@
 ﻿namespace Trace.Geometry;
 
 /// <summary>
-/// A Normal Vector in 3D space.
+///     A Normal Vector in 3D space.
 /// </summary>
 public struct Normal
 {
     public float X { get; set; } = 0.0f;
     public float Y { get; set; } = 0.0f;
     public float Z { get; set; } = 0.0f;
-    
+
     public Normal(float x, float y, float z)
     {
         X = x;
@@ -22,15 +22,15 @@ public struct Normal
     }
 
     /// <summary>
-    /// Checks if two Normals are equal within a epsilon threshold.
+    ///     Checks if two Normals are equal within a epsilon threshold.
     /// </summary>
-    public bool is_close(Normal n, double epsilon=10-5)
+    public bool is_close(Normal n, double epsilon = 10 - 5)
     {
         return Math.Abs(X - n.X) < epsilon && Math.Abs(Y - n.Y) < epsilon && Math.Abs(Z - n.Z) < epsilon;
     }
 
     /// <summary>
-    /// Returns the negation of the Normal -n .
+    ///     Returns the negation of the Normal -n .
     /// </summary>
     public Normal neg()
     {
@@ -38,15 +38,15 @@ public struct Normal
     }
 
     /// <summary>
-    /// Overloading for product of a Normal and a scalar. 
+    ///     Overloading for product of a Normal and a scalar.
     /// </summary>
     public static Normal operator *(float a, Normal n)
     {
         return new Normal(a * n.X, a * n.Y, a * n.Z);
     }
-    
+
     /// <summary>
-    /// Overloading for product of a Normal and a scalar. 
+    ///     Overloading for product of a Normal and a scalar.
     /// </summary>
     public static Normal operator *(Normal n, float a)
     {
@@ -54,26 +54,26 @@ public struct Normal
     }
 
     /// <summary>
-    /// Overloading for the scalar product of two Vectors.
+    ///     Overloading for the scalar product of two Vectors.
     /// </summary>
     public static float operator *(Normal n, Normal m)
     {
         return n.X * m.X + n.Y * m.Y + n.Z * m.Z;
     }
-    
+
     /// <summary>
-    /// Scalar product of a normalized normal and a normalized vector.
+    ///     Scalar product of a normalized normal and a normalized vector.
     /// </summary>
     public float normalized_dot(Vec v)
     {
         normalize();
         v.normalize();
 
-        return X * v.X + Y * v.Y + Z * v.Z; 
+        return X * v.X + Y * v.Y + Z * v.Z;
     }
-    
+
     /// <summary>
-    /// Returns the vector product of the Normal with the Vector v as a Vector.
+    ///     Returns the vector product of the Normal with the Vector v as a Vector.
     /// </summary>
     public Vec vec_prod(Vec v)
     {
@@ -83,9 +83,9 @@ public struct Normal
             X * v.Y - Y * v.X
         );
     }
-    
+
     /// <summary>
-    /// Returns the vector product of the Normal with the Normal n as a Vector.
+    ///     Returns the vector product of the Normal with the Normal n as a Vector.
     /// </summary>
     public Vec vec_prod(Normal n)
     {
@@ -95,9 +95,9 @@ public struct Normal
             X * n.Y - Y * n.X
         );
     }
-    
+
     /// <summary>
-    /// Returns the norm of the Normal.
+    ///     Returns the norm of the Normal.
     /// </summary>
     public float norm()
     {
@@ -105,7 +105,7 @@ public struct Normal
     }
 
     /// <summary>
-    /// Returns the norm of the Normal.
+    ///     Returns the norm of the Normal.
     /// </summary>
     public float squared_norm()
     {
@@ -113,13 +113,13 @@ public struct Normal
     }
 
     /// <summary>
-    /// Normalize the Normal by invoking norm().
+    ///     Normalize the Normal by invoking norm().
     /// </summary>
     public Normal normalize()
     {
-        X /= (float) norm();
-        Y /= (float) norm();
-        Z /= (float) norm();
+        X /= norm();
+        Y /= norm();
+        Z /= norm();
         return this;
     }
 
@@ -127,5 +127,4 @@ public struct Normal
     {
         return new Vec(X, Y, Z);
     }
-
 }

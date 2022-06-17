@@ -1,7 +1,7 @@
-namespace DMF_ImaGenerator;
-
 using CommandLine;
 using CommandLine.Text;
+
+namespace DMF_ImaGenerator;
 
 internal class ParserSettings
 {
@@ -178,7 +178,7 @@ internal class ParserSettings
 
         [Option('d', "declare-float", MetaValue = "FLOAT", Default = "", Separator = ' ',
             HelpText = "Specify a floating point variable. Use the syntax NAME=VALUE." +
-                       "You can specify multiple variables separated by a space. Variables must be already declared in the file scene." )]
+                       "You can specify multiple variables separated by a space. Variables must be already declared in the file scene.")]
         public string FloatVariable { get; set; } = null!;
     }
 }

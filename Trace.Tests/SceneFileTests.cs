@@ -1,11 +1,9 @@
-using System.IO;
-using Xunit;
-using System.Text;
 using System;
-using System.Security.Cryptography;
+using System.IO;
+using System.Text;
 using Trace.Cameras;
 using Trace.Geometry;
-
+using Xunit;
 
 namespace Trace.Tests;
 
@@ -76,7 +74,7 @@ public class SceneFileTests
         using var memStream = new MemoryStream(buf);
         var stream = new InputStream(memStream);
 
-        
+
         Assert.True(stream.ReadToken().Keyword == KeywordEnum.New);
         Assert.True(stream.ReadToken().Keyword == KeywordEnum.Material);
         Assert.True(stream.ReadToken().Identifier == "sky_material");
@@ -93,37 +91,31 @@ public class SceneFileTests
     public void TestParser()
     {
         var buf = Encoding.ASCII.GetBytes(
-            "float clock(150)\n" + 
+            "float clock(150)\n" +
             "material sky_material(diffuse(uniform(<0, 0, 0>)), " +
-                                    "uniform(<0.7, 0.5, 1>))\n" +
-            "# Here is a comment\n" + 
+            "uniform(<0.7, 0.5, 1>))\n" +
+            "# Here is a comment\n" +
             "material ground_material(diffuse(checkered(<0.3, 0.5, 0.1>,<0.1, 0.2, 0.5>, 4)), \n" +
-                                    "uniform(<0, 0, 0>))" +
-            
+            "uniform(<0, 0, 0>))" +
             "material sphere_material(specular(uniform(<0.5, 0.5, 0.5>)), \n" +
-                                    "uniform(<0, 0, 0>))" +
-            
+            "uniform(<0, 0, 0>))" +
             "plane (sky_material, translation([0, 0, 100]) * rotation_y(clock))\n" +
-            
             "plane (ground_material, identity)\n" +
-            
             "sphere(sphere_material, translation([0, 0, 1]))\n" +
-            
             "camera(perspective, rotation_z(30) * translation([-4, 0, 1]), 1.0, 2.0)\n" +
-            
             "pointlight( (-30, 40, 50) , <0.2, 0.5, 1> , 0 )"
         );
         using var memStream = new MemoryStream(buf);
         var stream = new InputStream(memStream);
 
         var scene = stream.parse_scene();
-        
+
         //Check that the float variables are ok
 
         Assert.True(scene.FloatVariables.Count == 1);
         Assert.True(scene.FloatVariables.ContainsKey("clock"));
         Assert.True(Math.Abs(scene.FloatVariables["clock"] - 150.0) < 10E-5);
-        
+
         //Check that the materials are ok
         Assert.True(scene.Materials.Count == 3);
         Assert.True(scene.Materials.ContainsKey("sphere_material"));
@@ -133,28 +125,28 @@ public class SceneFileTests
         var sphereMaterial = scene.Materials["sphere_material"];
         var skyMaterial = scene.Materials["sky_material"];
         var groundMaterial = scene.Materials["ground_material"];
-        
+
         Assert.True(skyMaterial.Brdf.GetType() == typeof(DiffuseBrdf));
         Assert.True(skyMaterial.Brdf.Pigment.GetType() == typeof(UniformPigment));
         Assert.True(skyMaterial.Brdf.Pigment.Color.is_close(new Color(0, 0, 0)));
-        
+
         Assert.True(groundMaterial.Brdf.GetType() == typeof(DiffuseBrdf));
         Assert.True(groundMaterial.Brdf.Pigment.GetType() == typeof(CheckeredPigment));
         Assert.True(groundMaterial.Brdf.Pigment.Color1.is_close(new Color(0.3f, 0.5f, 0.1f)));
         Assert.True(groundMaterial.Brdf.Pigment.Color2.is_close(new Color(0.1f, 0.2f, 0.5f)));
         Assert.True(groundMaterial.Brdf.Pigment.NumOfSteps == 4);
-        
+
         Assert.True(sphereMaterial.Brdf.GetType() == typeof(SpecularBrdf));
         Assert.True(sphereMaterial.Brdf.Pigment.GetType() == typeof(UniformPigment));
         Assert.True(sphereMaterial.Brdf.Pigment.Color.is_close(new Color(0.5f, 0.5f, 0.5f)));
-        
+
         Assert.True(skyMaterial.EmittedRadiance.GetType() == typeof(UniformPigment));
         Assert.True(skyMaterial.EmittedRadiance.Color.is_close(new Color(0.7f, 0.5f, 1.0f)));
         Assert.True(groundMaterial.EmittedRadiance.GetType() == typeof(UniformPigment));
         Assert.True(groundMaterial.EmittedRadiance.Color.is_close(new Color(0, 0, 0)));
         Assert.True(sphereMaterial.EmittedRadiance.GetType() == typeof(UniformPigment));
         Assert.True(sphereMaterial.EmittedRadiance.Color.is_close(new Color(0, 0, 0)));
-        
+
         //Check that the shapes are ok
 
         Assert.True(scene.World.Shapes.Count == 3);
@@ -165,20 +157,20 @@ public class SceneFileTests
         Assert.True(scene.World.Shapes[1].Transformation.is_close(new Transformation()));
         Assert.True(scene.World.Shapes[2].GetType() == typeof(Sphere));
         Assert.True(scene.World.Shapes[2].Transformation.is_close(Transformation.translation(new Vec(0, 0, 1))));
-        
+
         //Check that the camera is ok
 
         Assert.True(scene.Camera!.GetType() == typeof(PerspectiveCamera));
-        Assert.True(scene.Camera.Transformation.is_close(Transformation.rotation_z(30) * Transformation.translation(new Vec(-4, 0, 1))));
-        Assert.True(Math.Abs(1.0 - scene.Camera.AspectRatio) < 1e-5); 
+        Assert.True(scene.Camera.Transformation.is_close(Transformation.rotation_z(30) *
+                                                         Transformation.translation(new Vec(-4, 0, 1))));
+        Assert.True(Math.Abs(1.0 - scene.Camera.AspectRatio) < 1e-5);
         Assert.True(Math.Abs(2.0 - scene.Camera.Distance) < 1e-5);
-        
+
         // Check pointlight is ok
-        
+
         Assert.True(scene.World.PointLights[0].GetType() == typeof(PointLight));
-        Assert.True(scene.World.PointLights[0].Position.is_close(new Point(-30,40,50)));
+        Assert.True(scene.World.PointLights[0].Position.is_close(new Point(-30, 40, 50)));
         Assert.True(scene.World.PointLights[0].Color.is_close(new Color(0.2f, 0.5f, 1)));
-        
     }
 
     [Fact]
@@ -192,12 +184,13 @@ public class SceneFileTests
         try
         {
             var scene = stream.parse_scene();
-            Assert.True(1==0, "the code did not throw an exception");
+            Assert.True(1 == 0, "the code did not throw an exception");
         }
         catch (GrammarError ex)
-        {}
+        {
+        }
     }
-    
+
     [Fact]
     //Check that defining two cameras in the same file raises a GrammarError
     public void TestParserDoubleCamera()
@@ -211,11 +204,10 @@ public class SceneFileTests
         try
         {
             var scene = stream.parse_scene();
-            Assert.True(1==0, "the code did not throw an exception");
+            Assert.True(1 == 0, "the code did not throw an exception");
         }
         catch (GrammarError ex)
-        {}
+        {
+        }
     }
-    
-    
 }
