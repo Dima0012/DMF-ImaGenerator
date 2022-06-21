@@ -29,3 +29,13 @@ You must input a text file were the scene is described, using the syntax describ
 
 
 For every command, there are several options available that allows you to personalize the application and its output. You can view them with a description of what they do with ``./DMF-ImaGenerator help COMMAND``.
+
+# Scene description
+You can render any scene you want using the Shapes and Pigments supported. You need to write the description of the scene in a text file, similar to the ones you will find in the ``Examples`` folder, then launch the ``render``command with the file as the input.
+
+## Syntax
+The word ``float``indicates a floating point number, ``int`` an integer number.
+
+- Color ``<float, float, float>``
+- Vector ``[float, float, float]``
+- Point ``(float, float, float)``
