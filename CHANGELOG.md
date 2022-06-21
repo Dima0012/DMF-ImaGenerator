@@ -1,3 +1,5 @@
+# HEAD
+
 # Version 1.0.0
 - New version released on 06/17/22
 - Implemented a lexer and a parser to read scene files written using a simple textual syntax.
