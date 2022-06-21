@@ -33,9 +33,75 @@ For every command, there are several options available that allows you to person
 # Scene description
 You can render any scene you want using the Shapes and Pigments supported. You need to write the description of the scene in a text file, similar to the ones you will find in the ``Examples`` folder, then launch the ``render``command with the file as the input.
 
-## Syntax
-The word ``float``indicates a floating point number, ``int`` an integer number.
+In the scene, you can specify the Shapes and their position with a Transformation; you need to alspo specify the BRDF of the Shape (the way the obejct reflect the light. The BRDF needs a Pigment with a color in RGB format. You also need to specify where the camera (the observer) is in the scene.
 
+<!---
+## Syntax
+You decleare the elemnts in the scene with the folllowing syntax. The word ``float``indicates a floating point number, ``int`` an integer number.
+
+#### Elementary elements
 - Color ``<float, float, float>``
 - Vector ``[float, float, float]``
 - Point ``(float, float, float)``
+
+#### Transformation
+You can combine transfom
+- Translation ``translation(Vector)``
+- Rotation on X axis of some angle ``rotation_x(float)``
+- Rotation on Y axis of some angle ``rotation_y(float)``
+- Rotation on Z axis of some angle ``rotation_z(float)``
+- Scaling ``scaling(Vector)``
+--->
+
+In the following we present the syntax for the scne description in ENBF format
+
+---
+
+    scene ::= declaration*
+    
+    declaration ::= float_decl | plane_decl | sphere_decl | material_decl | camera_decl | pointlight_decl
+    
+    float_decl ::= "float" IDENTIFIER "(" number ")"
+    
+    plane_decl ::= "plane" "(" IDENTIFIER "," transformation ")"
+    
+    sphere_decl ::= "sphere" "(" IDENTIFIER "," transformation ")"
+    
+    material_decl ::= "material" IDENTIFIER "(" brdf "," pigment ")"
+    
+    camera_decl ::= "camera" "(" camera_type "," transformation "," number "," number ")"
+    
+    camera_type ::= "perspective" | "orthogonal"
+	
+	pointlight_decl ::= "pointlight" "(" point "," color "," number ")"
+    
+    brdf ::= diffuse_brdf | specular_brdf
+    
+    diffuse_brdf ::= "diffuse" "(" pigment ")"
+    
+    specular_brdf ::= "specular" "(" pigment ")"
+    
+    pigment ::= uniform_pigment | checkered_pigment | image_pigment
+    
+    uniform_pigment ::= "uniform" "(" color ")"
+    
+    checkered_pigment ::= "checkered" "(" color "," color "," number ")"
+    
+    image_pigment ::= "image" "(" LITERAL_STRING ")"
+    
+    color ::= "<" number "," number "," number ">"
+    
+    transformation ::= basic_transformation | basic_transformation "*" transformation
+    
+    basic_transformation ::= "identity" 
+        | "translation" "(" vector ")"
+        | "rotation_x" "(" number ")"
+        | "rotation_y" "(" number ")"
+        | "rotation_z" "(" number ")"
+        | "scaling" "(" vector ")"
+         
+    number ::= LITERAL_NUMBER | IDENTIFIER
+    
+    vector ::= "[" number "," number "," number "]"
+
+---
