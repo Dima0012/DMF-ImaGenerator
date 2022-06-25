@@ -105,6 +105,8 @@ In the following we present the syntax for the scne description in ENBF format
     number ::= LITERAL_NUMBER | IDENTIFIER
     
     vector ::= "[" number "," number "," number "]"
+    
+    point ::= "(" number "," number "," number ")"
 
 ---
 
