@@ -36,29 +36,12 @@ For every command, there are several options available that allows you to person
 # Scene description
 You can render any scene you want using the Shapes and Pigments supported. You need to write the description of the scene in a text file, similar to the ones you will find in the ``Examples`` folder, then launch the ``render``command with the file as the input.
 
-In the scene, you can specify the Shapes and their position with a Transformation; you need to also specify the BRDF of the Shape (the way the obejct reflect the light. The BRDF needs a Pigment with a color in RGB format. You also need to specify where the camera (the observer) is in the scene and point light sources if you use the pointlight algorithm.
+In the scene, you can specify the Shapes and their position with a Transformation; you need to also specify the BRDF of the Shape (the way the object reflect the light. The BRDF needs a Pigment with a color in RGB format. You also need to specify where the camera (the observer) is in the scene and point light sources if you use the pointlight algorithm.
 
 The shapes currently available are spheres and planes; we support Uniform and Specular BRFD, and Uniform, Checkered and Image Pigments.
 
-<!---
 ## Syntax
-You decleare the elemnts in the scene with the folllowing syntax. The word ``float``indicates a floating point number, ``int`` an integer number.
-
-#### Elementary elements
-- Color ``<float, float, float>``
-- Vector ``[float, float, float]``
-- Point ``(float, float, float)``
-
-#### Transformation
-You can combine transfom
-- Translation ``translation(Vector)``
-- Rotation on X axis of some angle ``rotation_x(float)``
-- Rotation on Y axis of some angle ``rotation_y(float)``
-- Rotation on Z axis of some angle ``rotation_z(float)``
-- Scaling ``scaling(Vector)``
---->
-
-In the following we present the syntax for the scne description in ENBF format
+In the following we present the syntax for the scne description in ENBF format.
 
 ---
 
