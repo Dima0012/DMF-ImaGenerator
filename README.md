@@ -38,7 +38,7 @@ You can render any scene you want using the Shapes and Pigments supported. You n
 
 In the scene, you can specify the Shapes and their position with a Transformation; you need to also specify the BRDF of the Shape (the way the obejct reflect the light. The BRDF needs a Pigment with a color in RGB format. You also need to specify where the camera (the observer) is in the scene and point light sources if you use the pointlight algorithm.
 
-The shapes curently available are spheres and planes; we support Uniform and Specular BRFD, and Uniform, Checkered and Image Pigments.
+The shapes currently available are spheres and planes; we support Uniform and Specular BRFD, and Uniform, Checkered and Image Pigments.
 
 <!---
 ## Syntax
