@@ -110,7 +110,7 @@ In the following we present the syntax for the scne description in ENBF format
 
 ---
 
-## Histoy
+## History
 See [CHANGELOG.md](https://github.com/Dima0012/DMF-ImaGenerator/blob/master/CHANGELOG.md).
 
 ## License
