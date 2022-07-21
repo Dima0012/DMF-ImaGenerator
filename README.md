@@ -41,7 +41,7 @@ In the scene, you can specify the Shapes and their position with a Transformatio
 The shapes currently available are spheres and planes; we support Uniform and Specular BRFD, and Uniform, Checkered and Image Pigments.
 
 ## Syntax
-In the following we present the syntax for the scne description in ENBF format.
+In the following we present the syntax for the scne description in ENBF format. You need to write a scene using this syntax in a text file to decleare a scene for the ``render``command. An exmaple of written scene is presented in the Examples folder.
 
 ---
 
