@@ -352,7 +352,7 @@ internal static class DfmImaGenerator
         }
 
         var samplesPerSide = MathF.Sqrt(pixelSamples);
-        if (Math.Abs(samplesPerSide * samplesPerSide - pixelSamples) > 10 - 4)
+        if (Math.Abs(samplesPerSide * samplesPerSide - pixelSamples) > 10E-4)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(
