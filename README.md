@@ -12,6 +12,8 @@ After donwloading the execuable, we suggest running the ``demo``command to chek 
 
 We noted that there is an erroneous parsing of numbers if you use a Terminal without different languages setting than English; in fact, it may interpret the wrong numbers and not generate the correct image. Consider switching to English as the Terminal usage language, or similar solutions.
 
+Finally, keep in mind that it may take a long time to generate the image, depending on the scene and the resolution!
+
 
 # Features available
 
