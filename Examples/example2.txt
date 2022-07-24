@@ -1,0 +1,34 @@
+# for this scene, use an high value for antialiasing (es. 16)
+
+float clock(0)
+
+material sky_material(
+    diffuse(uniform(<0, 0, 0>)),
+    uniform(<0.7,0.5,1>)
+)
+
+material ground_material(
+    diffuse(checkered(<0.3, 0.5, 0.1>,
+                      <0.1, 0.2, 0.5>, 4)),
+    uniform(<0, 0, 0>)
+)
+
+material sphere_material(
+    diffuse(uniform(<0.6, 0.3, 0>)),
+    uniform(<0.3, 0.3, 0.3>)
+)
+
+material sun_mat( diffuse(uniform(<0, 0, 0>)), uniform(<40, 40, 40>) )
+
+#plane (sky_material, translation([0, 0, 100]) * rotation_y(clock))
+plane (ground_material, translation([0, 0, 0]))
+
+sphere(sphere_material, translation([0, 0, 5]))
+#sphere(sun_mat, translation([0, 0, 25]) * scaling([6,6,6]))
+#sphere(sun_mat, translation([0, -20, 25]) * scaling([6,6,6]))
+sphere(sun_mat, translation([0, 20, 25]) * scaling([6,6,6]))
+
+sphere(sphere_material, translation([0, 5, -2]) * scaling([4,4,4]))
+sphere(sphere_material, translation([0, -5, -2]) * scaling([4,4,4]))
+
+camera(perspective, rotation_z(0) * translation([-10, 0, 3]), 1.0, 1.0)
