@@ -1,9 +1,12 @@
 # DMF-ImaGenerator
 Project for RayTracing Course @ Physics UniMi AY 21/22
 
-This application renders simple photo-realistic images, by reading a scene from a text file, and it saves them in HDR format (PFM) and LDR format (PNG). It has now reached the (course) final version 1.0.0. It is available for MacOS and Linux.
+This application renders simple photo-realistic images, by reading a scene from a text file, and it saves them in HDR format (PFM) and LDR format (PNG). It has now reached the (course) final version 1.0.0. It is available for MacOS and Linux. Below we present an image generated with our application.  
 
-To install the application, simply download the .zip file ``DMF-ImaGenerator`` from the latest release. You then need to add executable rights with the Unix command: ``chmod +x DMF-ImaGenerator`` via Terminal. Then the application is ready to run via command line as ``./DMF-ImaGenerator COMMAND`` . You can also run the program. via ``dotnet run``if you have [.NET6](https://dotnet.microsoft.com/en-us/) and the required libraries installed.
+![Demo image](Examples/perspective_demo_example.png)
+_Image generated with the ``demo``command and ``path-tracer``algorithm, using 10 secondary rays and 25 rays per pixel for antialiasing. Resolution is Full HD (1920x1080p)._
+
+To install the application, simply download the .zip file ``DMF-ImaGenerator`` from the latest release. You then need to add executable rights with the Unix command: ``chmod +x DMF-ImaGenerator`` via Terminal. Then the application is ready to run via command line as ``./DMF-ImaGenerator COMMAND`` . You can also run the program using the source code via ``dotnet run``if you have [.NET6](https://dotnet.microsoft.com/en-us/) and the required libraries installed.
 
 After donwloading the execuable, we suggest running the ``demo``command to chek if the application runs as intended. For additional help, you can call ``./DMF-ImaGenerator help``.
 
@@ -33,29 +36,14 @@ For every command, there are several options available that allows you to person
 # Scene description
 You can render any scene you want using the Shapes and Pigments supported. You need to write the description of the scene in a text file, similar to the ones you will find in the ``Examples`` folder, then launch the ``render``command with the file as the input.
 
-In the scene, you can specify the Shapes and their position with a Transformation; you need to alspo specify the BRDF of the Shape (the way the obejct reflect the light. The BRDF needs a Pigment with a color in RGB format. You also need to specify where the camera (the observer) is in the scene and point light sources if you use the pointlight algorithm.
+In the scene, you can specify the Shapes and their position with a Transformation; you need to also specify the BRDF of the Shape (the way the object reflect the light). The BRDF needs a Pigment with a color in RGB format. You also need to specify where the camera (the observer) is in the scene and point light sources if you use the pointlight algorithm.
 
-The shapes curently available are spheres and planes; we support Uniform and Specular BRFD, and Uniform, Checkered and Image Pigments.
+The Shapes needs to be decleared with a Material; a Material is decleared with 2 parameters: the first is a BRDF (represents the interaction of the Shape with the light) and the second is a Pigment (represent the emitted radiance of the Shape, i.e. the light emitted). 
 
-<!---
+The shapes currently available are spheres and planes; we support Uniform and Specular BRFD, and Uniform, Checkered and Image Pigments.
+
 ## Syntax
-You decleare the elemnts in the scene with the folllowing syntax. The word ``float``indicates a floating point number, ``int`` an integer number.
-
-#### Elementary elements
-- Color ``<float, float, float>``
-- Vector ``[float, float, float]``
-- Point ``(float, float, float)``
-
-#### Transformation
-You can combine transfom
-- Translation ``translation(Vector)``
-- Rotation on X axis of some angle ``rotation_x(float)``
-- Rotation on Y axis of some angle ``rotation_y(float)``
-- Rotation on Z axis of some angle ``rotation_z(float)``
-- Scaling ``scaling(Vector)``
---->
-
-In the following we present the syntax for the scne description in ENBF format
+In the following we present the syntax for the scne description in ENBF format. You need to write a scene using this syntax in a text file to decleare a scene for the ``render``command. An exmaple of written scene is presented in the Examples folder.
 
 ---
 
