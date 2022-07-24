@@ -36,7 +36,9 @@ For every command, there are several options available that allows you to person
 # Scene description
 You can render any scene you want using the Shapes and Pigments supported. You need to write the description of the scene in a text file, similar to the ones you will find in the ``Examples`` folder, then launch the ``render``command with the file as the input.
 
-In the scene, you can specify the Shapes and their position with a Transformation; you need to also specify the BRDF of the Shape (the way the object reflect the light. The BRDF needs a Pigment with a color in RGB format. You also need to specify where the camera (the observer) is in the scene and point light sources if you use the pointlight algorithm.
+In the scene, you can specify the Shapes and their position with a Transformation; you need to also specify the BRDF of the Shape (the way the object reflect the light). The BRDF needs a Pigment with a color in RGB format. You also need to specify where the camera (the observer) is in the scene and point light sources if you use the pointlight algorithm.
+
+The Shapes needs to be decleared with a Material; a Material is decleared with 2 parameters: the first is a BRDF (represents the interaction of the Shape with the light) and the second is a Pigment (represent the emitted radiance of the Shape, i.e. the light emitted). 
 
 The shapes currently available are spheres and planes; we support Uniform and Specular BRFD, and Uniform, Checkered and Image Pigments.
 
